@@ -1,5 +1,7 @@
 # TBDEngine (name subject to change)
 
+A 3D game engine that aims to be convenient when developing {} genre of games
+
 ## Contributors
 - Ilter Ulutas
 - kickdapie
