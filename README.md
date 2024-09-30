@@ -3,6 +3,7 @@
 A 3D game engine that aims to be convenient when developing {} genre of games
 
 ## Contributors
+
 - Ilter Ulutas
 - kickdapie
 - alejandro-d-garza
@@ -11,7 +12,7 @@ A 3D game engine that aims to be convenient when developing {} genre of games
 - JoshEury
 - abzf227
 - Bobby547
-- FunniNam3
+- Ethan Nguyen
 - SwordMaster3341
 - Owen-House
 - camgraham22
