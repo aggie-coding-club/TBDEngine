@@ -8,7 +8,7 @@ A 3D game engine that aims to be convenient when developing {} genre of games
 - kickdapie
 - alejandro-d-garza
 - Pooji20-dot
-- calvinfunfun
+- Calvin Fun
 - JoshEury
 - abzf227
 - Roei Ben Porat
