@@ -14,7 +14,7 @@ A 3D game engine that aims to be convenient when developing {} genre of games, u
 - Roei Ben Porat
 - Ethan Nguyen
 - SwordMaster3341
-- Owen-House
+- Owen House
 - camgraham22
 - uzairak12
 - aabuyazid
