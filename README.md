@@ -9,7 +9,7 @@ A 3D game engine that aims to be convenient when developing {} genre of games, u
 - alejandro-d-garza
 - Pooji20-dot
 - Calvin Fun
-- JoshEury
+- Josh Eury
 - abzf227
 - Roei Ben Porat
 - Ethan Nguyen
