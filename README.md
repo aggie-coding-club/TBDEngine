@@ -15,6 +15,6 @@ A 3D game engine that aims to be convenient when developing {} genre of games, u
 - Ethan Nguyen
 - SwordMaster3341
 - Owen House
-- camgraham22
+- Camryn Graham
 - uzairak12
 - Arkan A
