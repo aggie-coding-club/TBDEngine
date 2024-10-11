@@ -14,6 +14,7 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
+.cache
 *.dll
 
 # Fortran module files
@@ -50,5 +51,5 @@ CMakeUserPresets.json
 build
 
 # TBDEngine
-*/VulkanSDK
+VulkanSDK
 main.exe
