@@ -50,6 +50,10 @@ _deps
 CMakeUserPresets.json
 build
 
+#CLion
+.idea
+cmake-build-debug
+
 # TBDEngine
 VulkanSDK
 main.exe
