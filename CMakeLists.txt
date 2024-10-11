@@ -41,18 +41,18 @@ message(STATUS "GLFW include directory: ${GLFW_INCLUDE_DIRS}")
 include_directories(${GLFW_INCLUDE_DIRS})
 
 # Set the Vulkan SDK path if not already set by environment variables
-# Replace "/path/to/vulkan-sdk" with the actual path where your SDK is installed
-set(VULKAN_SDK "$ENV{VULKAN_SDK_PATH}")
+# set(VULKAN_SDK "$ENV{VULKAN_SDK_PATH}")
+message(STATUS "VULKAN_SDK_PATH is ${VULKAN_SDK}")
 
 # Specify the path to the Vulkan SDK cmake directory if needed
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${VULKAN_SDK}")
+message(STATUS "CMAKE_PREFIX_PATH is ${CMAKE_PREFIX_PATH}")
 
 # Use the Vulkan package provided by the SDK
 find_package(Vulkan REQUIRED)
 
 # If Vulkan is found, link it to your executable
 if (Vulkan_FOUND)
-    message(STATUS "Found Vulkan")
     target_link_libraries(${CMAKE_PROJECT_NAME} Vulkan::Vulkan)
 endif()
 
@@ -69,8 +69,10 @@ IF(WIN32)
     # -Wall produces way too many warnings.
     # -pedantic is not supported.
     # Disable warning 4996.
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
-    target_link_libraries(${CMAKE_PROJECT_NAME} ${VULKAN_SDK_LIBRARIES}/vulkan-1.lib)
+    # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+    message(STATUS "Vulkan_LIBRARY is ${Vulkan_LIBRARY}")
+    target_link_libraries(${CMAKE_PROJECT_NAME} ${Vulkan_LIBRARY})
     SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
 ELSE()
     # Enable all pedantic warnings.
@@ -90,13 +92,13 @@ ENDIF()
 
 # Additional settings for Vulkan-based projects
 # Specify Vulkan SDK paths for runtime environment (Windows)
-if(WIN32)
-    set(VULKAN_RUNTIME_PATH "${VULKAN_SDK}/bin")
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${VULKAN_RUNTIME_PATH}/vulkan-1.dll
-        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
-endif()
+# if(WIN32)
+#     set(VULKAN_RUNTIME_PATH "${VULKAN_SDK}/Lib")
+#     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+#         COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#         ${VULKAN_RUNTIME_PATH}/vulkan-1.dll
+#         $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+# endif()
 
 # Define a custom command to copy compile_commands.json after building
 add_custom_command(
