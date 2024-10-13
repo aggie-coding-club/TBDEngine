@@ -38,6 +38,13 @@ start.
 
 ### Unix/Linux
 Clone the repository and `cd` into the root directory of the project.
+If you are using WSL, run the following bash commands:
+```bash
+sudo apt install libxrandr-dev
+sudo apt install libxinerama-dev
+sudo apt install libxcursor-dev
+sudo apt install libxi-dev
+```
 Afterwards, run the following bash commands:
 ```bash
 mkdir build
