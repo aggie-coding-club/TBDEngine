@@ -49,9 +49,10 @@ FetchContent_Declare(
     GIT_TAG v0.7.2  # Stable release
 )
 FetchContent_MakeAvailable(fastgltf)
-set(FASTGLTF_INCLUDE_DIRS ${fastgltf_SOURCE_DIR}/include)
-message(STATUS "fastgltf include directory: ${FASTGLTF_INCLUDE_DIRS}")
-include_directories(${FASTGLTF_INCLUDE_DIRS})
+# set(FASTGLTF_INCLUDE_DIRS ${fastgltf_SOURCE_DIR}/include)
+# message(STATUS "fastgltf include directory: ${FASTGLTF_INCLUDE_DIRS}")
+# include_directories(${FASTGLTF_INCLUDE_DIRS})
+target_link_libraries(${CMAKE_PROJECT_NAME} fastgltf::fastgltf)
 
 # Fetch fmt
 FetchContent_Declare(
@@ -60,9 +61,10 @@ FetchContent_Declare(
     GIT_TAG 11.0.2  # Stable release
 )
 FetchContent_MakeAvailable(fmt)
-set(FMT_INCLUDE_DIRS ${fmt_SOURCE_DIR}/include)
-message(STATUS "fmt include directory: ${FMT_INCLUDE_DIRS}")
-include_directories(${FMT_INCLUDE_DIRS})
+# set(FMT_INCLUDE_DIRS ${fmt_SOURCE_DIR}/include)
+# message(STATUS "fmt include directory: ${FMT_INCLUDE_DIRS}")
+# include_directories(${FMT_INCLUDE_DIRS})
+target_link_libraries(${CMAKE_PROJECT_NAME} fmt::fmt)
 
 # Fetch imgui
 FetchContent_Declare(
@@ -82,19 +84,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(stb)
 set(STB_INCLUDE_DIRS ${stb_SOURCE_DIR})
-message(STATUS "imgui include directory: ${STB_INCLUDE_DIRS}")
+message(STATUS "stb include directory: ${STB_INCLUDE_DIRS}")
 include_directories(${STB_INCLUDE_DIRS})
-
-# Fetch imgui
-FetchContent_Declare(
-    imgui 
-    GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG v1.91.3  # Stable release
-)
-FetchContent_MakeAvailable(imgui)
-set(IMGUI_INCLUDE_DIRS ${imgui_SOURCE_DIR}/include)
-message(STATUS "imgui include directory: ${IMGUI_INCLUDE_DIRS}")
-include_directories(${IMGUI_INCLUDE_DIRS})
 
 # Fetch vk_bootstrap
 FetchContent_Declare(
