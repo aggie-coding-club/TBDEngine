@@ -6,6 +6,9 @@
 struct FrameData {
     VkCommandPool _commandPool;
     VkCommandBuffer _mainCommandBuffer;
+
+    VkSemaphore _swapchainSemaphore, _renderSemaphore;
+    VkFence _renderFence;
 };
 
 // Double-Buffering
@@ -15,7 +18,7 @@ class VulkanEngine {
 public:
     // Frame Data variables
     FrameData _frames[FRAME_OVERLAP];
-    FrameData& get_current_Frame() { return _frames[_frameNumber % FRAME_OVERLAP]; }
+    FrameData& get_current_frame() { return _frames[_frameNumber % FRAME_OVERLAP]; }
 
     // Command Queue
     VkQueue _graphicsQueue;
