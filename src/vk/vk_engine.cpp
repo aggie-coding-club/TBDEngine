@@ -73,6 +73,10 @@ void VulkanEngine::init_vulkan() {
     // Get the GkDevice handle used in the rest of the vulkan app
     _device = vkbDevice.device;
     _chosenGPU = physicalDevice.physical_device;
+
+    // Getting Vulkan Device
+    _graphicsQueue = vkbDevice.get_queue(vkb::QueueType::graphics).value();
+    _graphicsQueueFamily = vkbDevice.get_queue_index(vkb::QueueType::graphics).value();
 }
 
 // Vulkan Swapchain
@@ -114,7 +118,24 @@ void VulkanEngine::init_swapchain() {
 }
 
 void VulkanEngine::init_commands() {
+    // Create Command pool for commands submitted to the queue
+    VkCommandPoolCreateInfo commandPoolInfo = {};
+    commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    commandPoolInfo.pNext = nullptr;
+    commandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+    commandPoolInfo.queueFamilyIndex = _graphicsQueueFamily;
 
+    for (int i = 0; i < FRAME_OVERLAP; i++) {
+        VK_CHECK(vkCreateCommandPool(_device, &commandPoolInfo,
+            nullptr, &_frames[i]._commandPool));
+
+        // Allocate the default command buffer
+        VkCommandBufferAllocateInfo cmdAllocInfo =
+            vkinit::command_buffer_allocate_info(_frames[i]._commandPool, 1);
+
+        VK_CHECK(vkAllocateCommandBuffers(_device, &cmdAllocInfo,
+            &_frames[i]._mainCommandBuffer));
+    }
 }
 
 void VulkanEngine::init_sync_structures() {
@@ -154,6 +175,13 @@ void VulkanEngine::init() {
 
 void VulkanEngine::cleanup() {
     if (_isInitialized) {
+        // Make sure the GPU has finished its execution
+        vkDeviceWaitIdle(_device);
+
+        for (int i = 0; i < FRAME_OVERLAP; i++) {
+            vkDestroyCommandPool(_device, _frames[i]._commandPool, nullptr);
+        }
+
         destroy_swapchain();
 
         vkDestroySurfaceKHR(_instance, _surface, nullptr);

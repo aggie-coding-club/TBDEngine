@@ -3,8 +3,24 @@
 #include "vk/vk_types.h"
 #include <vulkan/vulkan_core.h>
 
+struct FrameData {
+    VkCommandPool _commandPool;
+    VkCommandBuffer _mainCommandBuffer;
+};
+
+// Double-Buffering
+constexpr unsigned int FRAME_OVERLAP = 2;
+
 class VulkanEngine {
 public:
+    // Frame Data variables
+    FrameData _frames[FRAME_OVERLAP];
+    FrameData& get_current_Frame() { return _frames[_frameNumber % FRAME_OVERLAP]; }
+
+    // Command Queue
+    VkQueue _graphicsQueue;
+    uint32_t _graphicsQueueFamily;
+
     // Window variables
     bool _isInitialized {false};
     int _frameNumber {0};
