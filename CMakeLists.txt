@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
 
 # Name of the project
 PROJECT(TBDEngine)
@@ -8,10 +8,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Get the list of all files.
 FILE(GLOB_RECURSE SOURCES "src/*.cpp")
-FILE(GLOB_RECURSE HEADERS "*.h" "*.hpp")
+FILE(GLOB_RECURSE HEADERS "include/*.h")
 FILE(GLOB_RECURSE GLSL "resources/*.glsl")
 
 # Set the executable.
+message(STATUS "Including ${CMAKE_SOURCE_DIR}/include")
+include_directories(${CMAKE_SOURCE_DIR}/include)
 ADD_EXECUTABLE(${CMAKE_PROJECT_NAME} ${SOURCES} ${HEADERS} ${GLSL})
 
 # Use FetchContent to download and build GLM, GLFW, and Vulkan SDK
@@ -40,13 +42,81 @@ set(GLFW_INCLUDE_DIRS ${glfw_SOURCE_DIR}/include)
 message(STATUS "GLFW include directory: ${GLFW_INCLUDE_DIRS}")
 include_directories(${GLFW_INCLUDE_DIRS})
 
-# Set the Vulkan SDK path if not already set by environment variables
-# set(VULKAN_SDK "$ENV{VULKAN_SDK_PATH}")
-message(STATUS "VULKAN_SDK_PATH is ${VULKAN_SDK}")
+# Fetch fastgltf
+FetchContent_Declare(
+    fastgltf
+    GIT_REPOSITORY https://github.com/spnda/fastgltf.git
+    GIT_TAG v0.7.2  # Stable release
+)
+FetchContent_MakeAvailable(fastgltf)
+# set(FASTGLTF_INCLUDE_DIRS ${fastgltf_SOURCE_DIR}/include)
+# message(STATUS "fastgltf include directory: ${FASTGLTF_INCLUDE_DIRS}")
+# include_directories(${FASTGLTF_INCLUDE_DIRS})
+target_link_libraries(${CMAKE_PROJECT_NAME} fastgltf::fastgltf)
 
-# Specify the path to the Vulkan SDK cmake directory if needed
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${VULKAN_SDK}")
-message(STATUS "CMAKE_PREFIX_PATH is ${CMAKE_PREFIX_PATH}")
+# Fetch fmt
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG 11.0.2  # Stable release
+)
+FetchContent_MakeAvailable(fmt)
+# set(FMT_INCLUDE_DIRS ${fmt_SOURCE_DIR}/include)
+# message(STATUS "fmt include directory: ${FMT_INCLUDE_DIRS}")
+# include_directories(${FMT_INCLUDE_DIRS})
+target_link_libraries(${CMAKE_PROJECT_NAME} fmt::fmt)
+
+# Fetch imgui
+FetchContent_Declare(
+    imgui 
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.91.3  # Stable release
+)
+FetchContent_MakeAvailable(imgui)
+set(IMGUI_INCLUDE_DIRS ${imgui_SOURCE_DIR}/include)
+message(STATUS "imgui include directory: ${IMGUI_INCLUDE_DIRS}")
+include_directories(${IMGUI_INCLUDE_DIRS})
+
+# Fetch stb
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+)
+FetchContent_MakeAvailable(stb)
+set(STB_INCLUDE_DIRS ${stb_SOURCE_DIR})
+message(STATUS "stb include directory: ${STB_INCLUDE_DIRS}")
+include_directories(${STB_INCLUDE_DIRS})
+
+# Fetch vk_bootstrap
+FetchContent_Declare(
+    vk_bootstrap
+    GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
+    GIT_TAG v1.3.296 
+)
+FetchContent_MakeAvailable(vk_bootstrap)
+target_link_libraries(${CMAKE_PROJECT_NAME} vk-bootstrap::vk-bootstrap)
+
+# Fetch VulkanMemoryAllocator
+FetchContent_Declare(
+    vma
+    GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+    GIT_TAG v3.1.0  # Stable release
+)
+FetchContent_MakeAvailable(vma)
+set(VMA_INCLUDE_DIRS ${vma_SOURCE_DIR}/include)
+message(STATUS "vma include directory: ${VMA_INCLUDE_DIRS}")
+include_directories(${VMA_INCLUDE_DIRS})
+
+# Fetch volk
+FetchContent_Declare(
+    volk
+    GIT_REPOSITORY https://github.com/zeux/volk.git
+    GIT_TAG vulkan-sdk-1.3.296.0  # Stable release
+)
+FetchContent_MakeAvailable(volk)
+set(VOLK_INCLUDE_DIRS ${volk_SOURCE_DIR})
+message(STATUS "volk include directory: ${VOLK_INCLUDE_DIRS}")
+include_directories(${VOLK_INCLUDE_DIRS})
 
 # Use the Vulkan package provided by the SDK
 find_package(Vulkan REQUIRED)
