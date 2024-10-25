@@ -14,7 +14,7 @@ Currently, this project uses the following versions:
 - Vulkan v1.3.296
 
 In order to install Vulkan, please refer to [the official LunarG webiste](https://vulkan.lunarg.com/sdk/home). 
-**Make sure the version is the same as the version listed above.**
+**Make sure the version is the same as the version listed above!**
 Installing into the default paths and disregarding all optional packages should 
 be sufficient, but you can experiment with the other packages.
 
