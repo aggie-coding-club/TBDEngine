@@ -1,19 +1,13 @@
-#include "vk/vk_engine.h"
-#include "UI.h"
+#include "gui/gui_engine.h"
 
-int main(int, char**)
-{
-    UI *ui = new UI();
-    if (ui->init()) {
-        return 1;
-    }
-    // Main loop
-    while (!glfwWindowShouldClose(ui->window))
-    {
-        ui->run();
-    }
+int main() {
+  GUIEngine engine = GUIEngine();
 
-    ui->UI_Clean();
+  engine.init();
 
-    return 0;
+  while(!glfwWindowShouldClose(engine.window)) {
+      engine.run();
+  }
+
+    engine.GUI_Clean();
 }
