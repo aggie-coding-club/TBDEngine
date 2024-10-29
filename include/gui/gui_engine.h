@@ -5,7 +5,6 @@
 #include "imgui.h"
 #include "simdjson.h"
 #include "backends/imgui_impl_vulkan.h"
-#include "stdio.h"
 
 // Data
 static VkAllocationCallbacks*   g_Allocator = nullptr;
