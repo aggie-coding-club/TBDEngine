@@ -34,6 +34,8 @@ class GUIEngine {
     // What windows are showing
     bool show_another_window = true;
 
+    ImGuiContext* context = nullptr;
+
     // Background Color
     ImVec4 background = ImVec4(102.0f/255.0f, 102.0f/255.0f, 102.0f/255.0f, 1.00f);
     ImGuiIO* io = nullptr;
