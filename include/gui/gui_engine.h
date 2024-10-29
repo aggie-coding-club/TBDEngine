@@ -28,47 +28,48 @@ class GUIEngine {
 
     public:
 
-    // Global functions
-    static GUIEngine get();
+        // Global functions
+        static GUIEngine get();
+        int init();
+        void run();
+        void GUI_Clean();
 
-    // What windows are showing
-    bool show_another_window = true;
+        // What windows are showing
+        bool show_another_window = true;
 
-    ImGuiContext* context = nullptr;
+        ImGuiContext* context = nullptr;
 
-    // Background Color
-    ImVec4 background = ImVec4(102.0f/255.0f, 102.0f/255.0f, 102.0f/255.0f, 1.00f);
-    ImGuiIO* io = nullptr;
+        // Background Color
+        ImVec4 background = ImVec4(102.0f/255.0f, 102.0f/255.0f, 102.0f/255.0f, 1.00f);
+        ImGuiIO* io = nullptr;
 
-    // Window
-    GLFWwindow* window = nullptr;
+        // Window
+        GLFWwindow* window = nullptr;
 
-    // ImGUI/Vulkan window
-    ImGui_ImplVulkanH_Window* wd = nullptr;
+        // ImGUI/Vulkan window
+        ImGui_ImplVulkanH_Window* wd = nullptr;
 
-    int init();
-    static void glfw_error_callback(int error, const char* description);
 
-    static void check_vk_result(VkResult err);
+    private:
+        static void glfw_error_callback(int error, const char* description);
 
-    bool IsExtensionAvailable(const ImVector<VkExtensionProperties>& properties, const char* extension);
+        static void check_vk_result(VkResult err);
 
-    VkPhysicalDevice SetupVulkan_SelectPhysicalDevice();
+        bool IsExtensionAvailable(const ImVector<VkExtensionProperties>& properties, const char* extension);
 
-    void SetupVulkan(ImVector<const char*> instance_extensions);
+        VkPhysicalDevice SetupVulkan_SelectPhysicalDevice();
 
-    // All the ImGui_ImplVulkanH_XXX structures/functions are optional helpers used by the demo.
-        // Your real engine/app may not use them.
-    void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
+        void SetupVulkan(ImVector<const char*> instance_extensions);
 
-    void CleanupVulkan();
+        // All the ImGui_ImplVulkanH_XXX structures/functions are optional helpers used by the demo.
+            // Your real engine/app may not use them.
+        void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
 
-    void CleanupVulkanWindow();
+        void CleanupVulkan();
 
-    void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
+        void CleanupVulkanWindow();
 
-    void FramePresent(ImGui_ImplVulkanH_Window* wd);
-    void run();
+        void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
 
-    void GUI_Clean();
+        void FramePresent(ImGui_ImplVulkanH_Window* wd);
 };
