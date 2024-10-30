@@ -6,8 +6,9 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "stdio.h"
-#include "Menu_Bar.cpp"
-#include "File_Hierarchy.cpp"
+
+// Every time a new widget is created include the file to this header until better option is created
+#include "gui/Custom_Widgets.h"
 
 GUIEngine* loadedUI = nullptr;
 GUIEngine GUIEngine::get() {return *loadedUI;}
@@ -439,6 +440,10 @@ void GUIEngine::run() {
 
     // Add the Inter Font to the UI
     ImGui::PushFont(Inter_Font12);
+
+    // Temporarily set the resize grip alpha to 0 to hide it
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_ResizeGrip].w = 0.0f;                // Set to 0 to hide// Temporarily set the resize grip alpha to 0 to hide it
 
     ShowMenuBar();
 

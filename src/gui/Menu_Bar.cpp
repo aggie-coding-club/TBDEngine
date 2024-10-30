@@ -1,5 +1,8 @@
 // Code for menu bar
 
+#include "imgui.h"
+#include "gui/Custom_Widgets.h"
+
 void ShowMenuBar(){
     if (ImGui::BeginMainMenuBar())
     {
