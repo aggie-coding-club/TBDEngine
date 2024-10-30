@@ -6,6 +6,8 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "stdio.h"
+#include "Menu_Bar.cpp"
+#include "File_Hierarchy.cpp"
 
 GUIEngine* loadedUI = nullptr;
 GUIEngine GUIEngine::get() {return *loadedUI;}
@@ -51,6 +53,8 @@ int GUIEngine::init(){
     (void)io;
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Load Inter font at size 12
     Inter_Font12 = io->Fonts->AddFontFromFileTTF("..\\include\\Fonts\\Inter-VariableFont_opsz,wght.ttf", 12*(float)w/1000.0f);
 
     // Setup Dear ImGui style
@@ -75,6 +79,7 @@ int GUIEngine::init(){
     init_info.Allocator = g_Allocator;
     init_info.CheckVkResultFn = check_vk_result;
     ImGui_ImplVulkan_Init(&init_info);
+
 
     return 0;
 }
@@ -432,19 +437,28 @@ void GUIEngine::run() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
+    // Add the Inter Font to the UI
+    ImGui::PushFont(Inter_Font12);
+
+    ShowMenuBar();
+
+    ShowFileHierarchy();
+
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
-        ImGui::Begin("ViewPort");                          // Create a window called "Hello, world!" and append into it.
-        if(Inter_Font12) {
-            ImGui::PushFont(Inter_Font12);
-        }
+        // Create a window called "ViewPort" and append into it.
+        ImGui::Begin("ViewPort");
+
         // Display some text (you can use a format strings too)
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io->Framerate, io->Framerate);
 
-        ImGui::PopFont();
+        ImGui::Checkbox("Display Another Window",&show_another_window);
+
 
         ImGui::End();
     }
+
+    ImGui::PopFont();
 
     // 3. Show another simple window.
     if (show_another_window)
