@@ -22,12 +22,15 @@ static int                      g_MinImageCount = 2;
 static bool                     g_SwapChainRebuild = false;
 
 // Font Data
-static ImFont* Inter_Var_Font;
+static ImFont* Inter_Font12;
+
 
 class GUIEngine {
 
     public:
 
+        int windowWidth = 1920;
+        int windowHeight = 1080;
         // Global functions
         static GUIEngine get();
         int init();

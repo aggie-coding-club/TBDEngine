@@ -18,7 +18,7 @@ int GUIEngine::init(){
 
     // Create window with Vulkan context
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    window = glfwCreateWindow(1280, 720, "TBD Engine", nullptr, nullptr);
+    window = glfwCreateWindow(windowWidth, windowHeight, "TBD Engine", nullptr, nullptr);
     if (!glfwVulkanSupported())
     {
         printf("GLFW: Vulkan Not Supported\n");
@@ -51,7 +51,7 @@ int GUIEngine::init(){
     (void)io;
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    Inter_Var_Font = io->Fonts->AddFontFromFileTTF("..\\include\\Fonts\\Inter-VariableFont_opsz,wght.ttf", 0.024f*(float)w);
+    Inter_Font12 = io->Fonts->AddFontFromFileTTF("..\\include\\Fonts\\Inter-VariableFont_opsz,wght.ttf", 12*(float)w/1000.0f);
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -434,28 +434,15 @@ void GUIEngine::run() {
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
-        static float f = 0.0f;
-        static int counter = 0;
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-        if(Inter_Var_Font) {
-            ImGui::PushFont(Inter_Var_Font);
+        ImGui::Begin("ViewPort");                          // Create a window called "Hello, world!" and append into it.
+        if(Inter_Font12) {
+            ImGui::PushFont(Inter_Font12);
         }
-        ImGui::Text("Viewport");               // Display some text (you can use a format strings too)
-
-        ImGui::Checkbox("Show another window", &show_another_window);
-
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&background); // Edit 3 floats representing a color
-
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
+        // Display some text (you can use a format strings too)
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io->Framerate, io->Framerate);
-        if(Inter_Var_Font) {
-            ImGui::PopFont();
-        }
+
+        ImGui::PopFont();
+
         ImGui::End();
     }
 
