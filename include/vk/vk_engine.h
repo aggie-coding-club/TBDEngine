@@ -29,8 +29,8 @@ public:
     int _frameNumber {0};
     bool stop_rendering {false};
 
-    int WIDTH {1440};
-    int HEIGHT {810};
+    int WIDTH {1980};
+    int HEIGHT {1080};
     VkExtent2D _windowsExtent;
     struct GLFWwindow* _window {nullptr};
 

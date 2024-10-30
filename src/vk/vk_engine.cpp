@@ -242,7 +242,7 @@ void VulkanEngine::draw() {
 
     // Make a clear-color from frame number. This will flash with a 120 frame period.
     VkClearColorValue clearValue;
-    float flash = std::abs(std::sin(_frameNumber / 120.f));
+    float flash = std::abs(std::sin(_frameNumber / 60.f));
     clearValue = { { 0.0f, 0.0f, flash, 1.0f} };
 
     VkImageSubresourceRange clearRange =
@@ -259,7 +259,7 @@ void VulkanEngine::draw() {
     // Finalize the command buffer
     VK_CHECK(vkEndCommandBuffer(cmd));
 
-    //prepare the submission to the queue.
+    // prepare the submission to the queue.
     // we want to wait on the _presentSemaphore,
     // as that semaphore is signaled when the swapchain is ready
     // we will signal the _renderSemaphore, to signal that rendering has finished
@@ -275,7 +275,7 @@ void VulkanEngine::draw() {
 
     VkSubmitInfo2 submit = vkinit::submit_info(&cmdinfo,&signalInfo,&waitInfo);
 
-    //submit command buffer to the queue and execute it.
+    // submit command buffer to the queue and execute it.
     // _renderFence will now block until the graphic commands finish execution
     VK_CHECK(vkQueueSubmit2(_graphicsQueue, 1,
         &submit, get_current_frame()._renderFence));
@@ -297,19 +297,17 @@ void VulkanEngine::draw() {
 
     VK_CHECK(vkQueuePresentKHR(_graphicsQueue, &presentInfo));
 
-    //increase the number of frames drawn
+    // increase the number of frames drawn
     _frameNumber++;
 }
 
 void VulkanEngine::run() {
-    while (glfwWindowShouldClose(_window) == 0) {
-        if (stop_rendering) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        }
-        else
-        {
-            draw();
-        }
-		glfwPollEvents();
+	glfwPollEvents();
+    if (stop_rendering) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    else
+    {
+        draw();
     }
 }

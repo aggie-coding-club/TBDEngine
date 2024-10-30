@@ -1,10 +1,13 @@
-#include "vk/vk_engine.h"
+#include "gui/gui_engine.h"
 
-int main(int argc, char* argv[]) {
-    VulkanEngine engine;
-    engine.init();
-    engine.run();
-    engine.cleanup();
+int main() {
+  GUIEngine engine = GUIEngine();
 
-    return 0;
+  engine.init();
+
+  while(!glfwWindowShouldClose(engine.window)) {
+      engine.run();
+  }
+
+    engine.GUI_Clean();
 }
