@@ -86,19 +86,13 @@ set(IMGUI_SOURCES
         ${imgui_SOURCE_DIR}/imgui_widgets.cpp
         ${imgui_SOURCE_DIR}/imgui_demo.cpp
         ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-        ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
+        ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
+
 
 # Create the imgui library target
 add_library(imgui STATIC ${IMGUI_SOURCES})
 
-# Include directories for ImGui
-target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
-
-target_link_libraries(imgui PRIVATE glfw Vulkan::Vulkan)
-
-# Link imgui to your main project target
-target_link_libraries(${CMAKE_PROJECT_NAME} imgui)
 
 # Fetch stb
 FetchContent_Declare(
@@ -110,44 +104,53 @@ set(STB_INCLUDE_DIRS ${stb_SOURCE_DIR})
 message(STATUS "stb include directory: ${STB_INCLUDE_DIRS}")
 include_directories(${STB_INCLUDE_DIRS})
 
-# Fetch vk_bootstrap
-FetchContent_Declare(
-        vk_bootstrap
-        GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
-        GIT_TAG v1.3.296
-)
-FetchContent_MakeAvailable(vk_bootstrap)
-target_link_libraries(${CMAKE_PROJECT_NAME} vk-bootstrap::vk-bootstrap)
-
-# Fetch VulkanMemoryAllocator
-FetchContent_Declare(
-        vma
-        GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
-        GIT_TAG v3.1.0  # Stable release
-)
-FetchContent_MakeAvailable(vma)
-set(VMA_INCLUDE_DIRS ${vma_SOURCE_DIR}/include)
-message(STATUS "vma include directory: ${VMA_INCLUDE_DIRS}")
-include_directories(${VMA_INCLUDE_DIRS})
-
-# Fetch volk
-FetchContent_Declare(
-        volk
-        GIT_REPOSITORY https://github.com/zeux/volk.git
-        GIT_TAG vulkan-sdk-1.3.296.0  # Stable release
-)
-FetchContent_MakeAvailable(volk)
-set(VOLK_INCLUDE_DIRS ${volk_SOURCE_DIR})
-message(STATUS "volk include directory: ${VOLK_INCLUDE_DIRS}")
-include_directories(${VOLK_INCLUDE_DIRS})
+# # Fetch vk_bootstrap
+# FetchContent_Declare(
+#         vk_bootstrap
+#         GIT_REPOSITORY https://github.com/charles-lunarg/vk-bootstrap
+#         GIT_TAG v1.3.296
+# )
+# FetchContent_MakeAvailable(vk_bootstrap)
+# target_link_libraries(${CMAKE_PROJECT_NAME} vk-bootstrap::vk-bootstrap)
+#
+# # Fetch VulkanMemoryAllocator
+# FetchContent_Declare(
+#         vma
+#         GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+#         GIT_TAG v3.1.0  # Stable release
+# )
+# FetchContent_MakeAvailable(vma)
+# set(VMA_INCLUDE_DIRS ${vma_SOURCE_DIR}/include)
+# message(STATUS "vma include directory: ${VMA_INCLUDE_DIRS}")
+# include_directories(${VMA_INCLUDE_DIRS})
+#
+# # Fetch volk
+# FetchContent_Declare(
+#         volk
+#         GIT_REPOSITORY https://github.com/zeux/volk.git
+#         GIT_TAG vulkan-sdk-1.3.296.0  # Stable release
+# )
+# FetchContent_MakeAvailable(volk)
+# set(VOLK_INCLUDE_DIRS ${volk_SOURCE_DIR})
+# message(STATUS "volk include directory: ${VOLK_INCLUDE_DIRS}")
+# include_directories(${VOLK_INCLUDE_DIRS})
 
 # Use the Vulkan package provided by the SDK
-find_package(Vulkan REQUIRED)
+# find_package(Vulkan REQUIRED)
+find_package(OpenGL REQUIRED)
 
 # If Vulkan is found, link it to your executable
-if (Vulkan_FOUND)
-    target_link_libraries(${CMAKE_PROJECT_NAME} Vulkan::Vulkan)
-endif()
+# if (Vulkan_FOUND)
+#     target_link_libraries(${CMAKE_PROJECT_NAME} Vulkan::Vulkan)
+# endif()
+
+# Include directories for ImGui
+target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
+
+target_link_libraries(imgui PRIVATE glfw opengl32)
+
+# Link imgui to your main project target
+target_link_libraries(${CMAKE_PROJECT_NAME} imgui)
 
 
 # Link libraries for GLFW and Vulkan
@@ -183,36 +186,36 @@ ELSE()
     ENDIF()
 ENDIF()
 
-find_program(GLSL_VALIDATOR glslangValidator HINTS /usr/bin /usr/local/bin $ENV{VULKAN_SDK}/Bin/ $ENV{VULKAN_SDK}/Bin32/)
-
-if(NOT GLSL_VALIDATOR)
-    message(FATAL_ERROR "glslangValidator not found")
-endif()
-
-FILE(GLOB_RECURSE GLSL_SOURCE_FILES
-        "shaders/*.frag"
-        "shaders/*.vert"
-        "shaders/*.comp"
-)
-
-foreach(GLSL ${GLSL_SOURCE_FILES})
-    message(STATUS "BUILDING SHADER")
-    get_filename_component(FILE_NAME ${GLSL} NAME)
-    set(SPIRV "${PROJECT_SOURCE_DIR}/shaders/${FILE_NAME}.spv")
-    add_custom_command(
-            TARGET
-            ${CMAKE_PROJECT_NAME}
-            POST_BUILD
-            COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}
-            DEPENDS ${GLSL})
-    MESSAGE(STATUS "Compiling ${SPIRV}")
-    list(APPEND SPIRV_BINARY_FILES ${SPIRV})
-endforeach(GLSL)
-
-add_custom_target(
-        Shaders
-        ALL DEPENDS ${SPIRV_BINARY_FILES}
-)
+# find_program(GLSL_VALIDATOR glslangValidator HINTS /usr/bin /usr/local/bin $ENV{VULKAN_SDK}/Bin/ $ENV{VULKAN_SDK}/Bin32/)
+#
+# if(NOT GLSL_VALIDATOR)
+#     message(FATAL_ERROR "glslangValidator not found")
+# endif()
+#
+# FILE(GLOB_RECURSE GLSL_SOURCE_FILES
+#         "shaders/*.frag"
+#         "shaders/*.vert"
+#         "shaders/*.comp"
+# )
+#
+# foreach(GLSL ${GLSL_SOURCE_FILES})
+#     message(STATUS "BUILDING SHADER")
+#     get_filename_component(FILE_NAME ${GLSL} NAME)
+#     set(SPIRV "${PROJECT_SOURCE_DIR}/shaders/${FILE_NAME}.spv")
+#     add_custom_command(
+#             TARGET
+#             ${CMAKE_PROJECT_NAME}
+#             POST_BUILD
+#             COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}
+#             DEPENDS ${GLSL})
+#     MESSAGE(STATUS "Compiling ${SPIRV}")
+#     list(APPEND SPIRV_BINARY_FILES ${SPIRV})
+# endforeach(GLSL)
+#
+# add_custom_target(
+#         Shaders
+#         ALL DEPENDS ${SPIRV_BINARY_FILES}
+# )
 
 # Additional settings for Vulkan-based projects
 # Specify Vulkan SDK paths for runtime environment (Windows)

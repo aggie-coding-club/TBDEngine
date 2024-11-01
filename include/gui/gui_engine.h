@@ -1,78 +1,30 @@
 #pragma once
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
 #include "imgui.h"
-#include "simdjson.h"
-#include "backends/imgui_impl_vulkan.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include <stdio.h>
+#define GL_SILENCE_DEPRECATION
+#if defined(IMGUI_IMPL_OPENGL_ES2)
+#include <GLES2/gl2.h>
+#endif
+#include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
-// Data
-static VkAllocationCallbacks*   g_Allocator = nullptr;
-static VkInstance               g_Instance = VK_NULL_HANDLE;
-static VkPhysicalDevice         g_PhysicalDevice = VK_NULL_HANDLE;
-static VkDevice                 g_Device = VK_NULL_HANDLE;
-static uint32_t                 g_QueueFamily = (uint32_t)-1;
-static VkQueue                  g_Queue = VK_NULL_HANDLE;
-static VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
-static VkPipelineCache          g_PipelineCache = VK_NULL_HANDLE;
-static VkDescriptorPool         g_DescriptorPool = VK_NULL_HANDLE;
+class GuiEngine
+{
+private:
+     GLFWwindow* window;
+     ImGuiIO* io;
+     ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-static ImGui_ImplVulkanH_Window g_MainWindowData;
-static int                      g_MinImageCount = 2;
-static bool                     g_SwapChainRebuild = false;
+     bool show_demo_window = true;
+     bool show_another_window = false;
 
-// Font Data
-static ImFont* Inter_Font12;
-
-
-class GUIEngine {
-
-    public:
-
-        int windowWidth = 1920;
-        int windowHeight = 1080;
-        // Global functions
-        static GUIEngine get();
-        int init();
-        void run();
-        void GUI_Clean();
-
-        // What windows are showing
-        bool show_another_window = true;
-
-        ImGuiContext* context = nullptr;
-
-        // Background Color
-        ImVec4 background = ImVec4(102.0f/255.0f, 102.0f/255.0f, 102.0f/255.0f, 1.00f);
-        ImGuiIO* io = nullptr;
-
-        // Window
-        GLFWwindow* window = nullptr;
-
-        // ImGUI/Vulkan window
-        ImGui_ImplVulkanH_Window* wd = nullptr;
-
-
-    private:
-        static void glfw_error_callback(int error, const char* description);
-
-        static void check_vk_result(VkResult err);
-
-        bool IsExtensionAvailable(const ImVector<VkExtensionProperties>& properties, const char* extension);
-
-        VkPhysicalDevice SetupVulkan_SelectPhysicalDevice();
-
-        void SetupVulkan(ImVector<const char*> instance_extensions);
-
-        // All the ImGui_ImplVulkanH_XXX structures/functions are optional helpers used by the demo.
-            // Your real engine/app may not use them.
-        void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
-
-        void CleanupVulkan();
-
-        void CleanupVulkanWindow();
-
-        void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
-
-        void FramePresent(ImGui_ImplVulkanH_Window* wd);
+public:
+     int width, height;
+     GuiEngine(){}
+     ~GuiEngine(){};
+     bool init();
+     void run();
+     void cleanup();
 };
