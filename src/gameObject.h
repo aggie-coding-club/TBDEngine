@@ -4,7 +4,7 @@
 #include <unordered_set>
 using namespace std;
 
-class gameObject: public Component {
+class gameObject {
 public:
     string name;
     vector<Component> components;
