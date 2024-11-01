@@ -9,7 +9,6 @@ public:
     string name;
     vector<Component> components;
     unordered_set<string> tags;
-    int test;
 
     gameObject() : id(generateUniqueId()) {}
 private:
