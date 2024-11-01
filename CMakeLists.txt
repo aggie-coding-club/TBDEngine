@@ -44,6 +44,25 @@ set(GLFW_INCLUDE_DIRS ${glfw_SOURCE_DIR}/include)
 message(STATUS "GLFW include directory: ${GLFW_INCLUDE_DIRS}")
 include_directories(${GLFW_INCLUDE_DIRS})
 
+# Fetch GLEW
+FetchContent_Declare(
+        glew
+        GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
+        GIT_TAG glew-cmake-2.2.0  # Specify the version you want to use (e.g., "glew-2.2.0")
+)
+
+FetchContent_GetProperties(glew)
+if(NOT glew_POPULATED)
+    FetchContent_Populate(glew)
+
+    add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+FetchContent_MakeAvailable(glew)
+set(GLEW_INCLUDE_DIRS ${glew_SOURCE_DIR}/include)
+message(STATUS "GLEW include directory: ${GLEW_INCLUDE_DIRS}")
+target_link_libraries(${CMAKE_PROJECT_NAME} libglew_static)
+#include_directories(${GLEW_INCLUDE_DIRS})
+
 # Fetch fastgltf
 FetchContent_Declare(
         fastgltf
@@ -150,7 +169,7 @@ target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/
 target_link_libraries(imgui PRIVATE glfw opengl32)
 
 # Link imgui to your main project target
-target_link_libraries(${CMAKE_PROJECT_NAME} imgui)
+target_link_libraries(${CMAKE_PROJECT_NAME} imgui )
 
 
 # Link libraries for GLFW and Vulkan
