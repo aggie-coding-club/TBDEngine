@@ -5,7 +5,7 @@
 void ShowFileHierarchy()
 {
     // Remove Decorations for the window
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
     ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
 

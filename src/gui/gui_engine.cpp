@@ -53,6 +53,9 @@ bool GuiEngine::init(GLFWwindow *window)
     Inter_24 = io->Fonts->AddFontFromFileTTF("..\\include\\Fonts\\Inter-VariableFont_opsz,wght.ttf", 24);
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
+    // Temporarily set the resize grip alpha to 0 to hide it
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.Colors[ImGuiCol_ResizeGrip].w = 0.0f;
     //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
@@ -82,8 +85,8 @@ bool GuiEngine::init(GLFWwindow *window)
     clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     return true;
-
 }
+
 void GuiEngine::run( int width, int height )
 {
     // Poll and handle events (inputs, window resize, etc.)
@@ -100,22 +103,7 @@ void GuiEngine::run( int width, int height )
     // Game Engine
     ShowFileHierarchy();
     ShowMenuBar();
-    // Create an ImGui window
-    ImGui::Begin("Viewport");
-
-    // Get the position and size of the ImGui window content area
-    ImVec2 pos = ImGui::GetCursorScreenPos();
-    ImVec2 size = ImGui::GetContentRegionAvail();
-
-    // End ImGui window but don't render yet
-    ImGui::End();
-
-    // Set up OpenGL viewport and scissor area to match the ImGui window
-    glViewport((int)pos.x,  height - (int)pos.y - size.y, (int)size.x, (int)size.y);
-    glEnable(GL_SCISSOR_TEST);
-    glScissor((int)pos.x,  height - (int)pos.y - size.y, (int)size.x, (int)size.y);
-    // Disable scissor test after rendering OpenGL content
-    glDisable(GL_SCISSOR_TEST);
+    ShowViewport(width, height);
 
     // Rendering
     ImGui::Render();
