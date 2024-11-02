@@ -5,13 +5,13 @@
 void ShowFileHierarchy()
 {
     // Remove Decorations for the window
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
     ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
 
     float window_width = DisplaySize.x / 4;
     float window_height = DisplaySize.y / 2.5;
-    ImVec2 position(DisplaySize.x - window_width,28);
+    ImVec2 position(DisplaySize.x - window_width,29);
 
     // Set Window width
     ImGui::SetNextWindowSize(ImVec2(window_width,window_height));
