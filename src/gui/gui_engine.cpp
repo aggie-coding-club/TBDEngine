@@ -101,7 +101,7 @@ void GuiEngine::run( int width, int height )
     ShowFileHierarchy();
     ShowMenuBar();
     // Create an ImGui window
-    ImGui::Begin("OpenGL Render Window");
+    ImGui::Begin("Viewport");
 
     // Get the position and size of the ImGui window content area
     ImVec2 pos = ImGui::GetCursorScreenPos();
