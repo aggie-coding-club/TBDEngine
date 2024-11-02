@@ -13,7 +13,6 @@
 class GuiEngine
 {
 private:
-     GLFWwindow* window;
      ImGuiIO* io;
      ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -21,10 +20,11 @@ private:
      bool show_another_window = false;
 
 public:
+     GLFWwindow* window;
      int width, height;
      GuiEngine(){}
      ~GuiEngine(){};
-     bool init();
+     bool init(GLFWwindow *window);
      void run();
      void cleanup();
 };

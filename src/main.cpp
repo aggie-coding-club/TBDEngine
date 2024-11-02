@@ -19,6 +19,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+#include "gui/gui_engine.h"
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
@@ -165,15 +166,18 @@ void Init()
 int main(int argc, char *argv[])
 {	
 	Init();
-	while ( glfwWindowShouldClose(window) == 0) 
+	GuiEngine engine = GuiEngine();
+	engine.init(window);
+	while ( glfwWindowShouldClose(window) == 0 )
 	{
+		engine.run();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		Display();
 		glFlush();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
+	engine.cleanup();
 	glfwTerminate();
 	return 0;
 }
