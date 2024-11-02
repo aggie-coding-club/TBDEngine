@@ -16,9 +16,7 @@ private:
      ImGuiIO* io;
      ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-     bool show_demo_window = true;
-     bool show_another_window = false;
-
+     ImFont* Inter_24;
 public:
      GLFWwindow* window;
      int width, height;
