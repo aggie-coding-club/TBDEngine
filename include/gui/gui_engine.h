@@ -15,14 +15,14 @@ class GuiEngine
 private:
      ImGuiIO* io;
      ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-
-     ImFont* Inter_24;
-public:
      GLFWwindow* window;
+     ImFont* Inter_24;
+
+public:
      int width, height;
      GuiEngine(){}
      ~GuiEngine(){};
      bool init(GLFWwindow *window);
-     void run();
+     void run(int width, int height);
      void cleanup();
 };

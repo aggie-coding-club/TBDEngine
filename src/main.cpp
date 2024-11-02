@@ -170,12 +170,13 @@ int main(int argc, char *argv[])
 	engine.init(window);
 	while ( glfwWindowShouldClose(window) == 0 )
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		engine.run();
-		Display();
-		glFlush();
-		glfwSwapBuffers(window);
+		int width,height;
+		glfwGetWindowSize(window, &width, &height);
 		glfwPollEvents();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		engine.run(width,height);
+		Display();
+		glfwSwapBuffers(window);
 	}
 	engine.cleanup();
 	glfwTerminate();

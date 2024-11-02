@@ -1,4 +1,8 @@
 #include "gui/gui_engine.h"
+
+#include <iostream>
+#include <ostream>
+
 #include "gui/Custom_Widgets.h"
 
 static void glfw_error_callback(int error, const char* description)
@@ -35,8 +39,6 @@ bool GuiEngine::init(GLFWwindow *window)
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 #endif
-    this->width = width;
-    this->height = height;
     // Create window with graphics context
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
@@ -82,7 +84,7 @@ bool GuiEngine::init(GLFWwindow *window)
     return true;
 
 }
-void GuiEngine::run()
+void GuiEngine::run( int width, int height )
 {
     // Poll and handle events (inputs, window resize, etc.)
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -98,6 +100,22 @@ void GuiEngine::run()
     // Game Engine
     ShowFileHierarchy();
     ShowMenuBar();
+    // Create an ImGui window
+    ImGui::Begin("OpenGL Render Window");
+
+    // Get the position and size of the ImGui window content area
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    ImVec2 size = ImGui::GetContentRegionAvail();
+
+    // End ImGui window but don't render yet
+    ImGui::End();
+
+    // Set up OpenGL viewport and scissor area to match the ImGui window
+    glViewport((int)pos.x,  height - (int)pos.y - size.y, (int)size.x, (int)size.y);
+    glEnable(GL_SCISSOR_TEST);
+    glScissor((int)pos.x,  height - (int)pos.y - size.y, (int)size.x, (int)size.y);
+    // Disable scissor test after rendering OpenGL content
+    glDisable(GL_SCISSOR_TEST);
 
     // Rendering
     ImGui::Render();
