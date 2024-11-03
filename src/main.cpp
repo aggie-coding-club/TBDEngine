@@ -31,9 +31,22 @@
 #define WINDOW_HEIGHT 480
 #define NUM_LIGHTS 2
 #define NUM_MATERIALS 3
+#define NUM_SHADERS 3
 
 GLFWwindow *window;
 std::string resource_path = "../resources";
+
+std::string verts[NUM_SHADERS] = {
+    "/vert.glsl",
+    "/phong_vert.glsl",
+    "/silhouette_vert.glsl"
+};
+
+std::string frags[NUM_SHADERS] = {
+    "/frag.glsl",
+    "/phong_frag.glsl",
+    "/silhouette_frag.glsl"
+};
 
 Program program;
 std::vector<float> posBuff;
@@ -52,9 +65,13 @@ struct lightStruct {
 	glm::vec3 color;
 } lights[NUM_LIGHTS];
 
+int mat_idx = 0;
+int shader_idx = 0;
+
+void ShadersInit();
 
 void Display()
-{		
+{
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 
@@ -64,23 +81,58 @@ void Display()
 	glm::mat4 modelMatrix(1.0f);
 	modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
+    glm::mat4 modelInverseTranspose = glm::transpose(glm::inverse(modelMatrix));
+
 	program.Bind();
 	program.SendUniformData(modelMatrix, "model");
 	program.SendUniformData(viewMatrix, "view");
 	program.SendUniformData(projectionMatrix, "projection");
+	program.SendUniformData(modelInverseTranspose, "modelInverseTranspose");
+
+    if (0 <= shader_idx && shader_idx < NUM_SHADERS-1) {
+	    program.SendUniformData(materials[mat_idx].ka, "ka");
+	    program.SendUniformData(materials[mat_idx].kd, "kd");
+	    program.SendUniformData(materials[mat_idx].ks, "ks");
+	    program.SendUniformData(materials[mat_idx].s, "s");
+
+	    program.SendUniformData(lights[0].position, "lights[0].position");
+	    program.SendUniformData(lights[0].color, "lights[0].color");
+
+	    program.SendUniformData(lights[1].position, "lights[1].position");
+	    program.SendUniformData(lights[1].color, "lights[1].color");
+
+    }
+
 	glDrawArrays(GL_TRIANGLES, 0, posBuff.size() / 3);
 	program.Unbind();
-
 }
 
 // Keyboard character callback function
 void CharacterCallback(GLFWwindow* lWindow, unsigned int key)
 {
-	switch (key) 
+	switch (key)
 	{
 	case 'q':
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 		break;
+    case 'm':
+        mat_idx = (++mat_idx) % NUM_MATERIALS;
+        break;
+    case 'M':
+        mat_idx = (--mat_idx % NUM_MATERIALS + NUM_MATERIALS) % NUM_MATERIALS;
+        break;
+    case '3':
+        shader_idx = 2;
+        ShadersInit();
+        break;
+    case '2':
+        shader_idx = 1;
+        ShadersInit();
+        break;
+    case '1':
+        shader_idx = 0;
+        ShadersInit();
+        break;
 	default:
 		break;
 	}
@@ -140,6 +192,40 @@ void LoadModel(const std::string &name)
 	}
 }
 
+void SetMaterials() {
+    materials[0].ka = {0.2f, 0.2f, 0.2f};
+    materials[0].kd = {0.8f, 0.7f, 0.7f};
+    materials[0].ks = {1.0f, 1.0f, 1.0f};
+    materials[0].s  = 10.0f;
+
+    materials[1].ka = {0.0f, 0.2f, 0.2f};
+    materials[1].kd = {0.5f, 0.7f, 0.2f};
+    materials[1].ks = {0.1f, 1.0f, 0.1f};
+    materials[1].s  = 100.0;
+
+    materials[2].ka = {0.2f, 0.2f, 0.2f};
+    materials[2].kd = {0.1f, 0.3f, 0.9f};
+    materials[2].ks = {0.1f, 0.1f, 0.1f};
+    materials[2].s  = 1.0;
+}
+
+void SetLight() {
+    lights[0].position = {0.0f, 0.0f, 3.0f};
+    lights[0].color    = {0.5f, 0.5f, 0.5f};
+
+    lights[1].position = {0.0f, 3.0f, 0.0f};
+    lights[1].color    = {0.2f, 0.2f, 0.2f};
+}
+void ShadersInit() {
+	program.SetShadersFileName(resource_path + verts[shader_idx],
+            resource_path + frags[shader_idx]);
+
+	program.Init();
+
+	program.SendAttributeData(posBuff, "vPositionModel");
+	program.SendAttributeData(norBuff, "vNormalModel");
+}
+
 void Init()
 {
 	glfwInit();
@@ -154,12 +240,13 @@ void Init()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 
+	SetMaterials();
+	SetLight();
+
 	LoadModel(resource_path + "/bunny.obj");
+
+	ShadersInit();
 	
-	program.SetShadersFileName(resource_path + "/vert.glsl", resource_path + "/frag.glsl");
-	program.Init();
-	program.SendAttributeData(posBuff, "vPositionModel");
-	program.SendAttributeData(norBuff, "vNormalModel");
 }
 
 
