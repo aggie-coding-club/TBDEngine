@@ -17,8 +17,8 @@
 #include "core/game_engine.h"
 #include "render/render_engine.h"
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 #define NUM_LIGHTS 2
 #define NUM_MATERIALS 3
 #define NUM_SHADERS 3
