@@ -10,12 +10,9 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-bool GuiEngine::init(GLFWwindow *window)
+bool GuiEngine::init(GLFWwindow *_window)
 {
-    glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit()) {
-        return false;
-    }
+    window = _window;
 
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -116,7 +113,4 @@ void GuiEngine::cleanup()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
 }
