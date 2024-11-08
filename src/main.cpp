@@ -27,6 +27,8 @@ GLFWwindow *window;
 std::unique_ptr<GuiEngine> guiEngine;
 std::unique_ptr<RenderEngine> renderEngine;
 
+Camera camera;
+
 // Keyboard character callback function
 void CharacterCallback(GLFWwindow* lWindow, unsigned int key)
 {
@@ -65,7 +67,7 @@ int main(int argc, char *argv[])
 	glEnable(GL_DEPTH_TEST);
 
 	guiEngine = std::make_unique<GuiEngine>();
-	renderEngine = std::make_unique<RenderEngine>(window);
+	renderEngine = std::make_unique<RenderEngine>(window, &camera);
 	guiEngine->init(window);
 	while ( glfwWindowShouldClose(window) == 0 )
 	{

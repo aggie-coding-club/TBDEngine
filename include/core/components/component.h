@@ -1,8 +1,9 @@
+#pragma once
+
 #include <string>
 
 enum COMPONENT_TYPE {
     TRANSFORM,
-
 };
 
 class Component {

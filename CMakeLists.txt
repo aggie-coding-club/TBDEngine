@@ -123,6 +123,15 @@ set(STB_INCLUDE_DIRS ${stb_SOURCE_DIR})
 message(STATUS "stb include directory: ${STB_INCLUDE_DIRS}")
 include_directories(${STB_INCLUDE_DIRS})
 
+FetchContent_Declare(
+        yaml
+        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+)
+FetchContent_MakeAvailable(yaml)
+set(YAML_INCLUDE_DIRS ${yaml_SOURCE_DIR})
+message(STATUS "yaml include directory: ${YAML_INCLUDE_DIRS}/include")
+include_directories(${YAML_INCLUDE_DIRS})
+
 # # Fetch vk_bootstrap
 # FetchContent_Declare(
 #         vk_bootstrap

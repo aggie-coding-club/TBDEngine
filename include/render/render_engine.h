@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Program.h"
+#include "core/camera.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -9,8 +10,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
@@ -55,6 +54,8 @@ class RenderEngine
 	int mat_idx = 0;
 	int shader_idx = 0;
 
+	Camera* camera;
+
 public:
 	RenderEngine()
 	{
@@ -63,6 +64,13 @@ public:
 	RenderEngine(GLFWwindow* _window)
 	{
 		window = _window;
+		Init();
+	}
+
+	RenderEngine(GLFWwindow* _window, Camera* _camera)
+	{
+		window = _window;
+		camera = _camera;
 		Init();
 	}
 
