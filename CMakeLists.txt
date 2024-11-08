@@ -175,10 +175,15 @@ find_package(OpenGL REQUIRED)
 # Include directories for ImGui
 target_include_directories(imgui PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
 
-target_link_libraries(imgui PRIVATE glfw opengl32)
+IF(WIN32)
+    target_link_libraries(imgui PRIVATE glfw opengl32)
+ELSE()
+    target_link_libraries(imgui PRIVATE glfw OpenGL)
+ENDIF()
 
 # Link imgui to your main project target
 target_link_libraries(${CMAKE_PROJECT_NAME} imgui )
+
 
 
 # Link libraries for GLFW and Vulkan

@@ -47,7 +47,7 @@ bool GuiEngine::init(GLFWwindow *_window)
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    Inter_24 = io->Fonts->AddFontFromFileTTF("..\\include\\Fonts\\Inter-VariableFont_opsz,wght.ttf", 24);
+    Inter_24 = io->Fonts->AddFontFromFileTTF("../include/Fonts/Inter-VariableFont_opsz,wght.ttf", 24);
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     // Temporarily set the resize grip alpha to 0 to hide it
