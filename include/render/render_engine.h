@@ -2,6 +2,7 @@
 
 #include "Program.h"
 #include "core/camera.h"
+#include "core/game_engine.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -10,6 +11,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
@@ -35,6 +37,9 @@ class RenderEngine
 	};
 
 	Program program;
+	std::unordered_map<std::string, std::vector<float>> posBuffMap;
+	std::unordered_map<std::string, std::vector<float>> texBuffMap;
+	std::unordered_map<std::string, std::vector<float>> norBuffMap;
 	std::vector<float> posBuff;
 	std::vector<float> norBuff;
 	std::vector<float> texBuff;
@@ -55,6 +60,7 @@ class RenderEngine
 	int shader_idx = 0;
 
 	Camera* camera;
+	GameEngine* gameEngine;
 
 public:
 	RenderEngine()
@@ -71,6 +77,15 @@ public:
 	{
 		window = _window;
 		camera = _camera;
+		Init();
+	}
+
+	RenderEngine(GLFWwindow* _window, Camera* _camera, GameEngine* _gameEngine)
+	{
+		window = _window;
+		camera = _camera;
+		gameEngine = _gameEngine;
+
 		Init();
 	}
 

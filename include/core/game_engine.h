@@ -16,7 +16,8 @@ public:
     void test_init()
     {
         auto bunnyObj = std::make_shared<GameObject>();
-        Transform bunnyTransform;
+        auto bunnyTransform = std::make_shared<Transform>();
+
         bunnyObj->components.push_back(bunnyTransform);
 
         gameObjects.push_back(bunnyObj);
@@ -26,7 +27,8 @@ public:
     GameEngine()
     {
         test_init();
-
     }
+
+    const std::vector<std::shared_ptr<GameObject>>& GetGameObjects() { return gameObjects; }
 
 };

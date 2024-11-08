@@ -14,6 +14,7 @@
 #include <memory>
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
+#include "core/game_engine.h"
 #include "render/render_engine.h"
 
 #define WINDOW_WIDTH 640
@@ -28,6 +29,7 @@ std::unique_ptr<GuiEngine> guiEngine;
 std::unique_ptr<RenderEngine> renderEngine;
 
 Camera camera;
+GameEngine gameEngine;
 
 // Keyboard character callback function
 void CharacterCallback(GLFWwindow* lWindow, unsigned int key)
@@ -67,7 +69,7 @@ int main(int argc, char *argv[])
 	glEnable(GL_DEPTH_TEST);
 
 	guiEngine = std::make_unique<GuiEngine>();
-	renderEngine = std::make_unique<RenderEngine>(window, &camera);
+	renderEngine = std::make_unique<RenderEngine>(window, &camera, &gameEngine);
 	guiEngine->init(window);
 	while ( glfwWindowShouldClose(window) == 0 )
 	{

@@ -3,6 +3,7 @@
 #include <string>
 
 enum COMPONENT_TYPE {
+    NONE,
     TRANSFORM,
 };
 
@@ -11,4 +12,7 @@ private:
 
 public:
     COMPONENT_TYPE type;
+    virtual ~Component() = default;
+    Component(): type(NONE) {}
+    virtual COMPONENT_TYPE GetType() { return type; };
 };

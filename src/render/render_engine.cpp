@@ -3,6 +3,9 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "render/tiny_obj_loader.h"
 
+#include "core/components/component.h"
+#include "core/components/transform.h"
+
 void RenderEngine::Init()
 {
 	materials[0].ka = {0.2f, 0.2f, 0.2f};
@@ -27,8 +30,6 @@ void RenderEngine::Init()
 	lights[1].position = {0.0f, 3.0f, 0.0f};
 	lights[1].color    = {0.2f, 0.2f, 0.2f};
 
-	LoadModel(resource_path + "/bunny.obj");
-
 	ShadersInit();
 }
 
@@ -40,6 +41,13 @@ void RenderEngine::LoadModel(const std::string &name)
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 	std::string errStr;
+
+	posBuffMap[meshName] = std::vector<float>();
+	norBuffMap[meshName] = std::vector<float>();
+
+	std::vector<float>& posBuff = posBuffMap[meshName];
+	std::vector<float>& norBuff = norBuffMap[meshName];
+
 	bool rc = tinyobj::LoadObj(&attrib, &shapes, &materials, &errStr, meshName.c_str());
 	if (!rc) {
 		std::cerr << errStr << std::endl;
@@ -86,8 +94,6 @@ void RenderEngine::ShadersInit() {
 
 	program.Init();
 
-	program.SendAttributeData(posBuff, "vPositionModel");
-	program.SendAttributeData(norBuff, "vNormalModel");
 }
 
 
@@ -102,33 +108,47 @@ void RenderEngine::Display()
 	glm::mat4 projectionMatrix = camera->GetProjectionMatrix();
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
 
-	glm::mat4 modelMatrix(1.0f);
-	modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 modelInverseTranspose = glm::transpose(glm::inverse(modelMatrix));
+	for (const auto gameObj : gameEngine->GetGameObjects())
+	{
+		auto objTransform = std::dynamic_pointer_cast<Transform>( gameObj->components.at(0) );
+		std::string& model_path = objTransform->model_path;
 
-	program.Bind();
-	program.SendUniformData(modelMatrix, "model");
-	program.SendUniformData(viewMatrix, "view");
-	program.SendUniformData(projectionMatrix, "projection");
-	program.SendUniformData(modelInverseTranspose, "modelInverseTranspose");
+		if (posBuffMap.find(model_path) == posBuffMap.end())
+		{
+			LoadModel(model_path);
+		}
 
-    if (0 <= shader_idx && shader_idx < NUM_SHADERS-1) {
-	    program.SendUniformData(materials[mat_idx].ka, "ka");
-	    program.SendUniformData(materials[mat_idx].kd, "kd");
-	    program.SendUniformData(materials[mat_idx].ks, "ks");
-	    program.SendUniformData(materials[mat_idx].s, "s");
+		glm::mat4 modelMatrix(1.0f);
+		modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	    program.SendUniformData(lights[0].position, "lights[0].position");
-	    program.SendUniformData(lights[0].color, "lights[0].color");
+    	glm::mat4 modelInverseTranspose = glm::transpose(glm::inverse(modelMatrix));
+		program.Bind();
+		program.SendAttributeData(posBuffMap[model_path], "vPositionModel");
+		program.SendAttributeData(norBuffMap[model_path], "vNormalModel");
+		program.SendUniformData(modelMatrix, "model");
+		program.SendUniformData(viewMatrix, "view");
+		program.SendUniformData(projectionMatrix, "projection");
+		program.SendUniformData(modelInverseTranspose, "modelInverseTranspose");
 
-	    program.SendUniformData(lights[1].position, "lights[1].position");
-	    program.SendUniformData(lights[1].color, "lights[1].color");
+    	if (0 <= shader_idx && shader_idx < NUM_SHADERS-1) {
+		    program.SendUniformData(materials[mat_idx].ka, "ka");
+		    program.SendUniformData(materials[mat_idx].kd, "kd");
+		    program.SendUniformData(materials[mat_idx].ks, "ks");
+		    program.SendUniformData(materials[mat_idx].s, "s");
 
-    }
+		    program.SendUniformData(lights[0].position, "lights[0].position");
+		    program.SendUniformData(lights[0].color, "lights[0].color");
 
-	glDrawArrays(GL_TRIANGLES, 0, posBuff.size() / 3);
-	program.Unbind();
+		    program.SendUniformData(lights[1].position, "lights[1].position");
+		    program.SendUniformData(lights[1].color, "lights[1].color");
+
+    	}
+		glDrawArrays(GL_TRIANGLES, 0, posBuffMap[model_path].size() / 3);
+		program.Unbind();
+
+	}
+
 }
 
 void RenderEngine::CharacterCallback(GLFWwindow* window, unsigned int key)
