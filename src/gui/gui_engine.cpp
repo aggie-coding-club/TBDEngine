@@ -100,7 +100,8 @@ void GuiEngine::run( int width, int height )
     // Game Engine
     ShowFileHierarchy();
     ShowMenuBar();
-    ShowViewport(width, height);
+    ShowViewport(ImVec2(width, height));
+    ShowDetails();
 
     // Rendering
     ImGui::Render();

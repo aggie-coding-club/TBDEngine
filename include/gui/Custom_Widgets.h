@@ -3,4 +3,5 @@
 // Custom widgets
 void ShowFileHierarchy();
 void ShowMenuBar();
-void ShowViewport(int width, int height);
+void ShowViewport(ImVec2 window_Size);
+void ShowDetails();
