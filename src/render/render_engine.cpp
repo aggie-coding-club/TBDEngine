@@ -121,7 +121,7 @@ void RenderEngine::Display()
 
 		glm::mat4 modelMatrix(1.0f);
 		// modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), objTransform->scale);
+		modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), objTransform->scale);
 
     	glm::mat4 modelInverseTranspose = glm::transpose(glm::inverse(modelMatrix));
 		program.Bind();
