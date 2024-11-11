@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include "gui/Custom_Widgets.h"
 
-void ShowViewport(int width, int height){
+void ShowViewport(ImVec2 window_Size){
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
     // Create an ImGui window
@@ -16,9 +16,9 @@ void ShowViewport(int width, int height){
     ImGui::End();
 
     // Set up OpenGL viewport and scissor area to match the ImGui window
-    glViewport((int)pos.x,  height - (int)pos.y - size.y, (int)size.x, (int)size.y);
+    glViewport((int)pos.x,  window_Size.y - (int)pos.y - size.y, (int)size.x, (int)size.y);
     glEnable(GL_SCISSOR_TEST);
-    glScissor((int)pos.x,  height - (int)pos.y - size.y, (int)size.x, (int)size.y);
+    glScissor((int)pos.x,  window_Size.y - (int)pos.y - size.y, (int)size.x, (int)size.y);
     // Disable scissor test after rendering OpenGL content
     glDisable(GL_SCISSOR_TEST);
 }
