@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
 	guiEngine = std::make_unique<GuiEngine>();
 	renderEngine = std::make_unique<RenderEngine>(window, &camera, &gameEngine);
-	guiEngine->init(window);
+	guiEngine->init(window, &gameEngine);
 	while ( glfwWindowShouldClose(window) == 0 )
 	{
 		int width,height;

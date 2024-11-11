@@ -3,7 +3,7 @@
 #include "gui/Custom_Widgets.h"
 #include <glm/vec3.hpp>
 
-void ShowDetails()
+void ShowDetails(std::shared_ptr<GameObject> object)
 {
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
@@ -17,16 +17,16 @@ void ShowDetails()
     ImGui::SetNextWindowSize(size);
     // Set window's position
     ImGui::SetNextWindowPos(pos);
-    glm::vec3 Position(0);
-    glm::vec3 Rotation(0);
-    glm::vec3 Scale(0);
+
+    auto objTransform = std::dynamic_pointer_cast<Transform>( object->components.at(0) );
+
     ImGui::Begin("Details",nullptr,window_flags);
     
-    ImGui::InputFloat3("Position", &Position[0], "%.3f");
+    ImGui::InputFloat3("Position", &objTransform->position[0], "%.3f");
 
-    ImGui::InputFloat3("Rotation", &Rotation[0], "%.3f");
+    ImGui::InputFloat3("Rotation", &objTransform->rotation[0], "%.3f");
 
-    ImGui::InputFloat3("Scale", &Scale[0], "%.3f");
+    ImGui::InputFloat3("Scale", &objTransform->scale[0], "%.3f");
 
     ImGui::End();
 }

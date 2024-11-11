@@ -4,15 +4,17 @@
 #include <ostream>
 
 #include "gui/Custom_Widgets.h"
+#include "core/game_engine.h"
 
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-bool GuiEngine::init(GLFWwindow *_window)
+bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
 {
     window = _window;
+    gameEngine = _game_engine;
 
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -101,7 +103,7 @@ void GuiEngine::run( int width, int height )
     ShowFileHierarchy();
     ShowMenuBar();
     ShowViewport(ImVec2(width, height));
-    ShowDetails();
+    ShowDetails(gameEngine->GetGameObjects()[1]);
 
     // Rendering
     ImGui::Render();
