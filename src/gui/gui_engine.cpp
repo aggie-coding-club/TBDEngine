@@ -103,7 +103,7 @@ void GuiEngine::run( int width, int height )
     ShowFileHierarchy();
     ShowMenuBar();
     ShowViewport(ImVec2(width, height));
-    ShowDetails(gameEngine->GetGameObjects()[1]);
+    ShowDetails(gameEngine->GetGameObjects()[0]);
 
     // Rendering
     ImGui::Render();
