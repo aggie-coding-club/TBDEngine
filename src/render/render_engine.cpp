@@ -9,7 +9,7 @@
 void RenderEngine::Init()
 {
 	materials[0].ka = {0.2f, 0.2f, 0.2f};
-	materials[0].kd = {0.8f, 0.7f, 0.7f};
+	materials[0].kd = {0.1f, 0.1f, 0.1f};
 	materials[0].ks = {1.0f, 1.0f, 1.0f};
 	materials[0].s  = 10.0f;
 

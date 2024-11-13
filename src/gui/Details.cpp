@@ -21,12 +21,22 @@ void ShowDetails(std::shared_ptr<GameObject> object)
     auto objTransform = std::dynamic_pointer_cast<Transform>( object->components.at(0) );
 
     ImGui::Begin("Details",nullptr,window_flags);
-    
-    ImGui::InputFloat3("Position", &objTransform->position[0], "%.3f");
 
-    ImGui::InputFloat3("Rotation", &objTransform->rotation[0], "%.3f");
+    if (ImGui::TreeNode("Transform")){
+        ImGui::Text("Position");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##Position", &objTransform->position[0], 0.001f, 0.0f, 0.0f, "%.3f");
 
-    ImGui::InputFloat3("Scale", &objTransform->scale[0], "%.3f");
+        ImGui::Text("Rotation");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##Rotation", &objTransform->rotation[0], 0.001f, 0.0f, 0.0f, "%.3f");
+
+        ImGui::Text("Scale");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##Scale", &objTransform->scale[0], 0.001f, 0.0f, 0.0f, "%.3f");
+
+        ImGui::TreePop();
+    }
 
     ImGui::End();
 }
