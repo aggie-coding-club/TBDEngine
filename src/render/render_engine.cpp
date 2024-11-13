@@ -112,6 +112,7 @@ void RenderEngine::Display()
 	for (const auto gameObj : gameEngine->GetGameObjects())
 	{
 		auto objTransform = std::dynamic_pointer_cast<Transform>( gameObj->components.at(0) );
+		auto objMaterial = std::dynamic_pointer_cast<Material>( gameObj->components.at(1) );
 		std::string& model_path = objTransform->model_path;
 
 		if (posBuffMap.find(model_path) == posBuffMap.end())
@@ -133,10 +134,10 @@ void RenderEngine::Display()
 		program.SendUniformData(modelInverseTranspose, "modelInverseTranspose");
 
     	if (0 <= shader_idx && shader_idx < NUM_SHADERS-1) {
-		    program.SendUniformData(materials[mat_idx].ka, "ka");
-		    program.SendUniformData(materials[mat_idx].kd, "kd");
-		    program.SendUniformData(materials[mat_idx].ks, "ks");
-		    program.SendUniformData(materials[mat_idx].s, "s");
+		    program.SendUniformData(objMaterial->ambient, "ka");
+		    program.SendUniformData(objMaterial->diffuse, "kd");
+		    program.SendUniformData(objMaterial->specular, "ks");
+		    program.SendUniformData(objMaterial->shininess, "s");
 
 		    program.SendUniformData(lights[0].position, "lights[0].position");
 		    program.SendUniformData(lights[0].color, "lights[0].color");
