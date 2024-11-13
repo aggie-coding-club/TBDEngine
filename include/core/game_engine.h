@@ -12,6 +12,9 @@ class GameEngine {
 private:
     std::vector<std::shared_ptr<GameObject>> gameObjects;
 public:
+
+    std::shared_ptr<GameObject> selectedGameObj = nullptr;
+
     void addObjectToVerticesMap(std::shared_ptr<GameObject> gameObject);
 
     void test_init()

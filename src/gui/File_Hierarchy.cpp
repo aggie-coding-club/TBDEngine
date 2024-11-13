@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "gui/Custom_Widgets.h"
-void ShowFileHierarchy()
+void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr<GameObject>>& Objects)
 {
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
@@ -22,45 +22,10 @@ void ShowFileHierarchy()
     ImGui::Begin("Hierarchy",nullptr, window_flags);
     if (ImGui::TreeNode("Root Folder"))
     {
-        // Folder 1
-        if (ImGui::TreeNode("Folder 1"))
-        {
-            ImGui::Selectable("File 1.1");
-            ImGui::Selectable("File 1.2");
-
-            if (ImGui::TreeNode("Subfolder 1.1"))
-            {
-                ImGui::Selectable("File 1.1.1");
-                ImGui::Selectable("File 1.1.2");
-                ImGui::TreePop();
+        for (const auto& obj : Objects) {
+            if(ImGui::Selectable(obj->name.c_str())) {
+                gameEngine->selectedGameObj = obj;
             }
-
-            ImGui::TreePop();
-        }
-
-        // Folder 2
-        if (ImGui::TreeNode("Folder 2"))
-        {
-            ImGui::Selectable("File 2.1");
-            ImGui::Selectable("File 2.2");
-            ImGui::TreePop();
-        }
-
-        // Folder 3
-        if (ImGui::TreeNode("Folder 3"))
-        {
-            if (ImGui::TreeNode("Subfolder 3.1"))
-            {
-                ImGui::Selectable("File 3.1.1");
-                ImGui::TreePop();
-            }
-            if (ImGui::TreeNode("Subfolder 3.2"))
-            {
-                ImGui::Selectable("File 3.2.1");
-                ImGui::Selectable("File 3.2.2");
-                ImGui::TreePop();
-            }
-            ImGui::TreePop();
         }
 
         ImGui::TreePop(); // End of Root Folder

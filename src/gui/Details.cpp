@@ -63,30 +63,35 @@ void ShowDetails(std::shared_ptr<GameObject> object)
     ImGui::SetNextWindowPos(pos);
 
     ImGui::Begin("Details",nullptr,window_flags);
+    if(object)
+    {
+        auto objectName = &object->name;
+        char nameBuffer[128];
+        strncpy(nameBuffer, objectName->c_str(), sizeof(nameBuffer));
+        nameBuffer[127] = '\0';
+        ImGui::Text("Name");
+        ImGui::SameLine();
+        if(ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
+            object->name = nameBuffer;
+        }
 
-    auto objectName = &object->name;
-    char nameBuffer[128];
-    strncpy(nameBuffer, objectName->c_str(), sizeof(nameBuffer));
-    nameBuffer[127] = '\0';
-    ImGui::Text("Name");
-    ImGui::SameLine();
-    if(ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
-        object->name = nameBuffer;
+        for(const auto& objComponent : object->components) {
+
+            // Try to cast component to a transform
+            if(auto objTransform = std::dynamic_pointer_cast<Transform>( objComponent ))
+            {
+                ShowTransform(objTransform);
+            }
+            // Try to cast component to a Material
+            if(auto objMaterial = std::dynamic_pointer_cast<Material>( objComponent ))
+            {
+                ShowMaterial(objMaterial);
+            }
+
+        }
     }
-
-    for(const auto& objComponent : object->components) {
-
-        // Try to cast component to a transform
-        if(auto objTransform = std::dynamic_pointer_cast<Transform>( objComponent ))
-        {
-            ShowTransform(objTransform);
-        }
-        // Try to cast component to a Material
-        if(auto objMaterial = std::dynamic_pointer_cast<Material>( objComponent ))
-        {
-            ShowMaterial(objMaterial);
-        }
-
+    else {
+        ImGui::Text("No Object Selected");
     }
 
     ImGui::End();

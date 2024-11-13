@@ -18,7 +18,6 @@ private:
      ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
      GLFWwindow* window;
      GameEngine* gameEngine;
-
      ImFont* Inter_24;
 
 public:
