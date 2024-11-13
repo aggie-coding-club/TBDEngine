@@ -23,6 +23,18 @@ void ShowDetails(std::shared_ptr<GameObject> object)
 
     ImGui::Begin("Details",nullptr,window_flags);
 
+    auto objectName = &object->name;
+    char nameBuffer[128];
+    strncpy(nameBuffer, objectName->c_str(), sizeof(nameBuffer));
+    nameBuffer[127] = '\0';
+    ImGui::Text("Name");
+    ImGui::SameLine();
+    if(ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
+        object->name = nameBuffer;
+    }
+
+
+
     // Try to cast first component to a transform component
     auto objTransform = std::dynamic_pointer_cast<Transform>( object->components.at(0) );
     if(objTransform)
