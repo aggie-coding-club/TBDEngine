@@ -6,6 +6,47 @@
 #include "gui/Custom_Widgets.h"
 #include <glm/vec3.hpp>
 
+void ShowTransform(std::shared_ptr<Transform> &object_transform){
+    if (ImGui::TreeNode("Transform")){
+        ImGui::Text("Position");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##Position", &object_transform->position[0], 0.001f, 0.0f, 0.0f, "%.3f");
+
+        ImGui::Text("Rotation");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##Rotation", &object_transform->rotation[0], 0.001f, 0.0f, 0.0f, "%.3f");
+
+        ImGui::Text("Scale");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##Scale", &object_transform->scale[0], 0.001f, 0.0f, 0.0f, "%.3f");
+
+        ImGui::TreePop();
+    }
+}
+
+void ShowMaterial(std::shared_ptr<Material> &object_material) {
+    if (ImGui::TreeNode("Material")){
+        ImGui::Text("Ambient");
+        ImGui::SameLine();
+        ImGui::ColorEdit3("##Ambient", &object_material->ambient[0]);
+
+        ImGui::Text("Diffuse");
+        ImGui::SameLine();
+        ImGui::ColorEdit3("##Diffuse", &object_material->diffuse[0]);
+
+        ImGui::Text("Specular");
+        ImGui::SameLine();
+        ImGui::ColorEdit3("##Specular", &object_material->specular[0]);
+
+        ImGui::Text("Shininess");
+        ImGui::SameLine();
+        ImGui::DragFloat("##Shininess", &object_material->shininess, 0.1f, 0.0f, 0.0f, "%.1f", ImGuiSliderFlags_ClampOnInput);
+        object_material->shininess = std::max(0.f, object_material->shininess);
+
+        ImGui::TreePop();
+    }
+}
+
 void ShowDetails(std::shared_ptr<GameObject> object)
 {
     // Remove Decorations for the window
@@ -33,56 +74,20 @@ void ShowDetails(std::shared_ptr<GameObject> object)
         object->name = nameBuffer;
     }
 
+    for(const auto& objComponent : object->components) {
 
-
-    // Try to cast first component to a transform component
-    auto objTransform = std::dynamic_pointer_cast<Transform>( object->components.at(0) );
-    if(objTransform)
-    {
-
-        if (ImGui::TreeNode("Transform")){
-            ImGui::Text("Position");
-            ImGui::SameLine();
-            ImGui::DragFloat3("##Position", &objTransform->position[0], 0.001f, 0.0f, 0.0f, "%.3f");
-
-            ImGui::Text("Rotation");
-            ImGui::SameLine();
-            ImGui::DragFloat3("##Rotation", &objTransform->rotation[0], 0.001f, 0.0f, 0.0f, "%.3f");
-
-            ImGui::Text("Scale");
-            ImGui::SameLine();
-            ImGui::DragFloat3("##Scale", &objTransform->scale[0], 0.001f, 0.0f, 0.0f, "%.3f");
-
-            ImGui::TreePop();
+        // Try to cast component to a transform
+        if(auto objTransform = std::dynamic_pointer_cast<Transform>( objComponent ))
+        {
+            ShowTransform(objTransform);
         }
-    }
-    // Try to cast first component to a Material component
-    auto objMaterial = std::dynamic_pointer_cast<Material>( object->components.at(1) );
-    if(objMaterial)
-    {
-        if (ImGui::TreeNode("Material")){
-            ImGui::Text("Ambient");
-            ImGui::SameLine();
-            ImGui::ColorEdit3("##Ambient", &objMaterial->ambient[0]);
-
-            ImGui::Text("Diffuse");
-            ImGui::SameLine();
-            ImGui::ColorEdit3("##Diffuse", &objMaterial->diffuse[0]);
-
-            ImGui::Text("Specular");
-            ImGui::SameLine();
-            ImGui::ColorEdit3("##Specular", &objMaterial->specular[0]);
-
-            ImGui::Text("Shininess");
-            ImGui::SameLine();
-            ImGui::DragFloat("##Shininess", &objMaterial->shininess, 0.1f, 0.0f, 0.0f, "%.1f", ImGuiSliderFlags_ClampOnInput);
-            objMaterial->shininess = std::max(0.f, objMaterial->shininess);
-
-            ImGui::TreePop();
+        // Try to cast component to a Material
+        if(auto objMaterial = std::dynamic_pointer_cast<Material>( objComponent ))
+        {
+            ShowMaterial(objMaterial);
         }
+
     }
-
-
 
     ImGui::End();
 }
