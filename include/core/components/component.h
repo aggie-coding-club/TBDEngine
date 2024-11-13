@@ -5,6 +5,7 @@
 enum COMPONENT_TYPE {
     NONE,
     TRANSFORM,
+    MATERIAL,
 };
 
 class Component {
