@@ -54,8 +54,8 @@ void ShowDetails(std::shared_ptr<GameObject> object)
 
     ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
 
-    ImVec2 size(DisplaySize.x / 4, DisplaySize.y / 2.5);
-    ImVec2 pos(DisplaySize.x - size.x,29 + DisplaySize.y / 2.5);
+    ImVec2 size(DisplaySize.x / 4, DisplaySize.y / 2);
+    ImVec2 pos(DisplaySize.x - size.x,29 + DisplaySize.y / 2);
 
     // Set Window width
     ImGui::SetNextWindowSize(size);
