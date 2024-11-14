@@ -10,7 +10,7 @@ void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr
     ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
 
     float window_width = DisplaySize.x / 4;
-    float window_height = DisplaySize.y / 2.5;
+    float window_height = DisplaySize.y / 2;
     ImVec2 position(DisplaySize.x - window_width,29);
 
     // Set Window width
