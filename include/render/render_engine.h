@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Program.h"
+#include "shader.h"
 #include "core/camera.h"
 #include "core/game_engine.h"
 
@@ -37,20 +37,13 @@ class RenderEngine
 	    "/silhouette_frag.glsl"
 	};
 
-	Program program;
+	Shader program;
 	std::unordered_map<std::string, std::vector<float>> posBuffMap;
 	std::unordered_map<std::string, std::vector<float>> texBuffMap;
 	std::unordered_map<std::string, std::vector<float>> norBuffMap;
 	std::vector<float> posBuff;
 	std::vector<float> norBuff;
 	std::vector<float> texBuff;
-
-	glm::vec3 eye = {0.0f, 0.0f, 4.0f};
-
-	struct materialStruct {
-		glm::vec3 ka, kd, ks;
-		float s;
-	} materials[NUM_MATERIALS];
 
 	struct lightStruct {
 		glm::vec3 position;

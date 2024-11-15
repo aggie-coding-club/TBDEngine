@@ -8,21 +8,6 @@
 
 void RenderEngine::Init()
 {
-	materials[0].ka = {0.2f, 0.2f, 0.2f};
-	materials[0].kd = {0.1f, 0.1f, 0.1f};
-	materials[0].ks = {1.0f, 1.0f, 1.0f};
-	materials[0].s  = 10.0f;
-
-	materials[1].ka = {0.0f, 0.2f, 0.2f};
-	materials[1].kd = {0.5f, 0.7f, 0.2f};
-	materials[1].ks = {0.1f, 1.0f, 0.1f};
-	materials[1].s  = 100.0;
-
-	materials[2].ka = {0.2f, 0.2f, 0.2f};
-	materials[2].kd = {0.1f, 0.3f, 0.9f};
-	materials[2].ks = {0.1f, 0.1f, 0.1f};
-	materials[2].s  = 1.0;
-
 	// Lights
 	lights[0].position = {0.0f, 0.0f, 3.0f};
 	lights[0].color    = {0.5f, 0.5f, 0.5f};

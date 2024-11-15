@@ -4,12 +4,12 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-class Program
+class Shader
 {
 public:
-	
-	Program();
-	~Program();
+
+	Shader();
+	~Shader();
 	void SetShadersFileName(const std::string &vFileName, const std::string &sFileName);
 	void CheckShaderCompileStatus(GLuint shader);
 	void Init();
