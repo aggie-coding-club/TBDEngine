@@ -14,7 +14,7 @@ void ShowTransform(std::shared_ptr<Transform> &object_transform){
 
         ImGui::Text("Rotation");
         ImGui::SameLine();
-        ImGui::DragFloat3("##Rotation", &object_transform->rotation[0], 0.001f, 0.0f, 0.0f, "%.3f");
+        ImGui::DragFloat3("##Rotation", &object_transform->rotation[0], 0.001f * 5.f, 0.0f, 0.0f, "%.3f");
 
         ImGui::Text("Scale");
         ImGui::SameLine();
