@@ -11,6 +11,7 @@
 class GameEngine {
 private:
     std::vector<std::shared_ptr<GameObject>> gameObjects;
+    int randomID = 0;
 public:
 
     std::shared_ptr<GameObject> selectedGameObj = nullptr;
@@ -58,7 +59,7 @@ public:
         for (int i = 0; i < n; i++)
         {
             auto bunnyObj = std::make_shared<GameObject>();
-            auto bunnyName = std::string("bunny" + std::to_string(i));
+            auto bunnyName = std::string("bunny" + std::to_string(randomID++));
             auto bunnyTransform = std::make_shared<Transform>(pos[i]);
             auto bunnyMaterial = std::make_shared<Material>();
 
@@ -67,9 +68,23 @@ public:
             bunnyObj->components.push_back(bunnyMaterial);
 
             gameObjects.push_back(bunnyObj);
-
         }
     }
+
+    void add_GameObject(){
+        glm::vec3 pos= {0.0f, 0.0f, 0.0f};
+
+        auto bunnyObj = std::make_shared<GameObject>();
+        auto bunnyName = std::string("bunny" + std::to_string(randomID++));
+        auto bunnyTransform = std::make_shared<Transform>(pos);
+        auto bunnyMaterial = std::make_shared<Material>();
+
+        bunnyObj->name = bunnyName;
+        bunnyObj->components.push_back(bunnyTransform);
+        bunnyObj->components.push_back(bunnyMaterial);
+
+        gameObjects.push_back(bunnyObj);
+    };
 
     // Test Constructor
     GameEngine()
