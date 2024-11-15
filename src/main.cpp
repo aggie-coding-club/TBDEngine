@@ -78,7 +78,9 @@ int main(int argc, char *argv[])
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		guiEngine->run(width,height);
-		renderEngine->Display();
+		if(guiEngine->showView) {
+			renderEngine->Display();
+		}
 		glfwSwapBuffers(window);
 	}
 	guiEngine->cleanup();
