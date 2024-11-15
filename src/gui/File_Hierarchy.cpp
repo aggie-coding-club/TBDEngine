@@ -20,6 +20,10 @@ void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr
 
     // Create the window
     ImGui::Begin("Hierarchy",nullptr, window_flags);
+    if(ImGui::Button("+")) {
+        gameEngine->add_GameObject();
+    }
+    ImGui::SameLine();
     if (ImGui::TreeNode("Root Folder"))
     {
         for (const auto& obj : Objects) {
