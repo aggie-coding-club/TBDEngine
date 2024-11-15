@@ -22,7 +22,8 @@
 class RenderEngine
 {
 	GLFWwindow* window;
-	std::string resource_path = "../resources";
+	const std::string modelPath = "../resources/models";
+	const std::string shadersPath = "../resources/shaders";
 
 	std::string verts[NUM_SHADERS] = {
 	    "/vert.glsl",

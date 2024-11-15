@@ -89,8 +89,8 @@ void RenderEngine::LoadModel(const std::string &name)
 }
 
 void RenderEngine::ShadersInit() {
-	program.SetShadersFileName(resource_path + verts[shader_idx],
-            resource_path + frags[shader_idx]);
+	program.SetShadersFileName(shadersPath + verts[shader_idx],
+            shadersPath + frags[shader_idx]);
 
 	program.Init();
 
@@ -109,7 +109,7 @@ void RenderEngine::Display()
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
 
 
-	for (const auto gameObj : gameEngine->GetGameObjects())
+	for (const auto& gameObj : gameEngine->GetGameObjects())
 	{
 		auto objTransform = std::dynamic_pointer_cast<Transform>( gameObj->components.at(0) );
 		auto objMaterial = std::dynamic_pointer_cast<Material>( gameObj->components.at(1) );
