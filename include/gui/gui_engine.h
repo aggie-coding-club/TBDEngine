@@ -19,8 +19,11 @@ private:
      GLFWwindow* window;
      GameEngine* gameEngine;
      ImFont* Inter_24;
+     bool showDetail = true;
+     bool showHierarchy = true;
 
 public:
+     bool showView = true;
      int width, height;
      GuiEngine(){}
      ~GuiEngine(){};
