@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "gui/Custom_Widgets.h"
 
-void ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy){
+void ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy, bool &ShowCameraDebug){
     if (ImGui::BeginMainMenuBar())
     {
         // File menu
@@ -54,6 +54,8 @@ void ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy){
             ImGui::MenuItem("Show Details", nullptr, &ShowDetail);
 
             ImGui::MenuItem("Show File Hierarchy", nullptr, &ShowHierarchy);
+
+            ImGui::MenuItem("Show Camera Debug", nullptr, &ShowCameraDebug);
 
             ImGui::EndMenu();
         }

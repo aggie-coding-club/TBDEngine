@@ -4,7 +4,6 @@
 
 #include "imgui.h"
 #include "gui/Custom_Widgets.h"
-#include <glm/vec3.hpp>
 
 void ShowTransform(std::shared_ptr<Transform> &object_transform){
     if (ImGui::TreeNode("Transform")){

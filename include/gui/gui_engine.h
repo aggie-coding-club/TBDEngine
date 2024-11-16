@@ -10,6 +10,7 @@
 #endif
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 #include "core/game_engine.h"
+#include "core/camera.h"
 
 class GuiEngine
 {
@@ -21,11 +22,13 @@ private:
      ImFont* Inter_24;
      bool showDetail = true;
      bool showHierarchy = true;
+     bool showCameraWindow = false;
+     Camera *camera;
 
 public:
      bool showView = true;
      int width, height;
-     GuiEngine(){}
+     GuiEngine(Camera *_camera) : camera(_camera){};
      ~GuiEngine(){};
      bool init(GLFWwindow *window , GameEngine *_game_engine);
      void run(int width, int height);

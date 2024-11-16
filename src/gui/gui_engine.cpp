@@ -1,6 +1,5 @@
 #include "gui/gui_engine.h"
 
-#include <iostream>
 #include <ostream>
 
 #include "gui/Custom_Widgets.h"
@@ -100,7 +99,7 @@ void GuiEngine::run( int width, int height )
     ImGui::NewFrame();
 
     // Game Engine
-    ShowMenuBar(showDetail, showView, showHierarchy);
+    ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
     if(showHierarchy) {
         ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects());
     }
@@ -111,6 +110,9 @@ void GuiEngine::run( int width, int height )
     if(showDetail)
     {
         ShowDetails(gameEngine->selectedGameObj);
+    }
+    if(showCameraWindow){
+        ShowCameraDebugWindow(camera);
     }
 
     // Rendering

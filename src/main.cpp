@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 
-	guiEngine = std::make_unique<GuiEngine>();
+	guiEngine = std::make_unique<GuiEngine>(&camera);
 	renderEngine = std::make_unique<RenderEngine>(window, &camera, &gameEngine);
 	guiEngine->init(window, &gameEngine);
 	while ( glfwWindowShouldClose(window) == 0 )

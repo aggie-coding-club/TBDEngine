@@ -1,7 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 class Camera
 {
@@ -23,12 +22,27 @@ public:
 
     inline glm::mat4 GetViewMatrix() const
     {
+        //glm::vec3 viewDir = center - eye;
+        //up = glm::normalize(glm::cross(up, viewDir));
         return glm::lookAt(eye, center, up);
     }
 
     inline glm::mat4 GetProjectionMatrix() const
     {
         return glm::perspective(glm::radians(fovy), aspect, 0.1f, 100.0f);
+    }
+
+    inline glm::vec3 GetEye() const
+    {
+        return eye;
+    }
+
+    inline glm::vec3 GetCenter(){
+        return center;
+    }
+
+    inline glm::vec3 GetUpVec(){
+        return up;
     }
 
     inline void SetAspect(const int width, const int height)
@@ -44,5 +58,13 @@ public:
     inline void SetEye(const glm::vec3 _eye)
     {
         eye = _eye;
+    }
+
+    inline void SetCenter(const glm::vec3 _center){
+        center = _center;
+    }
+
+    inline void SetUpVec(const glm::vec3 _upVect){
+        up = _upVect;
     }
 };
