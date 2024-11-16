@@ -12,13 +12,14 @@ class GameEngine {
 private:
     std::vector<std::shared_ptr<GameObject>> gameObjects;
     int randomID = 0;
+    std::string modelPath = "../resources/models/";
 public:
 
     std::shared_ptr<GameObject> selectedGameObj = nullptr;
 
-    void addObjectToVerticesMap(std::shared_ptr<GameObject> gameObject);
+    void AddObjectToVerticesMap(std::shared_ptr<GameObject> gameObject);
 
-    void test_init()
+    void TestInit()
     {
         auto bunnyObj = std::make_shared<GameObject>();
         auto bunnyTransform = std::make_shared<Transform>();
@@ -28,7 +29,7 @@ public:
         gameObjects.push_back(bunnyObj);
     }
 
-    void test_init_2()
+    void TestInit2()
     {
         size_t n = 3;
         glm::vec3 pos[n] = {
@@ -49,7 +50,7 @@ public:
 
     }
 
-    void test_init_3() {
+    void TestInit3() {
         size_t n = 3;
         glm::vec3 pos[n] = {
             {0.0f, -1.0f, 0.0f},
@@ -71,7 +72,17 @@ public:
         }
     }
 
-    void add_GameObject(){
+    void TestInit4()
+    {
+
+    }
+
+    void AddGameObject(std::shared_ptr<GameObject>& gameObject)
+    {
+        gameObjects.push_back(gameObject);
+    }
+
+    void AddGameObject(){
         glm::vec3 pos= {0.0f, 0.0f, 0.0f};
 
         auto bunnyObj = std::make_shared<GameObject>();
@@ -83,13 +94,14 @@ public:
         bunnyObj->components.push_back(bunnyTransform);
         bunnyObj->components.push_back(bunnyMaterial);
 
-        gameObjects.push_back(bunnyObj);
+        AddGameObject(bunnyObj);
+
     };
 
     // Test Constructor
     GameEngine()
     {
-        test_init_3();
+        TestInit3();
     }
 
     const std::vector<std::shared_ptr<GameObject>>& GetGameObjects() { return gameObjects; }

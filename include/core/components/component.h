@@ -6,6 +6,8 @@ enum COMPONENT_TYPE {
     NONE,
     TRANSFORM,
     MATERIAL,
+    MODEL,
+    LIGHT,
 };
 
 class Component {

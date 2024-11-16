@@ -22,19 +22,19 @@
 class RenderEngine
 {
 	GLFWwindow* window;
-	const std::string modelPath = "../resources/models";
-	const std::string shadersPath = "../resources/shaders";
+	const std::string modelPath = "../resources/models/";
+	const std::string shadersPath = "../resources/shaders/";
 
 	std::string verts[NUM_SHADERS] = {
-	    "/vert.glsl",
-	    "/phong_vert.glsl",
-	    "/silhouette_vert.glsl"
+	    "vert.glsl",
+	    "phong_vert.glsl",
+	    "silhouette_vert.glsl"
 	};
 
 	std::string frags[NUM_SHADERS] = {
-	    "/frag.glsl",
-	    "/phong_frag.glsl",
-	    "/silhouette_frag.glsl"
+	    "frag.glsl",
+	    "phong_frag.glsl",
+	    "silhouette_frag.glsl"
 	};
 
 	Shader program;
