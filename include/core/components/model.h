@@ -12,7 +12,7 @@ public:
     Model(const std::string& modelPath = "../resources/models/bunny.obj")
         : modelPath(modelPath)
     {
-        type = TRANSFORM;
+        type = MODEL;
     }
 
     // Add function to process component

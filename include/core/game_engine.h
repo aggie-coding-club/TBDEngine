@@ -7,7 +7,52 @@
 #include "game_object.h"
 #include "components/material.h"
 #include "components/transform.h"
+#include "scene.h"
 
+#define _USE_SCENE_
+
+class GameEngine
+{
+private:
+    std::string name;
+    std::vector<std::shared_ptr<Scene>> scenes;
+    int currSceneIdx = 0;
+
+    void TestInit2()
+    {
+        auto scene = std::make_shared<Scene>();
+        size_t n = 3;
+        glm::vec3 pos[n] = {
+            {0.0f, -1.0f, 0.0f},
+            {-2.0f, -1.0f, -3.0f},
+            {2.0f, -1.0f, -3.0f}
+        };
+        for (int i = 0; i < n; i++)
+        {
+            scene->AddModel();
+            const auto& obj = scene->GetModels().at(i);
+
+            std::dynamic_pointer_cast<Transform>(obj->components.at(0))->position = pos[i];
+        }
+
+        auto light = std::make_shared<GameObject>();
+        auto lightTransform = std::make_shared<Transform>(
+            glm::vec3()
+        );
+
+        scenes.push_back(scene);
+    }
+
+public:
+    std::vector<std::shared_ptr<Scene>>& GetScenes() { return scenes; }
+    std::shared_ptr<Scene>& GetCurrScene() { return scenes[currSceneIdx]; }
+    GameEngine()
+    {
+        TestInit2();
+    }
+};
+
+#ifndef _USE_SCENE_
 class GameEngine {
 private:
     std::vector<std::shared_ptr<GameObject>> gameObjects;
@@ -107,3 +152,4 @@ public:
     const std::vector<std::shared_ptr<GameObject>>& GetGameObjects() { return gameObjects; }
 
 };
+#endif

@@ -102,7 +102,10 @@ void GuiEngine::run( int width, int height )
     // Game Engine
     ShowMenuBar(showDetail, showView, showHierarchy);
     if(showHierarchy) {
+#ifndef _USE_SCENE_
         ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects());
+#endif
+        ShowFileHierarchy(gameEngine ,gameEngine->GetCurrScene()->GetModels());
     }
     if(showView)
     {
@@ -110,7 +113,10 @@ void GuiEngine::run( int width, int height )
     }
     if(showDetail)
     {
+#ifndef _USE_SCENE_
         ShowDetails(gameEngine->selectedGameObj);
+#endif
+        ShowDetails(gameEngine->GetCurrScene()->selectedGameObj);
     }
 
     // Rendering

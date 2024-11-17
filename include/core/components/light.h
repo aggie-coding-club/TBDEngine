@@ -1,8 +1,14 @@
-//
-// Created by arkan on 11/15/2024.
-//
+#pragma once
+#include "component.h"
+#include "glm\glm.hpp"
 
-#ifndef LIGHT_H
-#define LIGHT_H
-
-#endif //LIGHT_H
+class Light: public Component {
+public:
+    glm::vec3 color;
+    float intensity;
+    Light(const glm::vec3 color = {1.0f, 1.0f, 1.0f} , float intensity = 1.0f)
+        : color(color), intensity(intensity)
+    {
+        type = LIGHT;
+    }
+};

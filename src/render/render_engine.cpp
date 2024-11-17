@@ -8,12 +8,14 @@
 
 void RenderEngine::Init()
 {
+#ifndef _USE_SCENE_
 	// Lights
 	lights[0].position = {0.0f, 0.0f, 3.0f};
 	lights[0].color    = {0.5f, 0.5f, 0.5f};
 
 	lights[1].position = {0.0f, 3.0f, 0.0f};
 	lights[1].color    = {0.2f, 0.2f, 0.2f};
+#endif
 
 	ShadersInit();
 }
@@ -93,26 +95,33 @@ void RenderEngine::Display()
 	glm::mat4 projectionMatrix = camera->GetProjectionMatrix();
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
 
+	const auto& scene = gameEngine->GetCurrScene();
 
-	for (const auto& gameObj : gameEngine->GetGameObjects())
+	for (const auto& model : scene->GetModels())
 	{
-		auto objTransform = std::dynamic_pointer_cast<Transform>( gameObj->components.at(0) );
-		auto objMaterial = std::dynamic_pointer_cast<Material>( gameObj->components.at(1) );
-		std::string& model_path = objTransform->modelPath;
+		const auto& objTransform = std::dynamic_pointer_cast<Transform>( model->components.at(0) );
+		const auto& objMaterial = std::dynamic_pointer_cast<Material>( model->components.at(1) );
+		const auto& objModel = std::dynamic_pointer_cast<Model>(model->components.at(2) );
 
-		if (posBuffMap.find(model_path) == posBuffMap.end())
+		std::string& modelPath = objModel->modelPath;
+
+		if (posBuffMap.find(modelPath) == posBuffMap.end())
 		{
-			LoadModel(model_path);
+			LoadModel(modelPath);
 		}
 
 		glm::mat4 modelMatrix(1.0f);
 		// modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), objTransform->scale);
+		modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f))	// TODO Refactor this
+			* glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f))	// TODO Refactor this
+			* glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f))	// TODO Refactor this
+			* glm::scale(glm::mat4(1.0f), objTransform->scale);
 
     	glm::mat4 modelInverseTranspose = glm::transpose(glm::inverse(modelMatrix));
 		program.Bind();
-		program.SendAttributeData(posBuffMap[model_path], "vPositionModel");
-		program.SendAttributeData(norBuffMap[model_path], "vNormalModel");
+		program.SendAttributeData(posBuffMap[modelPath], "vPositionModel");
+		program.SendAttributeData(norBuffMap[modelPath], "vNormalModel");
 		program.SendUniformData(modelMatrix, "model");
 		program.SendUniformData(viewMatrix, "view");
 		program.SendUniformData(projectionMatrix, "projection");
@@ -131,7 +140,7 @@ void RenderEngine::Display()
 		    program.SendUniformData(lights[1].color, "lights[1].color");
 
     	}
-		glDrawArrays(GL_TRIANGLES, 0, posBuffMap[model_path].size() / 3);
+		glDrawArrays(GL_TRIANGLES, 0, posBuffMap[modelPath].size() / 3);
 		program.Unbind();
 	}
 

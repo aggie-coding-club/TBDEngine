@@ -21,14 +21,20 @@ void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr
     // Create the window
     ImGui::Begin("Hierarchy",nullptr, window_flags);
     if(ImGui::Button("+")) {
+#ifndef _USE_SCENE_
         gameEngine->AddGameObject();
+#endif
+        gameEngine->GetCurrScene()->AddModel();
     }
     ImGui::SameLine();
     if (ImGui::TreeNode("Root Folder"))
     {
         for (const auto& obj : Objects) {
             if(ImGui::Selectable(obj->name.c_str())) {
+#ifndef _USE_SCENE_
                 gameEngine->selectedGameObj = obj;
+#endif
+                gameEngine->GetCurrScene()->selectedGameObj = obj;
             }
         }
 
