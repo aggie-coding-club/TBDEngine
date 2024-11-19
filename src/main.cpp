@@ -17,6 +17,9 @@
 #include "core/game_engine.h"
 #include "render/render_engine.h"
 
+
+#include <yaml-cpp/yaml.h> // for tests, remove later
+
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
 #define NUM_LIGHTS 2
@@ -50,6 +53,9 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int argc, char *argv[])
 {
+	YAML::Node node; // Testing YAML
+	node["key"] = "value";
+
 	// GLFWwindow* window is shared between gui and render,
 	// so let's declare it in main.
     glfwSetErrorCallback(glfw_error_callback);
