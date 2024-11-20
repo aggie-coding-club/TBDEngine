@@ -1,5 +1,5 @@
-#include "project.h"
-#include "scenes.h"
+#include "serial/project.h"
+#include "serial/scenes.h"
 
 using namespace YAML;
 

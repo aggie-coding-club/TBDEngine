@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../include/serial/components/material.h"
+#include "serial/components/material.h"
 
 using namespace YAML;
 

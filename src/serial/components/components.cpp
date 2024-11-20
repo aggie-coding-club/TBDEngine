@@ -1,5 +1,6 @@
-#pragma once
-#include "../../../include/serial/components/components.h"
+#include "serial/components/components.h"
+#include "serial/components/transform.h"
+#include "serial/components/material.h"
 
 using namespace YAML;
 
@@ -22,5 +23,4 @@ Node SerializeComponents(std::vector<std::shared_ptr<Component>> components) {
     }
 
     return ComponentsNode;
-
 }
