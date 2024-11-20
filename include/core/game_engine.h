@@ -19,6 +19,8 @@ private:
     std::vector<std::shared_ptr<Scene>> scenes;
     int currSceneIdx = 0;
 
+    std::string modelPath = "../resources/models/";
+
     bool changedScene = true;
 
     void TestInit2()
@@ -37,6 +39,19 @@ private:
 
             std::dynamic_pointer_cast<Transform>(obj->components[TRANSFORM])->position = pos[i];
         }
+
+        const auto ground = std::make_shared<GameObject>();
+
+        ground->components[TRANSFORM] = std::make_shared<Transform>(
+            glm::vec3(0.0f, -0.75f, 0.0f),
+            glm::vec3(-90.0f, 0.0f, 0.0f),
+            glm::vec3(20.0f)
+            );
+        ground->components[MODEL] = std::make_shared<Model>(modelPath+"square.obj");
+        ground->components[MATERIAL] = std::make_shared<Material>();
+        ground->name = "Ground";
+
+        scene->AddModel(ground);
 
 	    // // Lights
 	    // lights[0].position = {0.0f, 0.0f, 3.0f};
