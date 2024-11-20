@@ -16,6 +16,7 @@
 #include "Details.h"
 #include "Viewport.h"
 #include "FileHierarchy.h"
+#include "MenuBar.h"
 
 class GuiEngine
 {
@@ -40,6 +41,7 @@ private:
     Viewport* viewport;
     FileHierarchy* fileHierarchy;
     Details* details;
+    MenuBar* menuBar;
 
 public:
      bool showView = true;

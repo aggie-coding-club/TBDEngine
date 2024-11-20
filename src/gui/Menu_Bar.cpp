@@ -1,9 +1,8 @@
 // Code for menu bar
 
-#include "imgui.h"
-#include "gui/Custom_Widgets.h"
+#include "gui/MenuBar.h"
 
-void ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy, bool &ShowCameraDebug){
+void MenuBar::ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy, bool &ShowCameraDebug){
     if (ImGui::BeginMainMenuBar())
     {
         // File menu
