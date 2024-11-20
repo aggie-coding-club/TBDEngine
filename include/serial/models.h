@@ -1,6 +1,6 @@
 #pragma once
 #include <yaml-cpp/yaml.h>
-#include "../core/game_engine.h"
-#include "components/components.h"
+#include "core/game_engine.h"
+#include "core/game_object.h"
 
-YAML::Node SerializeModels(std::vector<std::shared_ptr<GameObject>> models);
+YAML::Node SerializeModels(const std::vector<std::shared_ptr<GameObject>>& models);

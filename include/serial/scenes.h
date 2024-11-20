@@ -1,6 +1,6 @@
 #pragma once
 #include <yaml-cpp/yaml.h>
-#include "../../include/core/game_engine.h"
+#include "core/game_engine.h"
 
 // Node SerializeScenes(std::vector<scene>& scenes) {
 //     Node ScenesNode;

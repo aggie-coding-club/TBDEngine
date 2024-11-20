@@ -1,10 +1,9 @@
-#pragma once
-#include "../../../include/serial/components/transform.h"
+#include "serial/components/transform.h"
 
 
 using namespace YAML;
 
-Node SerializeTransform(std::shared_ptr<Transform> transform) {    
+Node SerializeTransform(const std::shared_ptr<Transform>& transform) {
     Node TransformNode;
 
     TransformNode["position"] = std::vector<float>{transform->position[0], transform->position[1], transform->position[2]};

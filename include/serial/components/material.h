@@ -2,4 +2,4 @@
 #include <yaml-cpp/yaml.h>
 #include "core/components/material.h"
 
-YAML::Node SerializeMaterial(std::shared_ptr<Material> material);
+YAML::Node SerializeMaterial(const std::shared_ptr<Material>& material);

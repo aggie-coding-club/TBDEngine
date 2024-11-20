@@ -1,5 +1,5 @@
 #pragma once
 #include <yaml-cpp/yaml.h>
-#include "../../include/core/game_engine.h"
+#include "core/game_engine.h"
 
-void SerializeProject(GameEngine* engine);
+void SerializeProject(const GameEngine* engine);
