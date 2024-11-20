@@ -16,14 +16,20 @@ class GuiEngine
 {
 private:
      ImGuiIO* io;
-     ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+     ImVec4 clearColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
      GLFWwindow* window;
      GameEngine* gameEngine;
-     ImFont* Inter_24;
+     ImFont* inter_24;
      bool showDetail = true;
      bool showHierarchy = true;
      bool showCameraWindow = false;
      Camera *camera;
+     bool showAddObject = false;
+    // For Add object window
+    int objectType = 0;
+
+    char objectLocation[128];
+    char objectName[128];
 
 public:
      bool showView = true;

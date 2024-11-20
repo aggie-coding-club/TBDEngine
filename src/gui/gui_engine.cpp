@@ -48,7 +48,7 @@ bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    Inter_24 = io->Fonts->AddFontFromFileTTF("../include/Fonts/Inter-VariableFont_opsz,wght.ttf", 24);
+    inter_24 = io->Fonts->AddFontFromFileTTF("../include/Fonts/Inter-VariableFont_opsz,wght.ttf", 24);
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     // Temporarily set the resize grip alpha to 0 to hide it
@@ -80,7 +80,11 @@ bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 
-    clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    // Setting End of buffers to '\0' to prevent errors
+    objectLocation[127] = '\0';
+    objectName[127] = '\0';
 
     return true;
 }
@@ -101,7 +105,7 @@ void GuiEngine::run( int width, int height )
     // Game Engine
     ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
     if(showHierarchy) {
-        ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects());
+        ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects(), showAddObject);
     }
     if(showView)
     {
@@ -113,6 +117,10 @@ void GuiEngine::run( int width, int height )
     }
     if(showCameraWindow){
         ShowCameraDebugWindow(camera);
+    }
+    if(showAddObject) {
+
+        ShowAddObjectWindow(gameEngine, showAddObject, objectType);
     }
 
     // Rendering

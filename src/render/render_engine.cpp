@@ -113,7 +113,7 @@ void RenderEngine::Display()
 	{
 		auto objTransform = std::dynamic_pointer_cast<Transform>( gameObj->components.at(0) );
 		auto objMaterial = std::dynamic_pointer_cast<Material>( gameObj->components.at(1) );
-		std::string& model_path = objTransform->model_path;
+		std::string& model_path = gameObj->model_path;
 
 		if (posBuffMap.find(model_path) == posBuffMap.end())
 		{

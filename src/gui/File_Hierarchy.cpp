@@ -2,7 +2,7 @@
 
 #include "imgui.h"
 #include "gui/Custom_Widgets.h"
-void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr<GameObject>>& Objects)
+void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr<GameObject>>& Objects, bool &showAddObject)
 {
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
@@ -21,7 +21,7 @@ void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr
     // Create the window
     ImGui::Begin("Hierarchy",nullptr, window_flags);
     if(ImGui::Button("+")) {
-        gameEngine->add_GameObject();
+        showAddObject = true;
     }
     ImGui::SameLine();
     if (ImGui::TreeNode("Root Folder"))

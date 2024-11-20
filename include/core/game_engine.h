@@ -71,12 +71,10 @@ public:
         }
     }
 
-    void add_GameObject(){
-        glm::vec3 pos= {0.0f, 0.0f, 0.0f};
-
-        auto bunnyObj = std::make_shared<GameObject>();
-        auto bunnyName = std::string("bunny" + std::to_string(randomID++));
-        auto bunnyTransform = std::make_shared<Transform>(pos);
+    void addGameObject(std::string location = "../resources/models/square.obj", std::string name = "AH"){
+        auto bunnyObj = std::make_shared<GameObject>(location);
+        auto bunnyName = std::string(name + std::to_string(randomID++));
+        auto bunnyTransform = std::make_shared<Transform>();
         auto bunnyMaterial = std::make_shared<Material>();
 
         bunnyObj->name = bunnyName;
