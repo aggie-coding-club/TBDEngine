@@ -1,8 +1,6 @@
-#include "imgui.h"
-#include <GLFW/glfw3.h>
-#include "gui/Custom_Widgets.h"
+#include "gui/Viewport.h"
 
-void ShowViewport(ImVec2 window_Size){
+void Viewport::ShowViewport(ImVec2 window_Size){
 
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse;
 

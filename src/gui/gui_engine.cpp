@@ -1,7 +1,5 @@
 #include "gui/gui_engine.h"
 
-#include <ostream>
-
 #include "gui/Custom_Widgets.h"
 #include "core/game_engine.h"
 
@@ -109,7 +107,7 @@ void GuiEngine::run( int width, int height )
     }
     if(showView)
     {
-        ShowViewport(ImVec2(width, height));
+        viewport.ShowViewport(ImVec2(width, height));
     }
     if(showDetail)
     {

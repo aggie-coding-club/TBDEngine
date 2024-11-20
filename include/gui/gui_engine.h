@@ -12,6 +12,9 @@
 #include "core/game_engine.h"
 #include "core/camera.h"
 
+// Window classes
+#include "gui/Viewport.h"
+
 class GuiEngine
 {
 private:
@@ -30,6 +33,9 @@ private:
 
     char objectLocation[128];
     char objectName[128];
+
+    // Windows
+    Viewport viewport;
 
 public:
      bool showView = true;
