@@ -15,6 +15,7 @@ private:
     std::vector<std::shared_ptr<Camera>> 		cameras;
 
     std::string name;
+    int currCameraIdx = 0;
 
     std::string modelPath = "../resources/models/";
 
@@ -31,9 +32,9 @@ public:
     {
         return lights;
     }
-    std::vector<std::shared_ptr<Camera>>& 		GetCameras()
+    std::shared_ptr<Camera>& GetCurrCamera()
     {
-        return cameras;
+        return cameras[currCameraIdx];
     }
     void AddModel(const std::shared_ptr<GameObject>& model)
     {
@@ -50,9 +51,9 @@ public:
   	    const auto bunnyModel = std::make_shared<Model>();
 
         bunnyObj->name = bunnyName;
-        bunnyObj->components.push_back(bunnyTransform);
-        bunnyObj->components.push_back(bunnyMaterial);
-  	    bunnyObj->components.push_back(bunnyModel);
+        bunnyObj->components[TRANSFORM] = bunnyTransform;
+        bunnyObj->components[MATERIAL] = bunnyMaterial;
+  	    bunnyObj->components[MODEL] = bunnyModel;
 
         AddModel(bunnyObj);
     };

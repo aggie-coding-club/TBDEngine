@@ -193,32 +193,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} glfw)
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
-# OS specific options and libraries
-IF(WIN32)
-    # -Wall produces way too many warnings.
-    # -pedantic is not supported.
-    # Disable warning 4996.
-    # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-    message(STATUS "Vulkan_LIBRARY is ${Vulkan_LIBRARY}")
-    target_link_libraries(${CMAKE_PROJECT_NAME} ${Vulkan_LIBRARY})
-    SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
-ELSE()
-    # Enable all pedantic warnings.
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
-    IF(APPLE)
-        # macOS specific frameworks for GLFW and Vulkan
-        find_library(MOLTENVK_FRAMEWORK NAMES MoltenVK
-                PATHS ${MOLTENVK_PATH}/include
-                NO_DEFAULT_PATH)
-
-        # target_link_libraries(${CMAKE_PROJECT_NAME} "-framework MoltenVK")
-    ELSE()
-        # Link the Linux Vulkan library
-        target_link_libraries(${CMAKE_PROJECT_NAME} vulkan)
-    ENDIF()
-ENDIF()
-
 # find_program(GLSL_VALIDATOR glslangValidator HINTS /usr/bin /usr/local/bin $ENV{VULKAN_SDK}/Bin/ $ENV{VULKAN_SDK}/Bin32/)
 #
 # if(NOT GLSL_VALIDATOR)

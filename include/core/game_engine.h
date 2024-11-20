@@ -7,6 +7,7 @@
 #include "game_object.h"
 #include "components/material.h"
 #include "components/transform.h"
+#include "components/light.h"
 #include "scene.h"
 
 #define _USE_SCENE_
@@ -18,11 +19,13 @@ private:
     std::vector<std::shared_ptr<Scene>> scenes;
     int currSceneIdx = 0;
 
+    bool changedScene = true;
+
     void TestInit2()
     {
-        auto scene = std::make_shared<Scene>();
-        size_t n = 3;
-        glm::vec3 pos[n] = {
+        const auto scene = std::make_shared<Scene>();
+        constexpr size_t n = 3;
+        constexpr glm::vec3 pos[n] = {
             {0.0f, -1.0f, 0.0f},
             {-2.0f, -1.0f, -3.0f},
             {2.0f, -1.0f, -3.0f}
@@ -32,13 +35,47 @@ private:
             scene->AddModel();
             const auto& obj = scene->GetModels().at(i);
 
-            std::dynamic_pointer_cast<Transform>(obj->components.at(0))->position = pos[i];
+            std::dynamic_pointer_cast<Transform>(obj->components[TRANSFORM])->position = pos[i];
         }
 
-        auto light = std::make_shared<GameObject>();
-        auto lightTransform = std::make_shared<Transform>(
-            glm::vec3()
-        );
+	    // // Lights
+	    // lights[0].position = {0.0f, 0.0f, 3.0f};
+	    // lights[0].color    = {0.5f, 0.5f, 0.5f};
+
+	    // lights[1].position = {0.0f, 3.0f, 0.0f};
+	    // lights[1].color    = {0.2f, 0.2f, 0.2f};
+        const auto light1 = std::make_shared<GameObject>();
+        const auto lightTransform1 = std::make_shared<Transform>(
+            glm::vec3(0.0f, 0.0f, 3.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f));
+
+        const auto lightComp1 = std::make_shared<Light>(
+            glm::vec3(0.5f, 0.5f, 0.5f),
+                1.0f);
+
+        light1->components[TRANSFORM] = lightTransform1;
+        light1->components[LIGHT] = lightComp1;
+
+        scene->GetLights().emplace_back(light1);
+
+        const auto light2 = std::make_shared<GameObject>();
+        const auto lightTransform2 = std::make_shared<Transform>(
+            glm::vec3(0.0f, 3.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f));
+
+        const auto lightComp2 = std::make_shared<Light>(
+            glm::vec3(0.2f, 0.2f, 0.2f),
+                1.0f);
+
+        light2->components[TRANSFORM] = lightTransform2;
+        light2->components[LIGHT] = lightComp2;
+
+        scene->GetLights().emplace_back(light2);
+
+        // Light End
+
 
         scenes.push_back(scene);
     }
@@ -50,6 +87,11 @@ public:
     {
         TestInit2();
     }
+
+    bool HasChangedScene() const { return changedScene; }
+    void ChangedSceneAcknowledged() { changedScene = false; }
+    void ChangeScene(const int idx) { currSceneIdx = idx; changedScene = true; }
+    void CycleScene() { currSceneIdx = (currSceneIdx+1) % scenes.size(); changedScene = true; }
 };
 
 #ifndef _USE_SCENE_

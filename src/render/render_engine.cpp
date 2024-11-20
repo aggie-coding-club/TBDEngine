@@ -4,7 +4,10 @@
 #include "render/tiny_obj_loader.h"
 
 #include "core/components/component.h"
+#include "core/components/light.h"
 #include "core/components/transform.h"
+
+#include <fmt/core.h>
 
 void RenderEngine::Init()
 {
@@ -92,6 +95,12 @@ void RenderEngine::Display()
 	// glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), float(width) / float(height), 0.1f, 100.0f);
 	// glm::mat4 viewMatrix = glm::lookAt(eye, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
+	if (gameEngine->HasChangedScene())
+	{
+		// TODO reinitialize shadow maps
+		gameEngine->ChangedSceneAcknowledged();
+	}
+
 	glm::mat4 projectionMatrix = camera->GetProjectionMatrix();
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
 
@@ -99,9 +108,9 @@ void RenderEngine::Display()
 
 	for (const auto& model : scene->GetModels())
 	{
-		const auto& objTransform = std::dynamic_pointer_cast<Transform>( model->components.at(0) );
-		const auto& objMaterial = std::dynamic_pointer_cast<Material>( model->components.at(1) );
-		const auto& objModel = std::dynamic_pointer_cast<Model>(model->components.at(2) );
+		const auto& objTransform = std::dynamic_pointer_cast<Transform>( model->components[TRANSFORM]);
+		const auto& objMaterial = std::dynamic_pointer_cast<Material>( model->components[MATERIAL]);
+		const auto& objModel = std::dynamic_pointer_cast<Model>(model->components[MODEL]);
 
 		std::string& modelPath = objModel->modelPath;
 
@@ -133,12 +142,19 @@ void RenderEngine::Display()
 		    program.SendUniformData(objMaterial->specular, "ks");
 		    program.SendUniformData(objMaterial->shininess, "s");
 
-		    program.SendUniformData(lights[0].position, "lights[0].position");
-		    program.SendUniformData(lights[0].color, "lights[0].color");
+    		const auto& lights = scene->GetLights();
 
-		    program.SendUniformData(lights[1].position, "lights[1].position");
-		    program.SendUniformData(lights[1].color, "lights[1].color");
+    		for (size_t i = 0; i < lights.size(); i++)
+    		{
+    			const auto& light = lights[i];
+    			const auto lightTransform = std::dynamic_pointer_cast<Transform>(light->components[TRANSFORM]);
+    			const auto lightComponent = std::dynamic_pointer_cast<Light>(light->components[LIGHT]);
 
+    			std::string name = fmt::format("lights[{}]", i);
+
+				program.SendUniformData(lightTransform->position, (name + ".position").c_str());
+				program.SendUniformData(lightComponent->color, (name+".color").c_str());
+    		}
     	}
 		glDrawArrays(GL_TRIANGLES, 0, posBuffMap[modelPath].size() / 3);
 		program.Unbind();

@@ -1,6 +1,6 @@
 #pragma once
 #include "component.h"
-#include "glm\glm.hpp"
+#include <glm/glm.hpp>
 
 class Light: public Component {
 public:
