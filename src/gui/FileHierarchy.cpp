@@ -1,9 +1,8 @@
 // Code for File Hierarchy
 
-#include "imgui.h"
-#include "gui/Custom_Widgets.h"
-void ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr<GameObject>>& Objects, bool &showAddObject)
-{
+#include "gui/FileHierarchy.h"
+void FileHierarchy::ShowFileHierarchy(GameEngine *gameEngine, const std::vector<std::shared_ptr<GameObject> > &Objects, bool &showAddObject) {
+
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
 

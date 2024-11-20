@@ -14,6 +14,7 @@
 
 // Window classes
 #include "gui/Viewport.h"
+#include "gui/FileHierarchy.h"
 
 class GuiEngine
 {
@@ -35,7 +36,8 @@ private:
     char objectName[128];
 
     // Windows
-    Viewport viewport;
+    Viewport* viewport;
+    FileHierarchy* fileHierarchy;
 
 public:
      bool showView = true;

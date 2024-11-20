@@ -103,11 +103,11 @@ void GuiEngine::run( int width, int height )
     // Game Engine
     ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
     if(showHierarchy) {
-        ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects(), showAddObject);
+        fileHierarchy->ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects(), showAddObject);
     }
     if(showView)
     {
-        viewport.ShowViewport(ImVec2(width, height));
+        viewport->ShowViewport(ImVec2(width, height));
     }
     if(showDetail)
     {
