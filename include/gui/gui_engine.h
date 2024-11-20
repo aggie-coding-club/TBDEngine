@@ -13,6 +13,8 @@
 #include "core/camera.h"
 
 // Window classes
+#include "AddObjectWindow.h"
+#include "CameraDebugWindow.h"
 #include "Details.h"
 #include "Viewport.h"
 #include "FileHierarchy.h"
@@ -42,6 +44,8 @@ private:
     FileHierarchy* fileHierarchy;
     Details* details;
     MenuBar* menuBar;
+    CameraDebugWindow* cameraDebugWindow;
+    AddObjectWindow* addObjectWindow;
 
 public:
      bool showView = true;

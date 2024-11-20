@@ -1,6 +1,4 @@
 #include "gui/gui_engine.h"
-
-#include "gui/Custom_Widgets.h"
 #include "core/game_engine.h"
 
 static void glfw_error_callback(int error, const char* description)
@@ -114,11 +112,11 @@ void GuiEngine::run( int width, int height )
         details->ShowDetails(gameEngine->selectedGameObj);
     }
     if(showCameraWindow){
-        ShowCameraDebugWindow(camera);
+        cameraDebugWindow->ShowCameraDebugWindow(camera);
     }
     if(showAddObject) {
 
-        ShowAddObjectWindow(gameEngine, showAddObject, objectType);
+        addObjectWindow->showAddObjectWindow(gameEngine, showAddObject, objectType);
     }
 
     // Rendering

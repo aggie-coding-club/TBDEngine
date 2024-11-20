@@ -1,9 +1,9 @@
 #include "imgui.h"
-#include "gui/Custom_Widgets.h"
+#include "gui/CameraDebugWindow.h"
 #include "core/camera.h"
 #include <glm/common.hpp>
 
-void ShowCameraDebugWindow(Camera *camera){
+void CameraDebugWindow::ShowCameraDebugWindow(Camera *camera){
     ImGui::Begin("Camera Debug", nullptr);
 
     glm::vec3 camEye = camera->GetEye();

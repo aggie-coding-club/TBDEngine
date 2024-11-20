@@ -1,9 +1,9 @@
 #include "imgui.h"
-#include "gui/Custom_Widgets.h"
+#include "gui/AddObjectWindow.h"
 #include "core/camera.h"
 #include <glm/common.hpp>
 
-void ShowAddObjectWindow(GameEngine *engine, bool &ShowAddObject, int &objectType){
+void AddObjectWindow::showAddObjectWindow(GameEngine *engine, bool &ShowAddObject, int &objectType){
 
     // Set add object;
     ImGui::Begin("Add Object Window", NULL);
