@@ -1,9 +1,6 @@
 // Code for Details window
-#include <iostream>
-#include <glm/common.hpp>
 
-#include "imgui.h"
-#include "gui/Custom_Widgets.h"
+#include "gui/Details.h"
 
 void ShowTransform(std::shared_ptr<Transform> &object_transform){
     if (ImGui::TreeNode("Transform")){
@@ -46,7 +43,7 @@ void ShowMaterial(std::shared_ptr<Material> &object_material) {
     }
 }
 
-void ShowDetails(std::shared_ptr<GameObject> object)
+void Details::ShowDetails(std::shared_ptr<GameObject> object)
 {
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;

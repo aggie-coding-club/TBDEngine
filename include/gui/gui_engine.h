@@ -13,8 +13,9 @@
 #include "core/camera.h"
 
 // Window classes
-#include "gui/Viewport.h"
-#include "gui/FileHierarchy.h"
+#include "Details.h"
+#include "Viewport.h"
+#include "FileHierarchy.h"
 
 class GuiEngine
 {
@@ -38,6 +39,7 @@ private:
     // Windows
     Viewport* viewport;
     FileHierarchy* fileHierarchy;
+    Details* details;
 
 public:
      bool showView = true;

@@ -111,7 +111,7 @@ void GuiEngine::run( int width, int height )
     }
     if(showDetail)
     {
-        ShowDetails(gameEngine->selectedGameObj);
+        details->ShowDetails(gameEngine->selectedGameObj);
     }
     if(showCameraWindow){
         ShowCameraDebugWindow(camera);
