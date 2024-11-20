@@ -128,8 +128,8 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
 )
 FetchContent_MakeAvailable(yaml)
-set(YAML_INCLUDE_DIRS ${yaml_SOURCE_DIR})
-message(STATUS "yaml include directory: ${YAML_INCLUDE_DIRS}/include")
+set(YAML_INCLUDE_DIRS "${yaml_SOURCE_DIR}/include")
+message(STATUS "yaml include directory: ${YAML_INCLUDE_DIRS}")
 include_directories(${YAML_INCLUDE_DIRS})
 
 # # Fetch vk_bootstrap
