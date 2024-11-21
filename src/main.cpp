@@ -19,6 +19,7 @@
 
 
 #include <yaml-cpp/yaml.h> // for tests, remove later
+#include <serial/models.h>
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -52,9 +53,33 @@ static void glfw_error_callback(int error, const char* description)
 
 
 int main(int argc, char *argv[])
-{
-	YAML::Node node; // Testing YAML
-	node["key"] = "value";
+{	
+	//Testing
+	std::vector<std::shared_ptr<GameObject>> gameObjects;
+    int randomID = 0;
+    std::string modelPath = "../resources/models/";
+
+	glm::vec3 pos= {0.0f, 0.0f, 0.0f};
+
+	auto bunnyObj = std::make_shared<GameObject>();
+	auto bunnyName = std::string("bunny" + std::to_string(randomID++));
+	auto bunnyTransform = std::make_shared<Transform>(pos);
+	auto bunnyMaterial = std::make_shared<Material>();
+	const auto bunnyModel = std::make_shared<Model>();
+	const auto bunnyLight = std::make_shared<Light>();
+
+	bunnyObj->name = bunnyName;
+	bunnyObj->components[TRANSFORM] = bunnyTransform;
+	bunnyObj->components[MATERIAL] = bunnyMaterial;
+	bunnyObj->components[MODEL] = bunnyModel;
+	bunnyObj->components[LIGHT] = bunnyLight;
+
+	gameObjects.push_back(bunnyObj);
+
+	auto node = YAML::Node();
+	node = SerializeModels(gameObjects);
+	std::cout << node << std::endl;
+	//End Testing
 
 	// GLFWwindow* window is shared between gui and render,
 	// so let's declare it in main.

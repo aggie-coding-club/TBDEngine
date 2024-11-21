@@ -15,7 +15,6 @@ YAML::Node SerializeComponent(const std::array<std::shared_ptr<Component>, Compo
             const auto& transform = std::dynamic_pointer_cast<Transform>(component);
             ComponentsNode["Transform"] = SerializeTransform(transform);
             break;
-
         }
         case MATERIAL:
         {
@@ -26,13 +25,13 @@ YAML::Node SerializeComponent(const std::array<std::shared_ptr<Component>, Compo
         case MODEL:
         {
             const auto& model = std::dynamic_pointer_cast<Model>(component);
-            ComponentsNode["Material"] = SerializeModel(model);
+            ComponentsNode["Model"] = SerializeModel(model);
             break;
         }
         case LIGHT:
         {
             const auto& light = std::dynamic_pointer_cast<Light>(component);
-            ComponentsNode["Material"] = SerializeLight(light);
+            ComponentsNode["Light"] = SerializeLight(light);
             break;
         }
         default:

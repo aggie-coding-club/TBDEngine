@@ -2,9 +2,9 @@
 #include "serial/components/component.h"
 
 YAML::Node SerializeModels(const std::vector<std::shared_ptr<GameObject>>& models) {
-    YAML::Node ModelsNode;
+    auto ModelsNode = YAML::Node();
 
-    ModelsNode["Models"] = YAML::Node();
+    ModelsNode["Models"];
 
     for(const auto& model : models) {
         YAML::Node CurrModelNode;
@@ -13,4 +13,6 @@ YAML::Node SerializeModels(const std::vector<std::shared_ptr<GameObject>>& model
 
         ModelsNode["Models"][model->name] = CurrModelNode;
     }
+
+    return ModelsNode;
 }
