@@ -8,6 +8,10 @@ YAML::Node SerializeComponent(const std::array<std::shared_ptr<Component>, Compo
     auto ComponentsNode = YAML::Node();
 
     for(const auto& component: components) {
+        if(component == nullptr) {
+            continue;
+        }
+
         switch(component->type)
         {
         case TRANSFORM:

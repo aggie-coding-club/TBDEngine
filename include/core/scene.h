@@ -57,4 +57,21 @@ public:
 
         AddModel(bunnyObj);
     };
+
+    void SetLightsVector(const std::vector<std::shared_ptr<GameObject>> _lights) {
+        lights = _lights;
+    }
+
+    void SetModelsVector(const std::vector<std::shared_ptr<GameObject>> _models) {
+        models = _models;
+    }
+
+    std::string GetName() {
+        return name;
+    }
+
+    void SetName(std::string _name) {
+        name = _name;
+    }
+
 };

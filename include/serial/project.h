@@ -2,4 +2,4 @@
 #include <yaml-cpp/yaml.h>
 #include "core/game_engine.h"
 
-void SerializeProject(GameEngine* engine);
+YAML::Node SerializeProject(GameEngine* engine);

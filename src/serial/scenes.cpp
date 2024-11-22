@@ -8,11 +8,14 @@ YAML::Node SerializeScenes(const std::vector<std::shared_ptr<Scene>>& scenes) {
 
     for(const std::shared_ptr<Scene>& scene : scenes) {
         auto CurrSceneNode = YAML::Node();
-        CurrSceneNode = SerializeModels(scene->GetModels());
-        CurrSceneNode = SerializeLights(scene->GetLights());
+        CurrSceneNode[scene->GetName()]["Models"] = SerializeModels(scene->GetModels());
+        CurrSceneNode[scene->GetName()]["Lights"] = SerializeLights(scene->GetLights());
+
+        // CurrSceneNode["Models"] = SerializeModels(scene->GetModels());
+        // CurrSceneNode["Lights"] = SerializeLights(scene->GetLights());
         // CurrSceneNode = SerializeCameras(scene->GetCameras());
 
-        // ScenesNode[scene->GetName()] = CurrSceneNode;
+        ScenesNode.push_back(CurrSceneNode);
     }
 
     return ScenesNode;

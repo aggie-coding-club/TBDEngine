@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include "gui/gui_engine.h"
 #define GL_SILENCE_DEPRECATION
@@ -19,7 +20,11 @@
 
 
 #include <yaml-cpp/yaml.h> // for tests, remove later
+#include <serial/lights.h>
 #include <serial/models.h>
+#include "core/scene.h"
+#include "serial/scenes.h"
+#include "serial/project.h"
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
@@ -55,30 +60,73 @@ static void glfw_error_callback(int error, const char* description)
 int main(int argc, char *argv[])
 {	
 	//Testing
-	std::vector<std::shared_ptr<GameObject>> gameObjects;
-    int randomID = 0;
-    std::string modelPath = "../resources/models/";
+	// std::vector<std::shared_ptr<GameObject>> gameObjects;
+    // int randomID = 0;
+    // std::string modelPath = "../resources/models/";
 
-	glm::vec3 pos= {0.0f, 0.0f, 0.0f};
+	// glm::vec3 pos= {0.0f, 0.0f, 0.0f};
 
-	auto bunnyObj = std::make_shared<GameObject>();
-	auto bunnyName = std::string("bunny" + std::to_string(randomID++));
-	auto bunnyTransform = std::make_shared<Transform>(pos);
-	auto bunnyMaterial = std::make_shared<Material>();
-	const auto bunnyModel = std::make_shared<Model>();
-	const auto bunnyLight = std::make_shared<Light>();
+	// auto bunnyObj = std::make_shared<GameObject>();
+	// auto bunnyName = std::string("bunny" + std::to_string(randomID++));
+	// auto bunnyTransform = std::make_shared<Transform>(pos);
+	// auto bunnyMaterial = std::make_shared<Material>();
+	// const auto bunnyModel = std::make_shared<Model>();
+	// // const auto bunnyLight = std::make_shared<Light>();
 
-	bunnyObj->name = bunnyName;
-	bunnyObj->components[TRANSFORM] = bunnyTransform;
-	bunnyObj->components[MATERIAL] = bunnyMaterial;
-	bunnyObj->components[MODEL] = bunnyModel;
-	bunnyObj->components[LIGHT] = bunnyLight;
+	// bunnyObj->name = bunnyName;
+	// bunnyObj->components[TRANSFORM] = bunnyTransform;
+	// bunnyObj->components[MATERIAL] = bunnyMaterial;
+	// bunnyObj->components[MODEL] = bunnyModel;
+	// // bunnyObj->components[LIGHT] = bunnyLight;
 
-	gameObjects.push_back(bunnyObj);
+	// gameObjects.push_back(bunnyObj);
 
-	auto node = YAML::Node();
-	node = SerializeModels(gameObjects);
-	std::cout << node << std::endl;
+	// const auto light1 = std::make_shared<GameObject>();
+	// const auto lightTransform1 = std::make_shared<Transform>(
+	// 	glm::vec3(0.0f, 0.0f, 3.0f),
+	// 	glm::vec3(0.0f, 0.0f, 0.0f),
+	// 	glm::vec3(0.0f, 0.0f, 0.0f));
+
+	// const auto lightComp1 = std::make_shared<Light>(
+	// 	glm::vec3(0.5f, 0.5f, 0.5f),
+	// 		1.0f);
+
+	// light1->components[TRANSFORM] = lightTransform1;
+	// light1->components[LIGHT] = lightComp1;
+	// light1->name = "light1";
+
+	// const auto light2 = std::make_shared<GameObject>();
+	// const auto lightTransform2 = std::make_shared<Transform>(
+	// 	glm::vec3(0.0f, 3.0f, 0.0f),
+	// 	glm::vec3(0.0f, 0.0f, 0.0f),
+	// 	glm::vec3(0.0f, 0.0f, 0.0f));
+
+	// const auto lightComp2 = std::make_shared<Light>(
+	// 	glm::vec3(0.2f, 0.2f, 0.2f),
+	// 		1.0f);
+
+	// light2->components[TRANSFORM] = lightTransform2;
+	// light2->components[LIGHT] = lightComp2;
+	// light2->name = "light2";
+
+	// std::vector<std::shared_ptr<GameObject>> lights;
+
+	// lights.push_back(light1);
+	// lights.push_back(light2);
+
+	// std::vector<std::shared_ptr<Scene>> scenes;
+	// auto scene = std::make_shared<Scene>();
+
+	
+	// scene->SetLightsVector(lights);
+	// scene->SetModelsVector(gameObjects);
+	// scene->SetName("scene");
+	// scenes.push_back(scene);
+	
+
+	// auto node = YAML::Node();
+	// node = SerializeScenes(scenes);
+	// std::cout << node << std::endl;
 	//End Testing
 
 	// GLFWwindow* window is shared between gui and render,
@@ -118,6 +166,17 @@ int main(int argc, char *argv[])
 
     glfwDestroyWindow(window);
     glfwTerminate();
+	auto node = YAML::Node();
+	node = SerializeProject(&gameEngine);
+	std::ofstream yamlFile("../user/project.yaml");
+	if(!yamlFile) {
+		std::cout << "file does not exist" << std::endl;
+		return 1;
+	}
+	yamlFile << node;
+	yamlFile.close();
+
+
 
 	return 0;
 }
