@@ -3,7 +3,7 @@
 #include "core/camera.h"
 #include <glm/common.hpp>
 
-void CameraDebugWindow::ShowCameraDebugWindow(Camera *camera){
+void CameraDebugWindow::ShowCameraDebugWindow(std::shared_ptr<Camera> camera){
     ImGui::Begin("Camera Debug", nullptr);
 
     glm::vec3 camEye = camera->GetEye();

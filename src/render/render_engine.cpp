@@ -100,11 +100,12 @@ void RenderEngine::Display()
 		// TODO reinitialize shadow maps
 		gameEngine->ChangedSceneAcknowledged();
 	}
+	const auto& scene = gameEngine->GetCurrScene();
+	camera = scene->GetCurrCamera();
 
 	glm::mat4 projectionMatrix = camera->GetProjectionMatrix();
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
 
-	const auto& scene = gameEngine->GetCurrScene();
 
 	for (const auto& model : scene->GetModels())
 	{
@@ -166,9 +167,6 @@ void RenderEngine::CharacterCallback(GLFWwindow* window, unsigned int key)
 {
 	switch (key)
 	{
-	case 'q':
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-		break;
     case 'm':
         mat_idx = (++mat_idx) % NUM_MATERIALS;
         break;

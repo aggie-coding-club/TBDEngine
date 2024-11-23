@@ -35,6 +35,12 @@ public:
     {
         return lights;
     }
+
+    std::vector<std::shared_ptr<Camera>>& 	    GetCameras()
+  	{
+  	    return cameras;
+  	}
+
     std::shared_ptr<Camera>& GetCurrCamera()
     {
         return cameras[currCameraIdx];

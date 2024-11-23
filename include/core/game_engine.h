@@ -24,6 +24,11 @@ private:
     void TestInit2()
     {
         const auto scene = std::make_shared<Scene>();
+
+        /**** Camera ****/
+        const auto camera = std::make_shared<Camera>();
+
+        scene->GetCameras().emplace_back(camera);
         constexpr size_t n = 3;
         constexpr glm::vec3 pos[n] = {
             {0.0f, -1.0f, 0.0f},
