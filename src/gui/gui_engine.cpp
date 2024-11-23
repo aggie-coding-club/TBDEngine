@@ -82,6 +82,8 @@ bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
     objectLocation[127] = '\0';
     objectName[127] = '\0';
 
+    io->DisplaySize;
+
     return true;
 }
 
