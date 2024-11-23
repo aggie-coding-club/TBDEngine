@@ -101,7 +101,10 @@ void GuiEngine::run( int width, int height )
     // Game Engine
     menuBar.ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
     if(showHierarchy) {
-        fileHierarchy.ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects(), showAddObject);
+#ifndef _USE_SCENE_
+        ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects());
+#endif
+        fileHierarchy.ShowFileHierarchy(gameEngine ,gameEngine->GetCurrScene()->GetModels(), showAddObject);
     }
     if(showView)
     {
@@ -109,13 +112,16 @@ void GuiEngine::run( int width, int height )
     }
     if(showDetail)
     {
-        details.ShowDetails(gameEngine->selectedGameObj);
+        details.ShowDetails(gameEngine->GetCurrScene()->selectedGameObj);
     }
     if(showCameraWindow){
         cameraDebugWindow.ShowCameraDebugWindow(camera);
     }
     if(showAddObject) {
         addObjectWindow.showAddObjectWindow(gameEngine, showAddObject);
+#ifndef _USE_SCENE_
+        details.ShowDetails(gameEngine->selectedGameObj);
+#endif
     }
 
     // Rendering

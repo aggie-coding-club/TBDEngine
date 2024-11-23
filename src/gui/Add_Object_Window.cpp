@@ -58,7 +58,7 @@ void AddObjectWindow::showAddObjectWindow(GameEngine *engine, bool &ShowAddObjec
         switch (objectType) {
             case 1:
                 if(location != "") {
-                    engine->addGameObject(location, name);
+                    engine->GetCurrScene()->AddModel(location, name);
                 }
                 break;
             default:

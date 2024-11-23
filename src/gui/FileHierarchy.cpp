@@ -27,7 +27,10 @@ void FileHierarchy::ShowFileHierarchy(GameEngine *gameEngine, const std::vector<
     {
         for (const auto& obj : Objects) {
             if(ImGui::Selectable(obj->name.c_str())) {
+#ifndef _USE_SCENE_
                 gameEngine->selectedGameObj = obj;
+#endif
+                gameEngine->GetCurrScene()->selectedGameObj = obj;
             }
         }
 

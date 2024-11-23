@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <array>
 #include <unordered_set>
 #include <memory>
 
@@ -9,7 +9,7 @@
 class GameObject {
 public:
     std::string name;
-    std::vector<std::shared_ptr<Component>> components;
+    std::array<std::shared_ptr<Component>, Component::GetEnumSize()> components{};
     std::unordered_set<std::string> tags;
     std::string model_path;
 

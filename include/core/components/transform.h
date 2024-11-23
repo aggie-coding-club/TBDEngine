@@ -1,9 +1,7 @@
 #pragma once
 
 #include "component.h"
-#include <glm/vec3.hpp>
-
-#include "fastgltf/types.hpp"
+#include <glm/glm.hpp>
 
 class Transform: public Component {
 public:
@@ -11,14 +9,15 @@ public:
     glm::vec3 rotation;
     glm::vec3 scale;
 
-    // TODO Remove hardcoded bunny
-    Transform(const glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f),
-              const glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f), // In degrees
-              const glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f))
+    Transform(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scl)
         : position(pos), rotation(rot), scale(scl)
     {
         type = TRANSFORM;
     }
+
+    Transform(const glm::vec3 pos):
+        Transform(pos, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}) {}
+
     // Add function to process component
 
 };

@@ -4,31 +4,21 @@
 #include "render/tiny_obj_loader.h"
 
 #include "core/components/component.h"
+#include "core/components/light.h"
 #include "core/components/transform.h"
+
+#include <fmt/core.h>
 
 void RenderEngine::Init()
 {
-	materials[0].ka = {0.2f, 0.2f, 0.2f};
-	materials[0].kd = {0.1f, 0.1f, 0.1f};
-	materials[0].ks = {1.0f, 1.0f, 1.0f};
-	materials[0].s  = 10.0f;
-
-	materials[1].ka = {0.0f, 0.2f, 0.2f};
-	materials[1].kd = {0.5f, 0.7f, 0.2f};
-	materials[1].ks = {0.1f, 1.0f, 0.1f};
-	materials[1].s  = 100.0;
-
-	materials[2].ka = {0.2f, 0.2f, 0.2f};
-	materials[2].kd = {0.1f, 0.3f, 0.9f};
-	materials[2].ks = {0.1f, 0.1f, 0.1f};
-	materials[2].s  = 1.0;
-
+#ifndef _USE_SCENE_
 	// Lights
 	lights[0].position = {0.0f, 0.0f, 3.0f};
 	lights[0].color    = {0.5f, 0.5f, 0.5f};
 
 	lights[1].position = {0.0f, 3.0f, 0.0f};
 	lights[1].color    = {0.2f, 0.2f, 0.2f};
+#endif
 
 	ShadersInit();
 }
@@ -105,29 +95,42 @@ void RenderEngine::Display()
 	// glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f), float(width) / float(height), 0.1f, 100.0f);
 	// glm::mat4 viewMatrix = glm::lookAt(eye, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
+	if (gameEngine->HasChangedScene())
+	{
+		// TODO reinitialize shadow maps
+		gameEngine->ChangedSceneAcknowledged();
+	}
+
 	glm::mat4 projectionMatrix = camera->GetProjectionMatrix();
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
 
+	const auto& scene = gameEngine->GetCurrScene();
 
-	for (const auto& gameObj : gameEngine->GetGameObjects())
+	for (const auto& model : scene->GetModels())
 	{
-		auto objTransform = std::dynamic_pointer_cast<Transform>( gameObj->components.at(0) );
-		auto objMaterial = std::dynamic_pointer_cast<Material>( gameObj->components.at(1) );
-		std::string& model_path = gameObj->model_path;
+		const auto& objTransform = std::dynamic_pointer_cast<Transform>( model->components[TRANSFORM]);
+		const auto& objMaterial = std::dynamic_pointer_cast<Material>( model->components[MATERIAL]);
+		const auto& objModel = std::dynamic_pointer_cast<Model>(model->components[MODEL]);
 
-		if (posBuffMap.find(model_path) == posBuffMap.end())
+		std::string& modelPath = objModel->modelPath;
+
+		if (posBuffMap.find(modelPath) == posBuffMap.end())
 		{
-			LoadModel(model_path);
+			LoadModel(modelPath);
 		}
 
 		glm::mat4 modelMatrix(1.0f);
 		// modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, -1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f)) * glm::scale(glm::mat4(1.0f), objTransform->scale);
+		modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position)
+			* glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f))	// TODO Refactor this
+			* glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f))	// TODO Refactor this
+			* glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f))	// TODO Refactor this
+			* glm::scale(glm::mat4(1.0f), objTransform->scale);
 
     	glm::mat4 modelInverseTranspose = glm::transpose(glm::inverse(modelMatrix));
 		program.Bind();
-		program.SendAttributeData(posBuffMap[model_path], "vPositionModel");
-		program.SendAttributeData(norBuffMap[model_path], "vNormalModel");
+		program.SendAttributeData(posBuffMap[modelPath], "vPositionModel");
+		program.SendAttributeData(norBuffMap[modelPath], "vNormalModel");
 		program.SendUniformData(modelMatrix, "model");
 		program.SendUniformData(viewMatrix, "view");
 		program.SendUniformData(projectionMatrix, "projection");
@@ -139,14 +142,21 @@ void RenderEngine::Display()
 		    program.SendUniformData(objMaterial->specular, "ks");
 		    program.SendUniformData(objMaterial->shininess, "s");
 
-		    program.SendUniformData(lights[0].position, "lights[0].position");
-		    program.SendUniformData(lights[0].color, "lights[0].color");
+    		const auto& lights = scene->GetLights();
 
-		    program.SendUniformData(lights[1].position, "lights[1].position");
-		    program.SendUniformData(lights[1].color, "lights[1].color");
+    		for (size_t i = 0; i < lights.size(); i++)
+    		{
+    			const auto& light = lights[i];
+    			const auto lightTransform = std::dynamic_pointer_cast<Transform>(light->components[TRANSFORM]);
+    			const auto lightComponent = std::dynamic_pointer_cast<Light>(light->components[LIGHT]);
 
+    			std::string name = fmt::format("lights[{}]", i);
+
+				program.SendUniformData(lightTransform->position, (name + ".position").c_str());
+				program.SendUniformData(lightComponent->color, (name+".color").c_str());
+    		}
     	}
-		glDrawArrays(GL_TRIANGLES, 0, posBuffMap[model_path].size() / 3);
+		glDrawArrays(GL_TRIANGLES, 0, posBuffMap[modelPath].size() / 3);
 		program.Unbind();
 	}
 
