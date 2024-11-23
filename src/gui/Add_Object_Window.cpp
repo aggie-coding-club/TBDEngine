@@ -57,7 +57,9 @@ void AddObjectWindow::showAddObjectWindow(GameEngine *engine, bool &ShowAddObjec
     if(ImGui::Button("Add Object")) {
         switch (objectType) {
             case 1:
-                engine->addGameObject(location, name);
+                if(location != "") {
+                    engine->addGameObject(location, name);
+                }
                 break;
             default:
                 ImGui::Text("Hallo");
