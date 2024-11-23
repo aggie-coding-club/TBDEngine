@@ -48,10 +48,11 @@ void Details::ShowDetails(std::shared_ptr<GameObject> object)
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
+
     ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
 
-    ImVec2 size(DisplaySize.x / 4, DisplaySize.y / 2);
-    ImVec2 pos(DisplaySize.x - size.x,29 + DisplaySize.y / 2);
+    size = ImVec2(DisplaySize.x / 4, DisplaySize.y / 2);
+    pos = ImVec2(DisplaySize.x - size.x,29 + DisplaySize.y / 2);
 
     // Set Window width
     ImGui::SetNextWindowSize(size);
