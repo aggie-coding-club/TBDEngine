@@ -3,7 +3,7 @@
 #include "core/camera.h"
 #include <glm/common.hpp>
 
-void AddObjectWindow::showAddObjectWindow(GameEngine *engine, bool &ShowAddObject, int &objectType){
+void AddObjectWindow::showAddObjectWindow(GameEngine *engine, bool &ShowAddObject){
 
     // Set add object;
     ImGui::Begin("Add Object Window", NULL);
@@ -20,41 +20,51 @@ void AddObjectWindow::showAddObjectWindow(GameEngine *engine, bool &ShowAddObjec
         objectType = 3;
     }
 
-    std::string objectTypeSelected;
     switch(objectType){
         case 1:
-            objectTypeSelected = "Game object selected";
+            ImGui::Text("Game object selected");
             ImGui::Text("Location");
             ImGui::SameLine();
-            ImGui::InputText("##Location", "A", sizeof("A"));
+            char locationbuffer[128];
+            strncpy(locationbuffer, location.c_str(), sizeof(locationbuffer));
+            locationbuffer[127] = '\0';
+            if(ImGui::InputText("##Location", locationbuffer, sizeof(locationbuffer))) {
+                location = locationbuffer;
+            }
+
             ImGui::Text("Name");
             ImGui::SameLine();
-            ImGui::InputText("##Name", "B", sizeof("B"));
-
+            char nameBuffer[128];
+            strncpy(nameBuffer, name.c_str(), sizeof(nameBuffer));
+            nameBuffer[127] = '\0';
+            if(ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
+                name = nameBuffer;
+            }
             break;
+
         case 2:
-            objectTypeSelected = "Light object selected";
+            ImGui::Text("Light object selected");
             break;
         case 3:
-            objectTypeSelected = "Camera object selected";
+            ImGui::Text("Camera object selected");
             break;
         default:
-            objectTypeSelected = "No object type selected";
+            ImGui::Text("No object type selected");
     }
-    ImGui::Text(objectTypeSelected.data());
+
+
 
     if(ImGui::Button("Add Object")) {
         switch (objectType) {
             case 1:
-                engine->addGameObject();
+                engine->addGameObject(location, name);
+                break;
+            default:
+                ImGui::Text("Hallo");
+                break;
         }
         ShowAddObject = false;
         objectType = 0;
     }
     ImGui::End();
 };
-
-void AddingGameObject(GameEngine *engine) {
-
-
-}

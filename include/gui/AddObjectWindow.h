@@ -6,6 +6,10 @@
 #include <glm/common.hpp>
 
 class AddObjectWindow{
+    private:
+        int objectType = 0;
+        std::string location;
+        std::string name;
   public:
-    void showAddObjectWindow(GameEngine *engine, bool &ShowAddObject, int &objectType);
+    void showAddObjectWindow(GameEngine *engine, bool &ShowAddObject);
 };

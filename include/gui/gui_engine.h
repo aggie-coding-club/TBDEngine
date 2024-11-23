@@ -33,19 +33,17 @@ private:
      bool showCameraWindow = false;
      Camera *camera;
      bool showAddObject = false;
-    // For Add object window
-    int objectType = 0;
 
     char objectLocation[128];
     char objectName[128];
 
     // Windows
-    Viewport* viewport;
-    FileHierarchy* fileHierarchy;
-    Details* details;
-    MenuBar* menuBar;
-    CameraDebugWindow* cameraDebugWindow;
-    AddObjectWindow* addObjectWindow;
+    Viewport viewport;
+    FileHierarchy fileHierarchy;
+    Details details;
+    MenuBar menuBar;
+    CameraDebugWindow cameraDebugWindow;
+    AddObjectWindow addObjectWindow;
 
 public:
      bool showView = true;

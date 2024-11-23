@@ -71,13 +71,15 @@ public:
         }
     }
 
-    void addGameObject(std::string location = "../resources/models/square.obj", std::string name = "AH"){
+    void addGameObject(std::string location = "../resources/models/square.obj", std::string name = ""){
         auto bunnyObj = std::make_shared<GameObject>(location);
-        auto bunnyName = std::string(name + std::to_string(randomID++));
         auto bunnyTransform = std::make_shared<Transform>();
         auto bunnyMaterial = std::make_shared<Material>();
 
-        bunnyObj->name = bunnyName;
+        if(name == "") {
+            name = "bunny" + std::to_string(randomID++);
+        }
+        bunnyObj->name = name;
         bunnyObj->components.push_back(bunnyTransform);
         bunnyObj->components.push_back(bunnyMaterial);
 

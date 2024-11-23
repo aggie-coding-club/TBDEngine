@@ -99,24 +99,23 @@ void GuiEngine::run( int width, int height )
     ImGui::NewFrame();
 
     // Game Engine
-    menuBar->ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
+    menuBar.ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
     if(showHierarchy) {
-        fileHierarchy->ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects(), showAddObject);
+        fileHierarchy.ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects(), showAddObject);
     }
     if(showView)
     {
-        viewport->ShowViewport(ImVec2(width, height));
+        viewport.ShowViewport(ImVec2(width, height));
     }
     if(showDetail)
     {
-        details->ShowDetails(gameEngine->selectedGameObj);
+        details.ShowDetails(gameEngine->selectedGameObj);
     }
     if(showCameraWindow){
-        cameraDebugWindow->ShowCameraDebugWindow(camera);
+        cameraDebugWindow.ShowCameraDebugWindow(camera);
     }
     if(showAddObject) {
-
-        addObjectWindow->showAddObjectWindow(gameEngine, showAddObject, objectType);
+        addObjectWindow.showAddObjectWindow(gameEngine, showAddObject);
     }
 
     // Rendering
