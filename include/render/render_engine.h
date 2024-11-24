@@ -53,31 +53,13 @@ class RenderEngine
 	int mat_idx = 0;
 	int shader_idx = 0;
 
-	Camera* camera;
+	std::shared_ptr<Camera> camera;
 	GameEngine* gameEngine;
 
 public:
-	RenderEngine()
-	{
-		Init();
-	}
-	RenderEngine(GLFWwindow* _window)
+	RenderEngine(GLFWwindow* _window, GameEngine* _gameEngine)
 	{
 		window = _window;
-		Init();
-	}
-
-	RenderEngine(GLFWwindow* _window, Camera* _camera)
-	{
-		window = _window;
-		camera = _camera;
-		Init();
-	}
-
-	RenderEngine(GLFWwindow* _window, Camera* _camera, GameEngine* _gameEngine)
-	{
-		window = _window;
-		camera = _camera;
 		gameEngine = _gameEngine;
 
 		Init();

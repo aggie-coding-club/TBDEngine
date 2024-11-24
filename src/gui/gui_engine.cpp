@@ -122,7 +122,7 @@ void GuiEngine::run( int width, int height )
         details.ShowDetails(gameEngine->GetCurrScene(), camera);
     }
     if(showCameraWindow){
-        cameraDebugWindow.ShowCameraDebugWindow(camera);
+        cameraDebugWindow.ShowCameraDebugWindow(gameEngine->GetCurrScene()->GetCurrCamera());
     }
     if(showAddObject) {
         addObjectWindow.showAddObjectWindow(gameEngine, showAddObject);

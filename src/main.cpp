@@ -37,7 +37,6 @@ GLFWwindow *window;
 std::unique_ptr<GuiEngine> guiEngine;
 std::unique_ptr<RenderEngine> renderEngine;
 
-Camera camera;
 GameEngine gameEngine;
 
 // Keyboard character callback function
@@ -59,76 +58,6 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int argc, char *argv[])
 {	
-	//Testing
-	// std::vector<std::shared_ptr<GameObject>> gameObjects;
-    // int randomID = 0;
-    // std::string modelPath = "../resources/models/";
-
-	// glm::vec3 pos= {0.0f, 0.0f, 0.0f};
-
-	// auto bunnyObj = std::make_shared<GameObject>();
-	// auto bunnyName = std::string("bunny" + std::to_string(randomID++));
-	// auto bunnyTransform = std::make_shared<Transform>(pos);
-	// auto bunnyMaterial = std::make_shared<Material>();
-	// const auto bunnyModel = std::make_shared<Model>();
-	// // const auto bunnyLight = std::make_shared<Light>();
-
-	// bunnyObj->name = bunnyName;
-	// bunnyObj->components[TRANSFORM] = bunnyTransform;
-	// bunnyObj->components[MATERIAL] = bunnyMaterial;
-	// bunnyObj->components[MODEL] = bunnyModel;
-	// // bunnyObj->components[LIGHT] = bunnyLight;
-
-	// gameObjects.push_back(bunnyObj);
-
-	// const auto light1 = std::make_shared<GameObject>();
-	// const auto lightTransform1 = std::make_shared<Transform>(
-	// 	glm::vec3(0.0f, 0.0f, 3.0f),
-	// 	glm::vec3(0.0f, 0.0f, 0.0f),
-	// 	glm::vec3(0.0f, 0.0f, 0.0f));
-
-	// const auto lightComp1 = std::make_shared<Light>(
-	// 	glm::vec3(0.5f, 0.5f, 0.5f),
-	// 		1.0f);
-
-	// light1->components[TRANSFORM] = lightTransform1;
-	// light1->components[LIGHT] = lightComp1;
-	// light1->name = "light1";
-
-	// const auto light2 = std::make_shared<GameObject>();
-	// const auto lightTransform2 = std::make_shared<Transform>(
-	// 	glm::vec3(0.0f, 3.0f, 0.0f),
-	// 	glm::vec3(0.0f, 0.0f, 0.0f),
-	// 	glm::vec3(0.0f, 0.0f, 0.0f));
-
-	// const auto lightComp2 = std::make_shared<Light>(
-	// 	glm::vec3(0.2f, 0.2f, 0.2f),
-	// 		1.0f);
-
-	// light2->components[TRANSFORM] = lightTransform2;
-	// light2->components[LIGHT] = lightComp2;
-	// light2->name = "light2";
-
-	// std::vector<std::shared_ptr<GameObject>> lights;
-
-	// lights.push_back(light1);
-	// lights.push_back(light2);
-
-	// std::vector<std::shared_ptr<Scene>> scenes;
-	// auto scene = std::make_shared<Scene>();
-
-	
-	// scene->SetLightsVector(lights);
-	// scene->SetModelsVector(gameObjects);
-	// scene->SetName("scene");
-	// scenes.push_back(scene);
-	
-
-	// auto node = YAML::Node();
-	// node = SerializeScenes(scenes);
-	// std::cout << node << std::endl;
-	//End Testing
-
 	// GLFWwindow* window is shared between gui and render,
 	// so let's declare it in main.
     glfwSetErrorCallback(glfw_error_callback);
@@ -147,8 +76,9 @@ int main(int argc, char *argv[])
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
 
-	guiEngine = std::make_unique<GuiEngine>(&camera);
-	renderEngine = std::make_unique<RenderEngine>(window, &camera, &gameEngine);
+	guiEngine = std::make_unique<GuiEngine>();
+	renderEngine = std::make_unique<RenderEngine>(window, &gameEngine);
+
 	guiEngine->init(window, &gameEngine);
 	while ( glfwWindowShouldClose(window) == 0 )
 	{
