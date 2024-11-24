@@ -31,7 +31,6 @@ private:
      bool showDetail = true;
      bool showHierarchy = true;
      bool showCameraWindow = false;
-     Camera *camera;
      bool showAddObject = false;
 
     char objectLocation[128];
@@ -47,8 +46,8 @@ private:
 
 public:
      bool showView = true;
-     GuiEngine(Camera *_camera) : camera(_camera){};
-     ~GuiEngine(){};
+     GuiEngine() = default;
+     ~GuiEngine() = default;
      bool init(GLFWwindow *window , GameEngine *_game_engine);
      void run(int width, int height);
      void cleanup();

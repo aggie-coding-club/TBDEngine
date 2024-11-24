@@ -43,7 +43,7 @@ void ShowMaterial(std::shared_ptr<Material> &object_material) {
     }
 }
 
-void Details::ShowDetails(std::shared_ptr<Scene> scene, Camera *camera)
+void Details::ShowDetails(std::shared_ptr<Scene> scene)
 {
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoResize;
@@ -57,7 +57,7 @@ void Details::ShowDetails(std::shared_ptr<Scene> scene, Camera *camera)
 
     ImGui::Begin("Details",nullptr,window_flags);
     if (scene->cameraSelected) {
-
+        std::shared_ptr<Camera> camera = scene->GetCurrCamera();
         glm::vec3 camEye = camera->GetEye();
 
         ImGui::Text("Camera Eye");
