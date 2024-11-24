@@ -43,6 +43,19 @@ void ShowMaterial(std::shared_ptr<Material> &object_material) {
     }
 }
 
+void ShowLight(std::shared_ptr<Light> &object_light) {
+    if (ImGui::TreeNode("Light")) {
+        ImGui::Text("Color");
+        ImGui::SameLine();
+        ImGui::ColorEdit3("##Color", &object_light->color[0]);
+        ImGui::Text("Intensity");
+        ImGui::SameLine();
+        ImGui::DragFloat("##Intensity", &object_light->intensity);
+
+        ImGui::TreePop();
+    }
+}
+
 void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
 {
     // Remove Decorations for the window
@@ -113,6 +126,10 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
             {
                 ShowMaterial(objMaterial);
             }
+            if(auto objLight = std::dynamic_pointer_cast<Light>( objComponent )) {
+                ShowLight(objLight);
+            }
+
 
         }
     }
