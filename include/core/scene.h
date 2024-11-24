@@ -28,6 +28,7 @@ private:
 public:
     std::shared_ptr<GameObject> selectedGameObj = nullptr;
     std::shared_ptr<Camera> selectedCamera = nullptr;
+    bool mOrL;
 
     Scene() = default;
   	std::vector<std::shared_ptr<GameObject>>& 	GetModels()

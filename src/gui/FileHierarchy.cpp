@@ -32,6 +32,7 @@ void FileHierarchy::ShowFileHierarchy(std::shared_ptr<Scene> scene, bool &showAd
 #endif
                 scene->selectedGameObj = obj;
                 scene->selectedCamera = nullptr;
+                scene->mOrL = true;
             }
         }
         ImGui::TreePop(); // End of Root Folder
@@ -59,6 +60,7 @@ void FileHierarchy::ShowFileHierarchy(std::shared_ptr<Scene> scene, bool &showAd
 #endif
                 scene->selectedGameObj = l;
                 scene->selectedCamera = nullptr;
+                scene->mOrL = false;
             }
         }
         ImGui::TreePop();

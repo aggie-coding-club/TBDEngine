@@ -56,6 +56,29 @@ void ShowLight(std::shared_ptr<Light> &object_light) {
     }
 }
 
+void DeleteObject(const std::shared_ptr<Scene>& scene) {
+    if (scene->selectedGameObj) {
+        auto& Objects = scene->mOrL ? scene->GetModels() : scene->GetLights();
+
+        auto it = std::find(Objects.begin(), Objects.end(), scene->selectedGameObj);
+        if (it != Objects.end()) {
+            Objects.erase(it);
+            scene->selectedGameObj.reset();
+            scene->selectedGameObj = nullptr;
+        }
+    } else {
+        auto& Cameras = scene->GetCameras();
+
+        auto it = std::find(Cameras.begin(), Cameras.end(), scene->selectedCamera);
+        if (it != Cameras.end()) {
+            Cameras.erase(it);
+            scene->selectedCamera.reset();
+            scene->selectedCamera = nullptr;
+        }
+    }
+}
+
+
 void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
 {
     // Remove Decorations for the window
@@ -100,6 +123,9 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
 
         camera->SetUpVec(camUp);
 
+        if(ImGui::Button("Delete")) {
+            DeleteObject(scene);
+        }
     }
     else if(scene->selectedGameObj)
     {
@@ -131,6 +157,9 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
             }
 
 
+        }
+        if(ImGui::Button("Delete")) {
+            DeleteObject(scene);
         }
     }
     else {
