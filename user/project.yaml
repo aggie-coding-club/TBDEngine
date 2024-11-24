@@ -92,36 +92,6 @@ Scenes:
             shininess: 32
           Model:
             model_path: ../resources/models/bunny.obj
-        teapot3:
-          Transform:
-            position:
-              - -1.199
-              - -0.418
-              - -0.14
-            rotation:
-              - -1.02
-              - -2.21
-              - 0
-            scale:
-              - 1
-              - 1
-              - 1
-          Material:
-            ambient:
-              - 0.1
-              - 0.1
-              - 0.1
-            diffuse:
-              - 0.8
-              - 0.8
-              - 0.8
-            specular:
-              - 0.5
-              - 0.5
-              - 0.5
-            shininess: 32
-          Model:
-            model_path: ../resources/models/teapot.obj
       Lights:
         "":
           Transform:

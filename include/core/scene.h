@@ -25,6 +25,7 @@ private:
     static int randomId;
 public:
     std::shared_ptr<GameObject> selectedGameObj = nullptr;
+    bool cameraSelected = false;
 
     Scene() = default;
   	std::vector<std::shared_ptr<GameObject>>& 	GetModels()

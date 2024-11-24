@@ -1,5 +1,9 @@
 #include "gui/gui_engine.h"
 #include "core/game_engine.h"
+#include "fmt/os.h"
+
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -82,8 +86,9 @@ bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
     objectLocation[127] = '\0';
     objectName[127] = '\0';
 
-    io->DisplaySize;
-
+    details.SetParms(ImVec2(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2), ImVec2(WINDOW_WIDTH - (WINDOW_WIDTH / 4),29 + WINDOW_HEIGHT / 2));
+    fileHierarchy.SetParms(ImVec2(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2),ImVec2(WINDOW_WIDTH * 3 / 4,29));
+    
     return true;
 }
 
@@ -114,7 +119,7 @@ void GuiEngine::run( int width, int height )
     }
     if(showDetail)
     {
-        details.ShowDetails(gameEngine->GetCurrScene()->selectedGameObj);
+        details.ShowDetails(gameEngine->GetCurrScene(), camera);
     }
     if(showCameraWindow){
         cameraDebugWindow.ShowCameraDebugWindow(camera);

@@ -47,7 +47,6 @@ private:
 
 public:
      bool showView = true;
-     int width, height;
      GuiEngine(Camera *_camera) : camera(_camera){};
      ~GuiEngine(){};
      bool init(GLFWwindow *window , GameEngine *_game_engine);

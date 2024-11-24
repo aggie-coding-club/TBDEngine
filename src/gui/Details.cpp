@@ -43,24 +43,49 @@ void ShowMaterial(std::shared_ptr<Material> &object_material) {
     }
 }
 
-void Details::ShowDetails(std::shared_ptr<GameObject> object)
+void Details::ShowDetails(std::shared_ptr<Scene> scene, Camera *camera)
 {
     // Remove Decorations for the window
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_AlwaysVerticalScrollbar;
-
-
-    ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
-
-    size = ImVec2(DisplaySize.x / 4, DisplaySize.y / 2);
-    pos = ImVec2(DisplaySize.x - size.x,29 + DisplaySize.y / 2);
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoResize;
 
     // Set Window width
     ImGui::SetNextWindowSize(size);
     // Set window's position
     ImGui::SetNextWindowPos(pos);
 
+    auto object = scene->selectedGameObj;
+
     ImGui::Begin("Details",nullptr,window_flags);
-    if(object)
+    if (scene->cameraSelected) {
+
+        glm::vec3 camEye = camera->GetEye();
+
+        ImGui::Text("Camera Eye");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##CamEye", &camEye[0], 0.1f, -100.0f, 100.0f, "%.3f");
+
+        camera->SetEye(camEye);
+
+        glm::vec3 camCenter = camera->GetCenter();
+
+        ImGui::Text("Camera Center");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##CamCenter", &camCenter[0], 0.1f, -100.0f, 100.0f, "%.3f");
+
+        camera->SetCenter(camCenter);
+
+        glm::vec3 camUp = camera->GetUpVec();
+
+        ImGui::Text("Camera Up Vector");
+        ImGui::SameLine();
+        ImGui::DragFloat3("##CamUpVect", &camUp[0], 0.001f, -100.0f, 100.0f, "%.3f");
+
+        camUp = glm::normalize(camUp);
+
+        camera->SetUpVec(camUp);
+
+    }
+    else if(object)
     {
         auto objectName = &object->name;
         char nameBuffer[128];
