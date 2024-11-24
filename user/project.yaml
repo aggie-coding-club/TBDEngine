@@ -18,13 +18,13 @@ Scenes:
               - 1
           Material:
             ambient:
-              - 0
-              - 0
-              - 0
+              - 0.1
+              - 0.1
+              - 0.1
             diffuse:
-              - 1
-              - 1
-              - 0
+              - 0.8
+              - 0.8
+              - 0.8
             specular:
               - 0.5
               - 0.5
@@ -48,13 +48,13 @@ Scenes:
               - 1
           Material:
             ambient:
-              - 0
-              - 0
-              - 0
+              - 0.1
+              - 0.1
+              - 0.1
             diffuse:
-              - 1
-              - 0
-              - 1
+              - 0.8
+              - 0.8
+              - 0.8
             specular:
               - 0.5
               - 0.5
@@ -78,13 +78,13 @@ Scenes:
               - 1
           Material:
             ambient:
-              - 0
-              - 0
-              - 0.09803922
+              - 0.1
+              - 0.1
+              - 0.1
             diffuse:
-              - 0.007843138
-              - 1
-              - 1
+              - 0.8
+              - 0.8
+              - 0.8
             specular:
               - 0.5
               - 0.5
@@ -92,54 +92,4 @@ Scenes:
             shininess: 32
           Model:
             model_path: ../resources/models/bunny.obj
-        ../resources/models/square3:
-          Transform:
-            position:
-              - 0
-              - 0
-              - 0
-            rotation:
-              - 0
-              - 0
-              - 0
-            scale:
-              - 1
-              - 1
-              - 1
-          Material:
-            ambient:
-              - 0.1
-              - 0.1
-              - 0.1
-            diffuse:
-              - 0.8
-              - 0.8
-              - 0.8
-            specular:
-              - 0.5
-              - 0.5
-              - 0.5
-            shininess: 32
-          Model:
-            model_path: ../resources/models/../resources/models/square.obj
-      Lights:
-        "":
-          Transform:
-            position:
-              - 0
-              - 3
-              - 0
-            rotation:
-              - 0
-              - 0
-              - 0
-            scale:
-              - 0
-              - 0
-              - 0
-          Light:
-            color:
-              - 0.2
-              - 0.2
-              - 0.2
-            intensity: 1
+      Lights: ~

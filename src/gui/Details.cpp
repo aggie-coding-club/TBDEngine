@@ -68,12 +68,14 @@ void DeleteObject(const std::shared_ptr<Scene>& scene) {
         }
     } else {
         auto& Cameras = scene->GetCameras();
+        assert(Cameras[0] == scene->GetCurrCamera());
 
         auto it = std::find(Cameras.begin(), Cameras.end(), scene->selectedCamera);
         if (it != Cameras.end()) {
-            Cameras.erase(it);
             scene->selectedCamera.reset();
             scene->selectedCamera = nullptr;
+            Cameras.erase(it);
+            scene->ResetCurrCameraIdx();
         }
     }
 }

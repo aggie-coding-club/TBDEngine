@@ -102,6 +102,11 @@ void RenderEngine::Display()
 	}
 	const auto& scene = gameEngine->GetCurrScene();
 	camera = scene->GetCurrCamera();
+	if (camera.get() == nullptr)
+	{
+		glDrawArrays(GL_POINTS, 0,0);
+		return;
+	}
 
 	glm::mat4 projectionMatrix = camera->GetProjectionMatrix();
 	glm::mat4 viewMatrix = camera->GetViewMatrix();
@@ -158,6 +163,15 @@ void RenderEngine::Display()
     		}
     	}
 		glDrawArrays(GL_TRIANGLES, 0, posBuffMap[modelPath].size() / 3);
+
+		const auto& lights = scene->GetLights();
+		for (size_t i = 0; i < lights.size(); i++)
+    	{
+    		std::string name = fmt::format("lights[{}]", i);
+
+			program.SendUniformData(glm::vec3(0.0f), (name + ".position").c_str());
+			program.SendUniformData(glm::vec3(0.0f), (name+".color").c_str());
+    	}
 		program.Unbind();
 	}
 

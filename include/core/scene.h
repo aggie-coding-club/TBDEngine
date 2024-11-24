@@ -11,6 +11,7 @@
 
 #include <vector>
 
+#include "fastgltf/types.hpp"
 #include "fmt/chrono.h"
 
 class Scene {
@@ -45,9 +46,13 @@ public:
   	    return cameras;
   	}
 
-    std::shared_ptr<Camera>& GetCurrCamera()
+    std::shared_ptr<Camera> GetCurrCamera()
     {
-        return cameras[currCameraIdx];
+  	    if (cameras.empty())
+  	    {
+	  	    return nullptr;
+  	    }
+        return cameras.at(currCameraIdx);
     }
     void AddModel(const std::shared_ptr<GameObject>& model)
     {
@@ -114,5 +119,8 @@ public:
 
     void SetName(const std::string& _name) {
         name = _name;
-    }};
+    }
+
+	void ResetCurrCameraIdx(){ currCameraIdx = 0; };
+};
 
