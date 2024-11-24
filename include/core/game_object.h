@@ -14,8 +14,8 @@ public:
     std::string model_path;
 
     GameObject(const std::string model_path = "../resources/models/bunny.obj") : model_path(model_path), id(generateUniqueId()) {}
-private:
     const int id;
+private:
 
     static int lastId;
 

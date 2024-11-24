@@ -111,7 +111,7 @@ void GuiEngine::run( int width, int height )
 #ifndef _USE_SCENE_
         ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects());
 #endif
-        fileHierarchy.ShowFileHierarchy(gameEngine ,gameEngine->GetCurrScene()->GetModels(), showAddObject);
+        fileHierarchy.ShowFileHierarchy(gameEngine->GetCurrScene() , showAddObject);
     }
     if(showView)
     {

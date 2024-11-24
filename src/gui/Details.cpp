@@ -43,20 +43,23 @@ void ShowMaterial(std::shared_ptr<Material> &object_material) {
     }
 }
 
-void Details::ShowDetails(std::shared_ptr<Scene> scene)
+void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
 {
     // Remove Decorations for the window
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoResize;
+
+    ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
+
+    size = ImVec2(DisplaySize.x / 4, DisplaySize.y / 2);
+    pos = ImVec2(DisplaySize.x - (DisplaySize.x / 4),29 + DisplaySize.y / 2);
 
     // Set Window width
     ImGui::SetNextWindowSize(size);
     // Set window's position
     ImGui::SetNextWindowPos(pos);
 
-    auto object = scene->selectedGameObj;
-
     ImGui::Begin("Details",nullptr,window_flags);
-    if (scene->cameraSelected) {
+    if (scene->selectedCamera) {
         std::shared_ptr<Camera> camera = scene->GetCurrCamera();
         glm::vec3 camEye = camera->GetEye();
 
@@ -85,8 +88,9 @@ void Details::ShowDetails(std::shared_ptr<Scene> scene)
         camera->SetUpVec(camUp);
 
     }
-    else if(object)
+    else if(scene->selectedGameObj)
     {
+        std::shared_ptr<GameObject> object = scene->selectedGameObj;
         auto objectName = &object->name;
         char nameBuffer[128];
         strncpy(nameBuffer, objectName->c_str(), sizeof(nameBuffer));

@@ -18,13 +18,13 @@ Scenes:
               - 1
           Material:
             ambient:
-              - 0.1
-              - 0.1
-              - 0.1
+              - 0
+              - 0
+              - 0
             diffuse:
-              - 0.8
-              - 0.8
-              - 0.8
+              - 1
+              - 1
+              - 0
             specular:
               - 0.5
               - 0.5
@@ -48,13 +48,13 @@ Scenes:
               - 1
           Material:
             ambient:
-              - 0.1
-              - 0.1
-              - 0.1
+              - 0
+              - 0
+              - 0
             diffuse:
-              - 0.8
-              - 0.8
-              - 0.8
+              - 1
+              - 0
+              - 1
             specular:
               - 0.5
               - 0.5
@@ -78,6 +78,36 @@ Scenes:
               - 1
           Material:
             ambient:
+              - 0
+              - 0
+              - 0.09803922
+            diffuse:
+              - 0.007843138
+              - 1
+              - 1
+            specular:
+              - 0.5
+              - 0.5
+              - 0.5
+            shininess: 32
+          Model:
+            model_path: ../resources/models/bunny.obj
+        ../resources/models/square3:
+          Transform:
+            position:
+              - 0
+              - 0
+              - 0
+            rotation:
+              - 0
+              - 0
+              - 0
+            scale:
+              - 1
+              - 1
+              - 1
+          Material:
+            ambient:
               - 0.1
               - 0.1
               - 0.1
@@ -91,7 +121,7 @@ Scenes:
               - 0.5
             shininess: 32
           Model:
-            model_path: ../resources/models/bunny.obj
+            model_path: ../resources/models/../resources/models/square.obj
       Lights:
         "":
           Transform:

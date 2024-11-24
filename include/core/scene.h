@@ -11,6 +11,8 @@
 
 #include <vector>
 
+#include "fmt/chrono.h"
+
 class Scene {
 private:
     std::vector<std::shared_ptr<GameObject>> 	models;
@@ -25,7 +27,7 @@ private:
     static int randomId;
 public:
     std::shared_ptr<GameObject> selectedGameObj = nullptr;
-    bool cameraSelected = false;
+    std::shared_ptr<Camera> selectedCamera = nullptr;
 
     Scene() = default;
   	std::vector<std::shared_ptr<GameObject>>& 	GetModels()
