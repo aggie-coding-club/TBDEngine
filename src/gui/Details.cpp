@@ -128,14 +128,16 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
     else if(scene->selectedGameObj)
     {
         std::shared_ptr<GameObject> object = scene->selectedGameObj;
-        auto objectName = &object->name;
-        char nameBuffer[128];
-        strncpy(nameBuffer, objectName->c_str(), sizeof(nameBuffer));
-        nameBuffer[127] = '\0';
-        ImGui::Text("Name");
-        ImGui::SameLine();
-        if(ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
-            object->name = nameBuffer;
+        if(auto objectName = &object->name)
+        {
+            char nameBuffer[128];
+            strncpy(nameBuffer, objectName->c_str(), sizeof(nameBuffer));
+            nameBuffer[127] = '\0';
+            ImGui::Text("Name");
+            ImGui::SameLine();
+            if(ImGui::InputText("##Name", nameBuffer, sizeof(nameBuffer))) {
+                object->name = nameBuffer;
+            }
         }
 
         for(const auto& objComponent : object->components) {

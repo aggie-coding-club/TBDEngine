@@ -57,16 +57,38 @@ void AddObjectWindow::showAddObjectWindow(GameEngine *engine, bool &ShowAddObjec
     if(ImGui::Button("Add Object")) {
         switch (objectType) {
             case 1:
-                if(location != "") {
+                if(!location.empty()) {
                     engine->GetCurrScene()->AddModel(location, name);
                 }
                 break;
+            case 2: {
+                const auto light1 = std::make_shared<GameObject>();
+                const auto lightTransform1 = std::make_shared<Transform>(
+                    glm::vec3(0.0f, 0.0f, 3.0f),
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    glm::vec3(0.0f, 0.0f, 0.0f));
+
+                const auto lightComp1 = std::make_shared<Light>(
+                    glm::vec3(0.5f, 0.5f, 0.5f),
+                        1.0f);
+
+                light1->components[TRANSFORM] = lightTransform1;
+                light1->components[LIGHT] = lightComp1;
+
+                engine->GetCurrScene()->GetLights().emplace_back(light1);
+                break;
+            }
+            case 3: {
+                auto camera = std::make_shared<Camera>();
+                engine->GetCurrScene()->GetCameras().emplace_back(camera);
+                break;
+            }
+
             default:
-                ImGui::Text("Hallo");
+                ImGui::Text("Invalid object type selected");
                 break;
         }
         ShowAddObject = false;
-        objectType = 0;
     }
     ImGui::End();
 };

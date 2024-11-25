@@ -46,6 +46,7 @@ void FileHierarchy::ShowFileHierarchy(std::shared_ptr<Scene> scene, bool &showAd
             if(ImGui::Selectable(std::string("Camera" + std::to_string(i)).c_str())) {
                 scene->selectedGameObj = nullptr;
                 scene->selectedCamera = cam;
+                scene->SetCurrCameraIdx(i);
             }
         }
         ImGui::TreePop();

@@ -122,5 +122,7 @@ public:
     }
 
 	void ResetCurrCameraIdx(){ currCameraIdx = 0; };
+
+	void SetCurrCameraIdx(int i){ currCameraIdx = i; };
 };
 
