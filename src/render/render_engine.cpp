@@ -187,18 +187,10 @@ void RenderEngine::CharacterCallback(GLFWwindow* window, unsigned int key)
     case 'M':
         mat_idx = (--mat_idx % NUM_MATERIALS + NUM_MATERIALS) % NUM_MATERIALS;
         break;
-    case '3':
-        shader_idx = 2;
-        ShadersInit();
-        break;
-    case '2':
-        shader_idx = 1;
-        ShadersInit();
-        break;
-    case '1':
-        shader_idx = 0;
-        ShadersInit();
-        break;
+	case '/':
+        shader_idx = (shader_idx+1) % NUM_SHADERS;
+		ShadersInit();
+		break;
 	default:
 		break;
 	}

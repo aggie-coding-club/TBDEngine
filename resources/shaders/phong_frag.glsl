@@ -12,7 +12,7 @@ struct lightStruct
     vec3 color;
 };
 
-#define NUM_LIGHTS 2
+#define NUM_LIGHTS 10
 
 uniform lightStruct lights[NUM_LIGHTS];
 

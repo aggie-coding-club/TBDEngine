@@ -97,8 +97,8 @@ Scenes:
           Transform:
             position:
               - 0
-              - 0
               - 3
+              - 0
             rotation:
               - 0
               - 0
@@ -109,7 +109,7 @@ Scenes:
               - 0
           Light:
             color:
-              - 0.7889693
-              - 0.8573854
-              - 0
+              - 0.2
+              - 0.2
+              - 0.2
             intensity: 1
