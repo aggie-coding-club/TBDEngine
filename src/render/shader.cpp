@@ -47,6 +47,11 @@ void Shader::Init()
 	std::string vstr = ReadShader(vertexShaderFileName);
 	std::string fstr = ReadShader(fragmentShaderFileName);
 
+	if (vstr.empty() || fstr.empty()) {
+		std::cerr << "Shader source code is empty, check file paths." << std::endl;
+		return;
+	}
+
 	const char* vsText = vstr.c_str();
 	glShaderSource(vertShader, 1, &vsText, 0);
 	const char* fsText = fstr.c_str();
@@ -68,9 +73,19 @@ void Shader::Init()
 	GLint status;
 	glGetProgramiv(programID, GL_LINK_STATUS, &status);
 	if (!status) {
-		std::cerr << "Unable to link the shaders" << std::endl;
+		GLint logLength;
+		glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logLength);
+		if(logLength > 0) {
+			std::vector<char> log(logLength);
+			glGetProgramInfoLog(programID, logLength, nullptr, log.data());
+			std::cerr << "Shader Program Linking Error:\n" << log.data() << std::endl;
+		}
 		return;
 	}
+
+	// Cleanup after linking shaders
+	glDeleteShader(vertShader);
+	glDeleteShader(fragShader);
 }
 
 std::string Shader::ReadShader(const std::string &name)
@@ -99,10 +114,16 @@ void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
 	glGenBuffers(1, &bufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * buffer.size(), &buffer[0], GL_STATIC_DRAW);
+
 	GLint aLoc = glGetAttribLocation(programID, name);
+	if (aLoc == -1) {
+		std::cerr << "Attribute " << name << " not found in shader program." << std::endl;
+		return;
+	}
 	glEnableVertexAttribArray(aLoc);
 	glVertexAttribPointer(aLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
+
 
 // Send an integer to the shader.
 void Shader::SendUniformData(int input, const char* name)
