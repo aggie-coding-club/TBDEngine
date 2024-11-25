@@ -131,8 +131,8 @@ glm::vec3 RenderEngine::GenerateNormal(const std::vector<glm::vec3>& faceVertice
 
 
 void RenderEngine::ShadersInit() {
-	program.SetShadersFileName(shadersPath + verts[shader_idx],
-            shadersPath + frags[shader_idx]);
+	program.SetShadersFileName(shadersPath + verts[0],
+            shadersPath + frags[0]);
 
 	program.Init();
 
@@ -225,21 +225,6 @@ void RenderEngine::Display()
 
 void RenderEngine::CharacterCallback(GLFWwindow* window, unsigned int key)
 {
-	switch (key)
-	{
-    case 'm':
-        mat_idx = (++mat_idx) % NUM_MATERIALS;
-        break;
-    case 'M':
-        mat_idx = (--mat_idx % NUM_MATERIALS + NUM_MATERIALS) % NUM_MATERIALS;
-        break;
-	case '/':
-        shader_idx = (shader_idx+1) % NUM_SHADERS;
-		ShadersInit();
-		break;
-	default:
-		break;
-	}
 }
 
 
