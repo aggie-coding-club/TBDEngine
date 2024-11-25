@@ -92,4 +92,24 @@ Scenes:
             shininess: 32
           Model:
             model_path: ../resources/models/bunny.obj
-      Lights: ~
+      Lights:
+        "":
+          Transform:
+            position:
+              - 0
+              - 3.527
+              - 0
+            rotation:
+              - 0
+              - 0
+              - 0
+            scale:
+              - 0
+              - 0
+              - 0
+          Light:
+            color:
+              - 0.08488977
+              - 1
+              - 0
+            intensity: 1

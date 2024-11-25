@@ -47,11 +47,7 @@ void ShowLight(std::shared_ptr<Light> &object_light) {
     if (ImGui::TreeNode("Light")) {
         ImGui::Text("Color");
         ImGui::SameLine();
-        ImGui::ColorEdit3("##Color", &object_light->color[0]);
-        ImGui::Text("Intensity");
-        ImGui::SameLine();
-        ImGui::DragFloat("##Intensity", &object_light->intensity);
-
+        ImGui::ColorPicker3("##Color", &object_light->color[0]);
         ImGui::TreePop();
     }
 }
