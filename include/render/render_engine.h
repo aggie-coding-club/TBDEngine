@@ -41,6 +41,7 @@ class RenderEngine
 	std::unordered_map<std::string, std::vector<float>> posBuffMap;
 	std::unordered_map<std::string, std::vector<float>> texBuffMap;
 	std::unordered_map<std::string, std::vector<float>> norBuffMap;
+
 	std::vector<float> posBuff;
 	std::vector<float> norBuff;
 	std::vector<float> texBuff;

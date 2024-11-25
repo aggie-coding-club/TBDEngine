@@ -103,19 +103,32 @@ void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
         return;
     }
 
-    GLuint bufferID;
-    glGenBuffers(1, &bufferID);
-    glBindBuffer(GL_ARRAY_BUFFER, bufferID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * buffer.size(), &buffer[0], GL_STATIC_DRAW);
+    GLuint bufferID = 0;
 
-    GLint aLoc = glGetAttribLocation(programID, name);
+    // Check if the buffer exists for the given attribute name
+    if (bufferMap.find(name) == bufferMap.end()) {
+        glGenBuffers(1, &bufferID);  // Generate a new buffer
+        bufferMap[name] = bufferID;  // Store the buffer ID in the map
+    } else {
+        bufferID = bufferMap[name];  // Reuse the existing buffer ID
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, bufferID);  // Bind the buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * buffer.size(), buffer.data(), GL_STATIC_DRAW);  // Update buffer data
+
+    GLint aLoc = glGetAttribLocation(programID, name);  // Get attribute location
     if (aLoc == -1) {
         std::cerr << "Attribute " << name << " not found in shader program." << std::endl;
         return;
     }
-    glEnableVertexAttribArray(aLoc);
-    glVertexAttribPointer(aLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glEnableVertexAttribArray(aLoc);  // Enable the attribute
+    glVertexAttribPointer(aLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);  // Set the pointer for vertex attributes
 }
+
+
+
+
 
 void Shader::SendUniformData(int input, const char* name)
 {
