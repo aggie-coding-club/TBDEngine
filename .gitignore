@@ -53,6 +53,9 @@ build
 .idea
 cmake-build-debug
 
+# VS Code
+.vscode
+
 # TBDEngine
 VulkanSDK
 main.exe

@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include "gui/gui_engine.h"
 #define GL_SILENCE_DEPRECATION
@@ -17,6 +18,14 @@
 #include "core/game_engine.h"
 #include "render/render_engine.h"
 
+
+#include <yaml-cpp/yaml.h> // for tests, remove later
+#include <serial/lights.h>
+#include <serial/models.h>
+#include "core/scene.h"
+#include "serial/scenes.h"
+#include "serial/project.h"
+
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
 #define NUM_LIGHTS 2
@@ -28,7 +37,6 @@ GLFWwindow *window;
 std::unique_ptr<GuiEngine> guiEngine;
 std::unique_ptr<RenderEngine> renderEngine;
 
-Camera camera;
 GameEngine gameEngine;
 
 // Keyboard character callback function
@@ -49,7 +57,7 @@ static void glfw_error_callback(int error, const char* description)
 
 
 int main(int argc, char *argv[])
-{
+{	
 	// GLFWwindow* window is shared between gui and render,
 	// so let's declare it in main.
     glfwSetErrorCallback(glfw_error_callback);
@@ -69,7 +77,8 @@ int main(int argc, char *argv[])
 	glEnable(GL_DEPTH_TEST);
 
 	guiEngine = std::make_unique<GuiEngine>();
-	renderEngine = std::make_unique<RenderEngine>(window, &camera, &gameEngine);
+	renderEngine = std::make_unique<RenderEngine>(window, &gameEngine);
+
 	guiEngine->init(window, &gameEngine);
 	while ( glfwWindowShouldClose(window) == 0 )
 	{
@@ -87,6 +96,17 @@ int main(int argc, char *argv[])
 
     glfwDestroyWindow(window);
     glfwTerminate();
+	auto node = YAML::Node();
+	node = SerializeProject(&gameEngine);
+	std::ofstream yamlFile("../user/project.yaml");
+	if(!yamlFile) {
+		std::cout << "file does not exist" << std::endl;
+		return 1;
+	}
+	yamlFile << node;
+	yamlFile.close();
+
+
 
 	return 0;
 }

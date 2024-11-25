@@ -1,24 +1,23 @@
 #pragma once
 
+#include <iostream>
 #include <glm/vec3.hpp>
 #include "component.h"
 #include <string>
 
-class Transform: public Component {
+#define RESOURCES_PATH "../resources/models/"
+class Model: public Component {
 public:
-    glm::vec3 position;
-    glm::vec3 rotation;
-    glm::vec3 scale;
-    std::string model_path;
+    std::string modelPath;
+    std::string resourcesPath = std::string(RESOURCES_PATH);
 
     // TODO Remove hardcoded bunny
-    Transform(const glm::vec3 pos = glm::vec3(1.0f, 1.0f, 1.0f),
-              const glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f), // In degrees
-              const glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f),
-              const std::string& model_path = "../resources/models/bunny.obj")
-        : position(pos), rotation(rot), scale(scl), model_path(model_path)
+    Model(const std::string& _modelPath = "bunny.obj")
     {
-        type = TRANSFORM;
+        type = MODEL;
+        modelPath = resourcesPath + _modelPath;
+        std::cout << resourcesPath << std::endl;
+        std::cout << modelPath << std::endl;
     }
 
     // Add function to process component

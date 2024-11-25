@@ -124,12 +124,12 @@ message(STATUS "stb include directory: ${STB_INCLUDE_DIRS}")
 include_directories(${STB_INCLUDE_DIRS})
 
 FetchContent_Declare(
-        yaml
+        yaml-cpp
         GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
 )
-FetchContent_MakeAvailable(yaml)
-set(YAML_INCLUDE_DIRS ${yaml_SOURCE_DIR})
-message(STATUS "yaml include directory: ${YAML_INCLUDE_DIRS}/include")
+FetchContent_MakeAvailable(yaml-cpp)
+set(YAML_INCLUDE_DIRS "${yaml-cpp_SOURCE_DIR}/include")
+message(STATUS "yaml include directory: ${YAML_INCLUDE_DIRS}")
 include_directories(${YAML_INCLUDE_DIRS})
 
 # # Fetch vk_bootstrap
@@ -182,9 +182,9 @@ ELSE()
 ENDIF()
 
 # Link imgui to your main project target
-target_link_libraries(${CMAKE_PROJECT_NAME} imgui )
+target_link_libraries(${CMAKE_PROJECT_NAME} imgui)
 
-
+target_link_libraries(${CMAKE_PROJECT_NAME} yaml-cpp::yaml-cpp)
 
 # Link libraries for GLFW and Vulkan
 target_link_libraries(${CMAKE_PROJECT_NAME} glfw)
@@ -192,70 +192,3 @@ target_link_libraries(${CMAKE_PROJECT_NAME} glfw)
 # Use C++17
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
-
-# OS specific options and libraries
-IF(WIN32)
-    # -Wall produces way too many warnings.
-    # -pedantic is not supported.
-    # Disable warning 4996.
-    # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-    message(STATUS "Vulkan_LIBRARY is ${Vulkan_LIBRARY}")
-    target_link_libraries(${CMAKE_PROJECT_NAME} ${Vulkan_LIBRARY})
-    SET_PROPERTY(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
-ELSE()
-    # Enable all pedantic warnings.
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
-    IF(APPLE)
-        # macOS specific frameworks for GLFW and Vulkan
-        find_library(MOLTENVK_FRAMEWORK NAMES MoltenVK
-                PATHS ${MOLTENVK_PATH}/include
-                NO_DEFAULT_PATH)
-
-        # target_link_libraries(${CMAKE_PROJECT_NAME} "-framework MoltenVK")
-    ELSE()
-        # Link the Linux Vulkan library
-        target_link_libraries(${CMAKE_PROJECT_NAME} vulkan)
-    ENDIF()
-ENDIF()
-
-# find_program(GLSL_VALIDATOR glslangValidator HINTS /usr/bin /usr/local/bin $ENV{VULKAN_SDK}/Bin/ $ENV{VULKAN_SDK}/Bin32/)
-#
-# if(NOT GLSL_VALIDATOR)
-#     message(FATAL_ERROR "glslangValidator not found")
-# endif()
-#
-# FILE(GLOB_RECURSE GLSL_SOURCE_FILES
-#         "shaders/*.frag"
-#         "shaders/*.vert"
-#         "shaders/*.comp"
-# )
-#
-# foreach(GLSL ${GLSL_SOURCE_FILES})
-#     message(STATUS "BUILDING SHADER")
-#     get_filename_component(FILE_NAME ${GLSL} NAME)
-#     set(SPIRV "${PROJECT_SOURCE_DIR}/shaders/${FILE_NAME}.spv")
-#     add_custom_command(
-#             TARGET
-#             ${CMAKE_PROJECT_NAME}
-#             POST_BUILD
-#             COMMAND ${GLSL_VALIDATOR} -V ${GLSL} -o ${SPIRV}
-#             DEPENDS ${GLSL})
-#     MESSAGE(STATUS "Compiling ${SPIRV}")
-#     list(APPEND SPIRV_BINARY_FILES ${SPIRV})
-# endforeach(GLSL)
-#
-# add_custom_target(
-#         Shaders
-#         ALL DEPENDS ${SPIRV_BINARY_FILES}
-# )
-
-# Additional settings for Vulkan-based projects
-# Specify Vulkan SDK paths for runtime environment (Windows)
-# if(WIN32)
-#     set(VULKAN_RUNTIME_PATH "${VULKAN_SDK}/Lib")
-#     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-#         COMMAND ${CMAKE_COMMAND} -E copy_if_different
-#         ${VULKAN_RUNTIME_PATH}/vulkan-1.dll
-#         $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
-# endif()

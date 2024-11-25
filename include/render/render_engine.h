@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Program.h"
+#include "shader.h"
 #include "core/camera.h"
 #include "core/game_engine.h"
 
@@ -22,35 +22,28 @@
 class RenderEngine
 {
 	GLFWwindow* window;
-	const std::string modelPath = "../resources/models";
-	const std::string shadersPath = "../resources/shaders";
+	const std::string modelPath = "../resources/models/";
+	const std::string shadersPath = "../resources/shaders/";
 
 	std::string verts[NUM_SHADERS] = {
-	    "/vert.glsl",
-	    "/phong_vert.glsl",
-	    "/silhouette_vert.glsl"
+	    "vert.glsl",
+	    "phong_vert.glsl",
+	    "silhouette_vert.glsl"
 	};
 
 	std::string frags[NUM_SHADERS] = {
-	    "/frag.glsl",
-	    "/phong_frag.glsl",
-	    "/silhouette_frag.glsl"
+	    "frag.glsl",
+	    "phong_frag.glsl",
+	    "silhouette_frag.glsl"
 	};
 
-	Program program;
+	Shader program;
 	std::unordered_map<std::string, std::vector<float>> posBuffMap;
 	std::unordered_map<std::string, std::vector<float>> texBuffMap;
 	std::unordered_map<std::string, std::vector<float>> norBuffMap;
 	std::vector<float> posBuff;
 	std::vector<float> norBuff;
 	std::vector<float> texBuff;
-
-	glm::vec3 eye = {0.0f, 0.0f, 4.0f};
-
-	struct materialStruct {
-		glm::vec3 ka, kd, ks;
-		float s;
-	} materials[NUM_MATERIALS];
 
 	struct lightStruct {
 		glm::vec3 position;
@@ -60,31 +53,13 @@ class RenderEngine
 	int mat_idx = 0;
 	int shader_idx = 0;
 
-	Camera* camera;
+	std::shared_ptr<Camera> camera;
 	GameEngine* gameEngine;
 
 public:
-	RenderEngine()
-	{
-		Init();
-	}
-	RenderEngine(GLFWwindow* _window)
+	RenderEngine(GLFWwindow* _window, GameEngine* _gameEngine)
 	{
 		window = _window;
-		Init();
-	}
-
-	RenderEngine(GLFWwindow* _window, Camera* _camera)
-	{
-		window = _window;
-		camera = _camera;
-		Init();
-	}
-
-	RenderEngine(GLFWwindow* _window, Camera* _camera, GameEngine* _gameEngine)
-	{
-		window = _window;
-		camera = _camera;
 		gameEngine = _gameEngine;
 
 		Init();

@@ -1,10 +1,9 @@
 #include "gui/gui_engine.h"
-
-#include <iostream>
-#include <ostream>
-
-#include "gui/Custom_Widgets.h"
 #include "core/game_engine.h"
+#include "fmt/os.h"
+
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -49,7 +48,7 @@ bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    Inter_24 = io->Fonts->AddFontFromFileTTF("../include/Fonts/Inter-VariableFont_opsz,wght.ttf", 24);
+    inter_24 = io->Fonts->AddFontFromFileTTF("../include/Fonts/Inter-VariableFont_opsz,wght.ttf", 24);
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     // Temporarily set the resize grip alpha to 0 to hide it
@@ -81,8 +80,15 @@ bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 
-    clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    // Setting End of buffers to '\0' to prevent errors
+    objectLocation[127] = '\0';
+    objectName[127] = '\0';
+
+    details.SetParms(ImVec2(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2), ImVec2(WINDOW_WIDTH - (WINDOW_WIDTH / 4),29 + WINDOW_HEIGHT / 2));
+    fileHierarchy.SetParms(ImVec2(WINDOW_WIDTH / 4, WINDOW_HEIGHT / 2),ImVec2(WINDOW_WIDTH * 3 / 4,29));
+    
     return true;
 }
 
@@ -100,17 +106,29 @@ void GuiEngine::run( int width, int height )
     ImGui::NewFrame();
 
     // Game Engine
-    ShowMenuBar(showDetail, showView, showHierarchy);
+    menuBar.ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
     if(showHierarchy) {
+#ifndef _USE_SCENE_
         ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects());
+#endif
+        fileHierarchy.ShowFileHierarchy(gameEngine->GetCurrScene() , showAddObject);
     }
     if(showView)
     {
-        ShowViewport(ImVec2(width, height));
+        viewport.ShowViewport(ImVec2(width, height));
     }
     if(showDetail)
     {
-        ShowDetails(gameEngine->selectedGameObj);
+        details.ShowDetails(gameEngine->GetCurrScene());
+    }
+    if(showCameraWindow){
+        cameraDebugWindow.ShowCameraDebugWindow(gameEngine->GetCurrScene()->GetCurrCamera());
+    }
+    if(showAddObject) {
+        addObjectWindow.showAddObjectWindow(gameEngine, showAddObject);
+#ifndef _USE_SCENE_
+        details.ShowDetails(gameEngine->selectedGameObj);
+#endif
     }
 
     // Rendering

@@ -1,24 +1,24 @@
-#include "render/Program.h"
+#include "render/shader.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 
-Program::Program()
+Shader::Shader()
 {
 }
 
-Program::~Program()
+Shader::~Shader()
 {
 }
 
-void Program::SetShadersFileName(const std::string &vFileName, const std::string &sFileName)
+void Shader::SetShadersFileName(const std::string &vFileName, const std::string &sFileName)
 {
 	vertexShaderFileName = vFileName;
 	fragmentShaderFileName = sFileName;
 }
 
-void Program::CheckShaderCompileStatus(GLuint shader)
+void Shader::CheckShaderCompileStatus(GLuint shader)
 {
 	GLint status;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
@@ -39,7 +39,7 @@ void Program::CheckShaderCompileStatus(GLuint shader)
 	}
 }
 
-void Program::Init()
+void Shader::Init()
 {
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -73,7 +73,7 @@ void Program::Init()
 	}
 }
 
-std::string Program::ReadShader(const std::string &name)
+std::string Shader::ReadShader(const std::string &name)
 {
 	GLint status;
 
@@ -93,7 +93,7 @@ std::string Program::ReadShader(const std::string &name)
 	return str;
 }
 
-void Program::SendAttributeData(std::vector<float>& buffer, const char* name)
+void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
 {
 	GLuint bufferID;
 	glGenBuffers(1, &bufferID);
@@ -105,36 +105,36 @@ void Program::SendAttributeData(std::vector<float>& buffer, const char* name)
 }
 
 // Send an integer to the shader.
-void Program::SendUniformData(int input, const char* name)
+void Shader::SendUniformData(int input, const char* name)
 {
 
 	glUniform1i(glGetUniformLocation(programID, name), input);
 }
 
 // Send a float number to the shader.
-void Program::SendUniformData(float input, const char* name)
+void Shader::SendUniformData(float input, const char* name)
 {
 	glUniform1f(glGetUniformLocation(programID, name), input);
 }
 
 // Send a vec3 to the shader.
-void Program::SendUniformData(glm::vec3 input, const char* name)
+void Shader::SendUniformData(glm::vec3 input, const char* name)
 {
 	glUniform3f(glGetUniformLocation(programID, name), input.x, input.y, input.z);
 }
 
 //send a matrix to the shader.
-void Program::SendUniformData(glm::mat4 &input, const char* name)
+void Shader::SendUniformData(glm::mat4 &input, const char* name)
 {
 	glUniformMatrix4fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &input[0][0]);
 }
 
-void Program::Bind()
+void Shader::Bind()
 {
 	glUseProgram(programID);
 }
 
-void Program::Unbind()
+void Shader::Unbind()
 {
 	glUseProgram(0);
 }
