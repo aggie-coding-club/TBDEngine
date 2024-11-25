@@ -110,6 +110,11 @@ std::string Shader::ReadShader(const std::string &name)
 
 void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
 {
+	if (buffer.empty()) {
+		std::cerr << "Empty buffer for attribute: " << name << std::endl;
+		return;
+	}
+
 	GLuint bufferID;
 	glGenBuffers(1, &bufferID);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
@@ -123,6 +128,7 @@ void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
 	glEnableVertexAttribArray(aLoc);
 	glVertexAttribPointer(aLoc, 3, GL_FLOAT, GL_FALSE, 0, 0);
 }
+
 
 
 // Send an integer to the shader.

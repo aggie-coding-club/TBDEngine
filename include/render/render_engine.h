@@ -56,6 +56,9 @@ class RenderEngine
 	std::shared_ptr<Camera> camera;
 	GameEngine* gameEngine;
 
+	// Helper Function to generate normals when obj doesn't have normals saved in the file
+	glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices);
+
 public:
 	RenderEngine(GLFWwindow* _window, GameEngine* _gameEngine)
 	{

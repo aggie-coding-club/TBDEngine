@@ -25,58 +25,110 @@ void RenderEngine::Init()
 
 void RenderEngine::LoadModel(const std::string &name)
 {
-	// Taken from Shinjiro Sueda with slight modification
-	std::string meshName(name);
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-	std::string errStr;
+    // Taken from Shinjiro Sueda with slight modification
+    std::string meshName(name);
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string errStr;
 
-	posBuffMap[meshName] = std::vector<float>();
-	norBuffMap[meshName] = std::vector<float>();
+    posBuffMap[meshName] = std::vector<float>();
+    norBuffMap[meshName] = std::vector<float>();
+    texBuffMap[meshName] = std::vector<float>(); // Assuming texBuffMap is declared somewhere
 
-	std::vector<float>& posBuff = posBuffMap[meshName];
-	std::vector<float>& norBuff = norBuffMap[meshName];
+    std::vector<float>& posBuff = posBuffMap[meshName];
+    std::vector<float>& norBuff = norBuffMap[meshName];
+    std::vector<float>& texBuff = texBuffMap[meshName];
 
-	bool rc = tinyobj::LoadObj(&attrib, &shapes, &materials, &errStr, meshName.c_str());
-	if (!rc) {
-		std::cerr << errStr << std::endl;
-	}
-	else {
-		// Some OBJ files have different indices for vertex positions, normals,
-		// and texture coordinates. For example, a cube corner vertex may have
-		// three different normals. Here, we are going to duplicate all such
-		// vertices.
-		// Loop over shapes
-		for (size_t s = 0; s < shapes.size(); s++) {
-			// Loop over faces (polygons)
-			size_t index_offset = 0;
-			for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
-				size_t fv = shapes[s].mesh.num_face_vertices[f];
-				// Loop over vertices in the face.
-				for (size_t v = 0; v < fv; v++) {
-					// access to vertex
-					tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
-					posBuff.push_back(attrib.vertices[3 * idx.vertex_index + 0]);
-					posBuff.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
-					posBuff.push_back(attrib.vertices[3 * idx.vertex_index + 2]);
-					if (!attrib.normals.empty()) {
-						norBuff.push_back(attrib.normals[3 * idx.normal_index + 0]);
-						norBuff.push_back(attrib.normals[3 * idx.normal_index + 1]);
-						norBuff.push_back(attrib.normals[3 * idx.normal_index + 2]);
-					}
-					if (!attrib.texcoords.empty()) {
-						texBuff.push_back(attrib.texcoords[2 * idx.texcoord_index + 0]);
-						texBuff.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
-					}
-				}
-				index_offset += fv;
-				// per-face material (IGNORE)
-				shapes[s].mesh.material_ids[f];
-			}
-		}
-	}
+    bool rc = tinyobj::LoadObj(&attrib, &shapes, &materials, &errStr, meshName.c_str());
+    if (!rc) {
+        std::cerr << errStr << std::endl;
+    }
+    else {
+        // Some OBJ files have different indices for vertex positions, normals,
+        // and texture coordinates. For example, a cube corner vertex may have
+        // three different normals. Here, we are going to duplicate all such
+        // vertices.
+
+        // Temporary storage for normals if not present in the OBJ file
+        std::vector<glm::vec3> generatedNormals;
+
+        // Loop over shapes
+        for (size_t s = 0; s < shapes.size(); s++) {
+            // Loop over faces (polygons)
+            size_t index_offset = 0;
+            for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
+                size_t fv = shapes[s].mesh.num_face_vertices[f];
+                // Loop over vertices in the face.
+                std::vector<glm::vec3> faceVertices;  // To store face vertices for normal calculation
+                for (size_t v = 0; v < fv; v++) {
+                    // Access to vertex
+                    tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+                    float vx = attrib.vertices[3 * idx.vertex_index + 0];
+                    float vy = attrib.vertices[3 * idx.vertex_index + 1];
+                    float vz = attrib.vertices[3 * idx.vertex_index + 2];
+                    posBuff.push_back(vx);
+                    posBuff.push_back(vy);
+                    posBuff.push_back(vz);
+
+                    // Store the vertex for normal calculation (if normals are absent)
+                    faceVertices.push_back(glm::vec3(vx, vy, vz));
+
+                    if (!attrib.normals.empty()) {
+                        // If normals are already provided, add them
+                        norBuff.push_back(attrib.normals[3 * idx.normal_index + 0]);
+                        norBuff.push_back(attrib.normals[3 * idx.normal_index + 1]);
+                        norBuff.push_back(attrib.normals[3 * idx.normal_index + 2]);
+                    }
+
+                    if (!attrib.texcoords.empty()) {
+                        texBuff.push_back(attrib.texcoords[2 * idx.texcoord_index + 0]);
+                        texBuff.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
+                    }
+                }
+                index_offset += fv;
+
+                // Generate normals if not provided
+                if (attrib.normals.empty()) {
+                    glm::vec3 normal = GenerateNormal(faceVertices);
+                    for (size_t v = 0; v < fv; v++) {
+                        // Duplicate normal for each vertex in the face (flat shading)
+                        norBuff.push_back(normal.x);
+                        norBuff.push_back(normal.y);
+                        norBuff.push_back(normal.z);
+                    }
+                }
+
+                // per-face material (IGNORE)
+                shapes[s].mesh.material_ids[f];
+            }
+        }
+    }
 }
+
+// Function to generate a normal for a face (using the cross product of two edges)
+glm::vec3 RenderEngine::GenerateNormal(const std::vector<glm::vec3>& faceVertices)
+{
+    // Ensure there are exactly three vertices
+    if (faceVertices.size() != 3) {
+        std::cerr << "Error: Cannot generate normal for a non-triangle face." << std::endl;
+        return glm::vec3(0.0f); // Return a zero normal
+    }
+
+    glm::vec3 v0 = faceVertices[0];
+    glm::vec3 v1 = faceVertices[1];
+    glm::vec3 v2 = faceVertices[2];
+
+    // Calculate two edges
+    glm::vec3 edge1 = v1 - v0;
+    glm::vec3 edge2 = v2 - v0;
+
+    // Calculate the normal using the cross product
+    glm::vec3 normal = glm::normalize(glm::cross(edge1, edge2));
+
+    return normal;
+}
+
 
 void RenderEngine::ShadersInit() {
 	program.SetShadersFileName(shadersPath + verts[shader_idx],
