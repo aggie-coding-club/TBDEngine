@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <glm/glm.hpp>
 
@@ -27,5 +28,6 @@ public:
 private:
 	GLint programID;
 	std::string vertexShaderFileName, fragmentShaderFileName;
+	std::unordered_map<std::string, GLuint> bufferMap;
 };
 

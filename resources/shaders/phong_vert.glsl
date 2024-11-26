@@ -17,7 +17,7 @@ void main()
 {
 
     fragPosition = vec3(model * vec4(vPositionModel, 1.0));
-    fragNormal = normalize(vec3(modelInverseTranspose * vec4(vNormalModel, 1.0)));
+    fragNormal = normalize(vec3(modelInverseTranspose * vec4(vNormalModel, 0.0)));
 
 
     // gl_Position already contains the world space for vertices

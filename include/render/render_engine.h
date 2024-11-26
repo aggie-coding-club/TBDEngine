@@ -26,21 +26,18 @@ class RenderEngine
 	const std::string shadersPath = "../resources/shaders/";
 
 	std::string verts[NUM_SHADERS] = {
-	    "vert.glsl",
 	    "phong_vert.glsl",
-	    "silhouette_vert.glsl"
 	};
 
 	std::string frags[NUM_SHADERS] = {
-	    "frag.glsl",
 	    "phong_frag.glsl",
-	    "silhouette_frag.glsl"
 	};
 
 	Shader program;
 	std::unordered_map<std::string, std::vector<float>> posBuffMap;
 	std::unordered_map<std::string, std::vector<float>> texBuffMap;
 	std::unordered_map<std::string, std::vector<float>> norBuffMap;
+
 	std::vector<float> posBuff;
 	std::vector<float> norBuff;
 	std::vector<float> texBuff;
@@ -55,6 +52,9 @@ class RenderEngine
 
 	std::shared_ptr<Camera> camera;
 	GameEngine* gameEngine;
+
+	// Helper Function to generate normals when obj doesn't have normals saved in the file
+	glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices);
 
 public:
 	RenderEngine(GLFWwindow* _window, GameEngine* _gameEngine)
