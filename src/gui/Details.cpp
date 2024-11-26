@@ -116,9 +116,12 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
         ImGui::SameLine();
         ImGui::DragFloat3("##CamUpVect", &camUp[0], 0.001f, -100.0f, 100.0f, "%.3f");
 
-        camUp = glm::normalize(camUp);
+        if(glm::length(camUp) != 0) {
+            camUp = glm::normalize(camUp);
 
-        camera->SetUpVec(camUp);
+            camera->SetUpVec(camUp);
+        }
+        
 
         if(ImGui::Button("Delete")) {
             DeleteObject(scene);
