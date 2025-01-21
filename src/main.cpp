@@ -86,10 +86,11 @@ int main(int argc, char *argv[])
 		glfwGetWindowSize(window, &width, &height);
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		guiEngine->run(width,height);
-		if(guiEngine->showView) {
-			renderEngine->Display();
-		}
+		// guiEngine->run(width,height);
+		// if(guiEngine->showView) {
+		// 	renderEngine->Display();
+		// }
+		renderEngine->Display();
 		glfwSwapBuffers(window);
 	}
 	guiEngine->cleanup();

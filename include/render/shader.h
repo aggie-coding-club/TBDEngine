@@ -29,5 +29,7 @@ private:
 	GLint programID;
 	std::string vertexShaderFileName, fragmentShaderFileName;
 	std::unordered_map<std::string, GLuint> bufferMap;
+	static bool CheckShaderCompileStatus(GLuint shader, const std::string& shaderName);
+	static bool CheckProgramLinkStatus(GLuint program);
 };
 

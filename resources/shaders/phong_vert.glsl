@@ -9,7 +9,6 @@ uniform mat4 projection;
 
 uniform mat4 modelInverseTranspose;
 
-
 varying vec3 fragPosition;
 varying vec3 fragNormal;
 

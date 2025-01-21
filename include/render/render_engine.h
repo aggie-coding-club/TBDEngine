@@ -26,11 +26,11 @@ class RenderEngine
 	const std::string shadersPath = "../resources/shaders/";
 
 	std::string verts[NUM_SHADERS] = {
-	    "phong_vert.glsl",
+	    "vert.glsl",
 	};
 
 	std::string frags[NUM_SHADERS] = {
-	    "phong_frag.glsl",
+	    "frag.glsl",
 	};
 
 	Shader program;
@@ -55,6 +55,18 @@ class RenderEngine
 
 	// Helper Function to generate normals when obj doesn't have normals saved in the file
 	glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices);
+
+	// Vertex data: positions and texture coordinates for the rectangle
+	GLfloat vertices[30] = {
+		// Positions        // Texture Coordinates
+		-0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  // Bottom-left
+		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // Bottom-right
+		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f,  // Top-left
+		 0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // Bottom-right
+		 0.5f,  0.5f, 0.0f,  1.0f, 1.0f,  // Top-right
+		-0.5f,  0.5f, 0.0f,  0.0f, 1.0f   // Top-left
+	};
+	GLuint VBO, VAO;
 
 public:
 	RenderEngine(GLFWwindow* _window, GameEngine* _gameEngine)

@@ -34,11 +34,12 @@ void Shader::CheckShaderCompileStatus(GLuint shader)
     }
 }
 
-void Shader::Init()
-{
+void Shader::Init() {
+    // Step 1: Create shader objects
     GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 
+    // Step 2: Load and set shader source
     std::string vstr = ReadShader(vertexShaderFileName);
     std::string fstr = ReadShader(fragmentShaderFileName);
 
@@ -49,38 +50,83 @@ void Shader::Init()
 
     const char* vsText = vstr.c_str();
     glShaderSource(vertShader, 1, &vsText, nullptr);
+
     const char* fsText = fstr.c_str();
     glShaderSource(fragShader, 1, &fsText, nullptr);
 
+    // Step 3: Compile shaders
     glCompileShader(vertShader);
-    std::cout << "Vertex shader compilation: ";
-    CheckShaderCompileStatus(vertShader);
+    if (!CheckShaderCompileStatus(vertShader, "Vertex Shader")) {
+        glDeleteShader(vertShader);
+        return;
+    }
 
     glCompileShader(fragShader);
-    std::cout << "Fragment shader compilation: ";
-    CheckShaderCompileStatus(fragShader);
+    if (!CheckShaderCompileStatus(fragShader, "Fragment Shader")) {
+        glDeleteShader(vertShader);
+        glDeleteShader(fragShader);
+        return;
+    }
 
+    // Step 4: Link shaders into a program
     programID = glCreateProgram();
     glAttachShader(programID, vertShader);
     glAttachShader(programID, fragShader);
 
+    // Bind attribute locations before linking
+    glBindAttribLocation(programID, 0, "aPosition");
+    glBindAttribLocation(programID, 1, "aTexCoord");
+
     glLinkProgram(programID);
-    GLint status;
-    glGetProgramiv(programID, GL_LINK_STATUS, &status);
-    if (!status) {
-        GLint logLength;
-        glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength > 0) {
-            std::vector<char> log(logLength);
-            glGetProgramInfoLog(programID, logLength, nullptr, log.data());
-            std::cerr << "Shader Program Linking Error: " << std::endl << log.data() << std::endl;
-        }
+    if (!CheckProgramLinkStatus(programID)) {
+        glDeleteShader(vertShader);
+        glDeleteShader(fragShader);
+        glDeleteProgram(programID);
         return;
     }
 
-    // Cleanup shaders after linking
+    // Cleanup shaders after successful linking
     glDeleteShader(vertShader);
     glDeleteShader(fragShader);
+
+    // Step 5: Use the program (optional)
+    glUseProgram(programID);
+
+    std::cout << "Shader program initialized successfully!" << std::endl;
+}
+
+// Helper: Check Shader Compilation
+bool Shader::CheckShaderCompileStatus(GLuint shader, const std::string& shaderName) {
+    GLint success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        GLint logLength;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength > 0) {
+            std::vector<char> log(logLength);
+            glGetShaderInfoLog(shader, logLength, nullptr, log.data());
+            std::cerr << shaderName << " Compilation Error: " << std::endl << log.data() << std::endl;
+        }
+        return false;
+    }
+    return true;
+}
+
+// Helper: Check Program Linking
+bool Shader::CheckProgramLinkStatus(GLuint program) {
+    GLint success;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        GLint logLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+        if (logLength > 0) {
+            std::vector<char> log(logLength);
+            glGetProgramInfoLog(program, logLength, nullptr, log.data());
+            std::cerr << "Shader Program Linking Error: " << std::endl << log.data() << std::endl;
+        }
+        return false;
+    }
+    return true;
 }
 
 std::string Shader::ReadShader(const std::string &name)
