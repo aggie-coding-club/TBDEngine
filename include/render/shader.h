@@ -22,11 +22,10 @@ public:
 	void SendUniformData(glm::mat4 &mat, const char* name);
 	void Bind();
 	void Unbind();
-	GLint GetPID() { return programID; };
 
 
 private:
-	GLint programID;
+	GLint shaderID;
 	std::string vertexShaderFileName, fragmentShaderFileName;
 	std::unordered_map<std::string, GLuint> bufferMap;
 	static bool CheckShaderCompileStatus(GLuint shader, const std::string& shaderName);

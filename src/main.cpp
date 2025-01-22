@@ -28,9 +28,6 @@
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
-#define NUM_LIGHTS 2
-#define NUM_MATERIALS 3
-#define NUM_SHADERS 3
 
 GLFWwindow *window;
 
@@ -86,11 +83,10 @@ int main(int argc, char *argv[])
 		glfwGetWindowSize(window, &width, &height);
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// guiEngine->run(width,height);
-		// if(guiEngine->showView) {
-		// 	renderEngine->Display();
-		// }
-		renderEngine->Display();
+		guiEngine->run(width,height);
+		if(guiEngine->showView) {
+			renderEngine->Display();
+		}
 		glfwSwapBuffers(window);
 	}
 	guiEngine->cleanup();

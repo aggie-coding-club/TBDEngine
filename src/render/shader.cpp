@@ -3,11 +3,11 @@
 #include <fstream>
 #include <sstream>
 
-Shader::Shader() : programID(0) {}
+Shader::Shader() : shaderID(0) {}
 
 Shader::~Shader() {
-    if (programID != 0) {
-        glDeleteProgram(programID);
+    if (shaderID != 0) {
+        glDeleteProgram(shaderID);
     }
 }
 
@@ -69,19 +69,19 @@ void Shader::Init() {
     }
 
     // Step 4: Link shaders into a program
-    programID = glCreateProgram();
-    glAttachShader(programID, vertShader);
-    glAttachShader(programID, fragShader);
+    shaderID = glCreateProgram();
+    glAttachShader(shaderID, vertShader);
+    glAttachShader(shaderID, fragShader);
 
     // Bind attribute locations before linking
-    glBindAttribLocation(programID, 0, "aPosition");
-    glBindAttribLocation(programID, 1, "aTexCoord");
+    glBindAttribLocation(shaderID, 0, "aPosition");
+    glBindAttribLocation(shaderID, 1, "aTexCoord");
 
-    glLinkProgram(programID);
-    if (!CheckProgramLinkStatus(programID)) {
+    glLinkProgram(shaderID);
+    if (!CheckProgramLinkStatus(shaderID)) {
         glDeleteShader(vertShader);
         glDeleteShader(fragShader);
-        glDeleteProgram(programID);
+        glDeleteProgram(shaderID);
         return;
     }
 
@@ -90,7 +90,7 @@ void Shader::Init() {
     glDeleteShader(fragShader);
 
     // Step 5: Use the program (optional)
-    glUseProgram(programID);
+    glUseProgram(shaderID);
 
     std::cout << "Shader program initialized successfully!" << std::endl;
 }
@@ -162,7 +162,7 @@ void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
     glBindBuffer(GL_ARRAY_BUFFER, bufferID);  // Bind the buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * buffer.size(), buffer.data(), GL_STATIC_DRAW);  // Update buffer data
 
-    GLint aLoc = glGetAttribLocation(programID, name);  // Get attribute location
+    GLint aLoc = glGetAttribLocation(shaderID, name);  // Get attribute location
     if (aLoc == -1) {
         std::cerr << "Attribute " << name << " not found in shader program." << std::endl;
         return;
@@ -178,27 +178,27 @@ void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
 
 void Shader::SendUniformData(int input, const char* name)
 {
-    glUniform1i(glGetUniformLocation(programID, name), input);
+    glUniform1i(glGetUniformLocation(shaderID, name), input);
 }
 
 void Shader::SendUniformData(float input, const char* name)
 {
-    glUniform1f(glGetUniformLocation(programID, name), input);
+    glUniform1f(glGetUniformLocation(shaderID, name), input);
 }
 
 void Shader::SendUniformData(glm::vec3 input, const char* name)
 {
-    glUniform3f(glGetUniformLocation(programID, name), input.x, input.y, input.z);
+    glUniform3f(glGetUniformLocation(shaderID, name), input.x, input.y, input.z);
 }
 
 void Shader::SendUniformData(glm::mat4 &input, const char* name)
 {
-    glUniformMatrix4fv(glGetUniformLocation(programID, name), 1, GL_FALSE, &input[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(shaderID, name), 1, GL_FALSE, &input[0][0]);
 }
 
 void Shader::Bind()
 {
-    glUseProgram(programID);
+    glUseProgram(shaderID);
 }
 
 void Shader::Unbind()

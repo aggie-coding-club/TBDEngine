@@ -10,7 +10,7 @@ void main()
 	pos = aTexCoord;
 
 	vec4 position = vec4(aPosition, 1.0);
-	position.xy *= 2;
 
+	position.xy *= 2;
 	gl_Position = position;
 }

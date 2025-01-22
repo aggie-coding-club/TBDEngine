@@ -13,48 +13,22 @@
 #include <vector>
 #include <unordered_map>
 
-#define WINDOW_WIDTH 640
-#define WINDOW_HEIGHT 480
-#define NUM_LIGHTS 2
-#define NUM_MATERIALS 3
-#define NUM_SHADERS 3
-
 class RenderEngine
 {
 	GLFWwindow* window;
 	const std::string modelPath = "../resources/models/";
 	const std::string shadersPath = "../resources/shaders/";
 
-	std::string verts[NUM_SHADERS] = {
+	std::string verts[1] = {
 	    "vert.glsl",
 	};
 
-	std::string frags[NUM_SHADERS] = {
+	std::string frags[1] = {
 	    "frag.glsl",
 	};
 
-	Shader program;
-	std::unordered_map<std::string, std::vector<float>> posBuffMap;
-	std::unordered_map<std::string, std::vector<float>> texBuffMap;
-	std::unordered_map<std::string, std::vector<float>> norBuffMap;
-
-	std::vector<float> posBuff;
-	std::vector<float> norBuff;
-	std::vector<float> texBuff;
-
-	struct lightStruct {
-		glm::vec3 position;
-		glm::vec3 color;
-	} lights[NUM_LIGHTS];
-
-	int mat_idx = 0;
-	int shader_idx = 0;
-
-	std::shared_ptr<Camera> camera;
+	Shader currShader;
 	GameEngine* gameEngine;
-
-	// Helper Function to generate normals when obj doesn't have normals saved in the file
-	glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices);
 
 	// Vertex data: positions and texture coordinates for the rectangle
 	GLfloat vertices[30] = {
@@ -83,7 +57,5 @@ public:
 	void Display();
 	void CharacterCallback(GLFWwindow* window, unsigned int key);
 	void FrameBufferSizeCallback(GLFWwindow* lWindow, int width, int height);
-
-	void LoadModel(const std::string &name);
 
 };
