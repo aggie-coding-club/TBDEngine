@@ -32,6 +32,14 @@ public:
         return glm::perspective(glm::radians(fovy), aspect, 0.1f, 100.0f);
     }
 
+    inline float GetAspect() {
+        return aspect;
+    }
+    
+    inline float GetFovy() {
+        return fovy;
+    }
+
     inline glm::vec3 GetEye() const
     {
         return eye;
