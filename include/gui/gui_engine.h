@@ -8,7 +8,6 @@
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
-#include <GLFW/glfw3.h> // Will drag system OpenGL headers
 #include "core/game_engine.h"
 #include "core/camera.h"
 
@@ -49,6 +48,6 @@ public:
      GuiEngine() = default;
      ~GuiEngine() = default;
      bool init(GLFWwindow *window , GameEngine *_game_engine);
-     void run(int width, int height);
+     void run(int width, int height, unsigned int& texture, unsigned int& rbo);
      void cleanup();
 };

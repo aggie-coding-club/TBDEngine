@@ -20,7 +20,7 @@ void RenderEngine::Init()
 	lights[1].color    = {0.2f, 0.2f, 0.2f};
 #endif
     glGenVertexArrays(1, &VAO); // Create a VAO
-    glGenBuffers(1, &VBO);       // Create a VBO
+    glGenBuffers(1, &VBO);      // Create a VBO
 
     // Bind VAO
     glBindVertexArray(VAO);
@@ -44,39 +44,52 @@ void RenderEngine::Init()
 }
 
 void RenderEngine::ShadersInit() {
-	currShader.SetShadersFileName(shadersPath + verts[0],
-            shadersPath + frags[0]);
-
+	int currentShaderIDs = gameEngine->GetCurrScene()->current_shader;
+	currShader.SetShadersFileName(shadersPath + verts[currentShaderIDs],shadersPath + frags[currentShaderIDs]);
 	currShader.Init();
 }
 
-void RenderEngine::Display()
-{
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
+void RenderEngine::Display(unsigned int& framebuffer, int framebufferWidth, int framebufferHeight) {
+	// Bind the framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-    // Bind shader program
-    currShader.Bind();
+	// Ensure the viewport matches the framebuffer size
+	glViewport(0, 0, framebufferWidth, framebufferHeight);
 
-    // Bind the VAO and draw the rectangle
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6); // Draw two triangles (6 vertices)
-    glBindVertexArray(0);
+	// Clear the framebuffer
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Unbind the shader program
-    currShader.Unbind();
+	// Verify framebuffer completeness
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		std::cerr << "ERROR: Framebuffer is not complete!" << std::endl;
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		return;
+	}
 
+	// Bind the shader program
+	currShader.Bind();
+
+	// Update uniforms, if necessary (e.g., transformation matrices)
+	// currShader.SetUniform("u_MVP", mvpMatrix);
+
+	// Bind the VAO and draw
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+
+	// Unbind framebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Unbind shader
+	currShader.Unbind();
 }
-
-
-
-
-
 
 
 
 void RenderEngine::CharacterCallback(GLFWwindow* window, unsigned int key)
 {
+	// Nothing rn cuz yea
 }
 
 

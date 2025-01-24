@@ -19,12 +19,14 @@ class RenderEngine
 	const std::string modelPath = "../resources/models/";
 	const std::string shadersPath = "../resources/shaders/";
 
-	std::string verts[1] = {
-	    "vert.glsl",
+	std::string verts[2] = {
+	    "vert_gradient.glsl",
+		"vert_gradient.glsl",
 	};
 
-	std::string frags[1] = {
-	    "frag.glsl",
+	std::string frags[2] = {
+	    "frag_gradient.glsl",
+	    "frag_gradient_box.glsl",
 	};
 
 	Shader currShader;
@@ -54,7 +56,7 @@ public:
 	void Init();
 
 	void ShadersInit();
-	void Display();
+	void Display(unsigned int& framebuffer, int framebufferWidth, int framebufferHeight);
 	void CharacterCallback(GLFWwindow* window, unsigned int key);
 	void FrameBufferSizeCallback(GLFWwindow* lWindow, int width, int height);
 
