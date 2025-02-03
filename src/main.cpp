@@ -58,6 +58,10 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int argc, char *argv[])
 {	
+
+	DeserializeProject(&gameEngine, "../user/project.yaml");
+
+	
 	// GLFWwindow* window is shared between gui and render,
 	// so let's declare it in main.
     glfwSetErrorCallback(glfw_error_callback);

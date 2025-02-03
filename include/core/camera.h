@@ -58,6 +58,10 @@ public:
         aspect = float(width) / float(height);
     }
 
+    void SetAspect(const float _aspect) {
+        aspect = _aspect;
+    }
+
     inline void SetFovy(const float _fovy)
     {
         fovy = glm::radians(_fovy);

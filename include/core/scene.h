@@ -113,6 +113,10 @@ public:
         models = _models;
     }
 
+    void SetCamerasVector(const std::vector<std::shared_ptr<Camera>> _cameras) {
+        cameras = _cameras;
+    }
+
     std::string& GetName() {
         return name;
     }
