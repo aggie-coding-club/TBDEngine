@@ -1,10 +1,11 @@
 #include "serial/cameras.h"
+#include <iostream>
 
 YAML::Node SerializeCameras(const std::vector<std::shared_ptr<Camera>>& cameras) {
     auto CamerasNode = YAML::Node();
 
     CamerasNode["Cameras"];
-
+    int index = 0;
     for(const auto& camera: cameras) {
         auto CurrCameraNode = YAML::Node();
 
@@ -21,29 +22,31 @@ YAML::Node SerializeCameras(const std::vector<std::shared_ptr<Camera>>& cameras)
         CurrCameraNode["up"] = std::vector<float>{up[0], up[1], up[2]};
 
 
-        CamerasNode["Camera Name"] = CurrCameraNode;
-        // Change "Camera Name"
+        CamerasNode["Camera" + std::to_string(index++)] = CurrCameraNode;
     }
 
     return CamerasNode;
 }
 
 void DeserializeCameras(std::vector<std::shared_ptr<Camera>>& cameras, const YAML::Node& camerasNode) {
-    for(const auto& currCameraNode : camerasNode) {
-        const auto camera = std::make_shared<Camera>();
-        std::string cameraName;
+    // std::cout << "cameraaaaa 1" << std::endl;
+    // std::cout << camerasNode << std::endl;
+    // for(const auto& currCameraNode : camerasNode) {
+    std::cout << "cameraaaaa 2" << std::endl;
+    //std::cout << currCameraNode << std::endl;
+    
 
-        for(const auto& cameraPair : currCameraNode) {
-            cameraName = cameraPair.first.as<std::string>();
-            const YAML::Node cameraNode = cameraPair.second;
+    for(const auto& cameraPair : camerasNode) {
+        auto camera = std::make_shared<Camera>();
+        const YAML::Node cameraNode = cameraPair.second;
 
-            camera->SetFovy(cameraNode["fovy"].as<float>());
-            camera->SetAspect(cameraNode["aspect"].as<float>());
-            camera->SetCenter(glm::vec3(cameraNode["center"][0].as<float>(), cameraNode["center"][1].as<float>(), cameraNode["center"][2].as<float>()));
-            camera->SetEye(glm::vec3(cameraNode["eye"][0].as<float>(), cameraNode["eye"][1].as<float>(), cameraNode["eye"][2].as<float>()));
-            camera->SetUpVec(glm::vec3(cameraNode["up"][0].as<float>(), cameraNode["up"][1].as<float>(), cameraNode["up"][2].as<float>()));
+        camera->SetFovy(glm::degrees(cameraNode["fovy"].as<float>()));
+        camera->SetAspect(1920.0 / 1080.0); // hardcoded
+        camera->SetCenter(glm::vec3(cameraNode["center"][0].as<float>(), cameraNode["center"][1].as<float>(), cameraNode["center"][2].as<float>()));
+        camera->SetEye(glm::vec3(cameraNode["eye"][0].as<float>(), cameraNode["eye"][1].as<float>(), cameraNode["eye"][2].as<float>()));
+        camera->SetUpVec(glm::vec3(cameraNode["up"][0].as<float>(), cameraNode["up"][1].as<float>(), cameraNode["up"][2].as<float>()));
 
-        }
+        // }
         cameras.push_back(camera);
     }
 }
