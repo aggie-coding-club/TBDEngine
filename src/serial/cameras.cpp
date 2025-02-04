@@ -1,5 +1,4 @@
 #include "serial/cameras.h"
-#include <iostream>
 
 YAML::Node SerializeCameras(const std::vector<std::shared_ptr<Camera>>& cameras) {
     auto CamerasNode = YAML::Node();
@@ -29,13 +28,6 @@ YAML::Node SerializeCameras(const std::vector<std::shared_ptr<Camera>>& cameras)
 }
 
 void DeserializeCameras(std::vector<std::shared_ptr<Camera>>& cameras, const YAML::Node& camerasNode) {
-    // std::cout << "cameraaaaa 1" << std::endl;
-    // std::cout << camerasNode << std::endl;
-    // for(const auto& currCameraNode : camerasNode) {
-    std::cout << "cameraaaaa 2" << std::endl;
-    //std::cout << currCameraNode << std::endl;
-    
-
     for(const auto& cameraPair : camerasNode) {
         auto camera = std::make_shared<Camera>();
         const YAML::Node cameraNode = cameraPair.second;
@@ -46,7 +38,6 @@ void DeserializeCameras(std::vector<std::shared_ptr<Camera>>& cameras, const YAM
         camera->SetEye(glm::vec3(cameraNode["eye"][0].as<float>(), cameraNode["eye"][1].as<float>(), cameraNode["eye"][2].as<float>()));
         camera->SetUpVec(glm::vec3(cameraNode["up"][0].as<float>(), cameraNode["up"][1].as<float>(), cameraNode["up"][2].as<float>()));
 
-        // }
         cameras.push_back(camera);
     }
 }
