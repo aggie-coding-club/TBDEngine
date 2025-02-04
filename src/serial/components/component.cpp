@@ -48,7 +48,6 @@ YAML::Node SerializeComponents(const std::array<std::shared_ptr<Component>, Comp
 
 void DeserializeComponents(std::array<std::shared_ptr<Component>, Component::GetEnumSize()>& components, const YAML::Node& componentsNode) {
 
-    std::cout << "componentNode" << std::endl;
     for(const auto& componentNode : componentsNode) {
         std::string componentName = componentNode.first.as<std::string>();
         if(componentName == "Transform") {

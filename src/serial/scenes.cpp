@@ -19,7 +19,6 @@ YAML::Node SerializeScenes(const std::vector<std::shared_ptr<Scene>>& scenes) {
 }
 
 void DeserializeScenes(std::vector<std::shared_ptr<Scene>>& scenes, const YAML::Node& scenesNode) {
-    std::cout << "sceneNode" << std::endl; 
     for(const auto& currSceneNode : scenesNode) {
         const auto scene = std::make_shared<Scene>();
         std::string sceneName;
@@ -41,7 +40,9 @@ void DeserializeScenes(std::vector<std::shared_ptr<Scene>>& scenes, const YAML::
             std::vector<std::shared_ptr<Camera>> cameras;
             YAML::Node camerasNode = sceneContent["Cameras"];
             DeserializeCameras(cameras, camerasNode);
-            scene->SetCamerasVector(cameras);
+            for(std::shared_ptr<Camera> camera : cameras) {
+                scene->GetCameras().emplace_back(camera);
+            }
         }
 
 

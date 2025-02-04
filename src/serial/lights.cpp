@@ -14,13 +14,11 @@ YAML::Node SerializeLights(const std::vector<std::shared_ptr<GameObject>>& light
 }
 
 void DeserializeLights(std::vector<std::shared_ptr<GameObject>>& lights, const YAML::Node& lightsNode) {
-    std::cout << "lightsNode" << std::endl;
     for(const auto& currLightNode : lightsNode) {
         const auto light = std::make_shared<GameObject>();
-        std::string lightName;
 
         for(const auto& lightPair : currLightNode) {
-            lightName = lightPair.first.as<std::string>();
+            light->name = lightPair.first.as<std::string>();
             const YAML::Node componentsNode = lightPair.second;
             DeserializeComponents(light->components, componentsNode);
         }

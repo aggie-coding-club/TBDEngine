@@ -14,7 +14,6 @@ YAML::Node SerializeModels(const std::vector<std::shared_ptr<GameObject>>& model
 }
 
 void DeserializeModels(std::vector<std::shared_ptr<GameObject>>& models, const YAML::Node& modelsNode) {
-    std::cout << "modelsNode" << std::endl;
     for(const auto& currModelNode : modelsNode) {
         const auto model = std::make_shared<GameObject>();
 
