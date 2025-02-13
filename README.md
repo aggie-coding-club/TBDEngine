@@ -64,7 +64,7 @@ command:
 - Owen House
 - Camryn Graham
 - Josh Eury
-- brain_dead.exe
+- Raniv Gupta
 - sppoon_
 - abhilaasya
 - ana_kaur
