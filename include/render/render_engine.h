@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shader.h"
+#include "render/Basic_Shader.h"
 #include "core/camera.h"
 #include "core/game_engine.h"
 
@@ -29,7 +29,7 @@ class RenderEngine
 	    "frag_gradient_box.glsl",
 	};
 
-	Shader currShader;
+	Basic_Shader currShader;
 	GameEngine* gameEngine;
 
 	// Vertex data: positions and texture coordinates for the rectangle

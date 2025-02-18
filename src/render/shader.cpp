@@ -11,6 +11,10 @@ Shader::~Shader() {
     }
 }
 
+void Shader::UpdateData() {
+    this->SendUniformData(1.f,"tempcolor");
+}
+
 void Shader::SetShadersFileName(const std::string &vFileName, const std::string &sFileName)
 {
     vertexShaderFileName = vFileName;
@@ -74,8 +78,9 @@ void Shader::Init() {
     glAttachShader(shaderID, fragShader);
 
     // Bind attribute locations before linking
-    glBindAttribLocation(shaderID, 0, "aPosition");
-    glBindAttribLocation(shaderID, 1, "aTexCoord");
+    glBindAttribLocation(shaderID, 0, "aPosition");    // Vertex position
+    glBindAttribLocation(shaderID, 1, "aTexCoord");    // Texture coordinates
+    glBindAttribLocation(shaderID, 2, "aNormal");      // Vertex normal
 
     glLinkProgram(shaderID);
     if (!CheckProgramLinkStatus(shaderID)) {

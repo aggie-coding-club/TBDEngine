@@ -71,7 +71,7 @@ void RenderEngine::Display(unsigned int& framebuffer, int framebufferWidth, int 
 	currShader.Bind();
 
 	// Update uniforms, if necessary (e.g., transformation matrices)
-	// currShader.SetUniform("u_MVP", mvpMatrix);
+	currShader.UpdateData();
 
 	// Bind the VAO and draw
 	glBindVertexArray(VAO);

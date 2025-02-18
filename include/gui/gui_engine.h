@@ -48,6 +48,6 @@ public:
      GuiEngine() = default;
      ~GuiEngine() = default;
      bool init(GLFWwindow *window , GameEngine *_game_engine);
-     void run(int width, int height, unsigned int& texture, unsigned int& rbo);
+     void run(unsigned int& texture, unsigned int& rbo);
      void cleanup();
 };

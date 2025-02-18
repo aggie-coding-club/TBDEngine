@@ -1,9 +1,12 @@
-#version 120
+#version 330 core
 
-varying vec2 pos;
+uniform float tempcolor;
+in vec2 pos;
+
+out vec4 fragColor;
 
 void main()
 {
-    vec2 newPos = fract(pos * 10);
-    gl_FragColor = vec4(newPos, 1., 1.);
+    vec2 newPos = fract(pos * 10.0);
+    fragColor = vec4(newPos, tempcolor, 1.0);
 }

@@ -7,5 +7,5 @@
 
 class Viewport{
   public:
-    void ShowViewport(unsigned int& textureColorbuffer, unsigned int& rbo);
+    void ShowViewport(unsigned int& textureColorbuffer);
 };

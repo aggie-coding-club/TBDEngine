@@ -1,4 +1,4 @@
-#define GLEW_STATIC
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -52,18 +52,6 @@ static void glfw_error_callback(int error, const char* description)
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-void ResizeFramebuffer(unsigned int& texture, unsigned int& renderbuffer, int width, int height) {
-	// Resize texture attachment
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Resize renderbuffer attachment
-	glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-}
-
 int main(int argc, char *argv[])
 {	
 	// GLFWwindow* window is shared between gui and render,
@@ -81,8 +69,6 @@ int main(int argc, char *argv[])
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glfwSetCharCallback(window, CharacterCallback);
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glEnable(GL_DEPTH_TEST);
 
 	guiEngine = std::make_unique<GuiEngine>();
 	renderEngine = std::make_unique<RenderEngine>(window, &gameEngine);
@@ -120,7 +106,7 @@ int main(int argc, char *argv[])
 		glfwGetWindowSize(window, &width, &height);
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		guiEngine->run(width,height,textureColorbuffer, rbo);
+		guiEngine->run(textureColorbuffer, rbo);
 		if(guiEngine->showView) {
 			renderEngine->Display(framebuffer, width, height);
 		}

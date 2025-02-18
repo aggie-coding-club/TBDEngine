@@ -1,5 +1,5 @@
 #pragma once
-#include <GL/glew.h>
+#include "GL/glew.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -17,6 +17,7 @@ class Shader
 public:
 	Shader();
 	~Shader();
+	void UpdateData();
 	void SetShadersFileName(const std::string &vFileName, const std::string &sFileName);
 	void CheckShaderCompileStatus(GLuint shader);
 	void Init();
