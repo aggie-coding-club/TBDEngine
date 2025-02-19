@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/Shader.h"
+#include "render/shader.h"
 
 class Basic_Shader : public Shader{
 
