@@ -102,7 +102,9 @@ int main(int argc, char *argv[])
     glfwTerminate();
 	auto node = YAML::Node();
 	node = SerializeProject(&gameEngine);
-	std::ofstream yamlFile("../user/project.yaml");
+	YAML::Node project = SerializeProject(&gameEngine);
+	std::string filename = "../user/" + gameEngine.getName() + ".yaml";
+	std::ofstream yamlFile(filename);
 	if(!yamlFile) {
 		std::cout << "file does not exist" << std::endl;
 		return 1;
