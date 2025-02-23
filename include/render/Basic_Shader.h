@@ -1,6 +1,5 @@
 #pragma once
 
-#define TINYOBJLOADER_IMPLEMENTATION
 #include "render/tiny_obj_loader.h"
 
 #include "render/Shader.h"
@@ -186,8 +185,8 @@ public:
                 this->SendUniformData(lightTransform->position, (name + ".position").c_str());
                 this->SendUniformData(lightComponent->color, (name+".color").c_str());
             }
-
-            this->SendUniformData(1.f,"tempcolor");
         }
+
+        this->SendUniformData(1.f,"tempcolor");
     };
 };

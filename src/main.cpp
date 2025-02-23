@@ -8,6 +8,7 @@
 #include <fstream>
 
 #include "gui/gui_engine.h"
+#define TINYOBJLOADER_IMPLEMENTATION
 #define GL_SILENCE_DEPRECATION
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
