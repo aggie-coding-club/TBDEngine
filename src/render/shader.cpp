@@ -38,7 +38,10 @@ void Shader::CheckShaderCompileStatus(GLuint shader)
     }
 }
 
-void Shader::Init() {
+void Shader::Init(std::shared_ptr<Scene> _Scene){
+
+    scene = _Scene;
+
     // Step 1: Create shader objects
     GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);

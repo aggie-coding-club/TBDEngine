@@ -1,10 +1,7 @@
 #pragma once
 #include "GL/glew.h"
-#include <string>
+#include "core/game_engine.h"
 #include <unordered_map>
-#include <vector>
-#include <glm/glm.hpp>
-
 
 class Shader
 {
@@ -20,8 +17,9 @@ public:
 	void UpdateData();
 	void SetShadersFileName(const std::string &vFileName, const std::string &sFileName);
 	void CheckShaderCompileStatus(GLuint shader);
-	void Init();
+	void Init(std::shared_ptr<Scene> _Scene);
 	std::string ReadShader(const std::string &name);
+	std::shared_ptr<Scene> scene;
 
 	void SendAttributeData(std::vector<float>& buffer, const char* name);
 	void SendUniformData(int a, const char* name);

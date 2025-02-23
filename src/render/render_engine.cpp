@@ -1,8 +1,5 @@
 #include "render/render_engine.h"
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "render/tiny_obj_loader.h"
-
 #include "core/components/component.h"
 #include "core/components/light.h"
 #include "core/components/transform.h"
@@ -46,7 +43,7 @@ void RenderEngine::Init()
 void RenderEngine::ShadersInit() {
 	int currentShaderIDs = gameEngine->GetCurrScene()->current_shader;
 	currShader.SetShadersFileName(shadersPath + verts[currentShaderIDs],shadersPath + frags[currentShaderIDs]);
-	currShader.Init();
+	currShader.Init(gameEngine->GetCurrScene());
 }
 
 void RenderEngine::Display(unsigned int& framebuffer, int framebufferWidth, int framebufferHeight) {
