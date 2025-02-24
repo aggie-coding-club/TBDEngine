@@ -72,6 +72,23 @@ void MenuBar::ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy,
             ImGui::EndMenu();
         }
 
+        // Start of Simulation, probably move out of menu bar
+        if(simulationManager.isRunning()) {
+            if (ImGui::Button("Pause")) {
+                simulationManager.StopSimulation();
+            }
+        }
+        else {
+            if (ImGui::Button("Start")) {
+                simulationManager.StartSimulation();
+            }
+        }
+        
+        if (ImGui::Button("Stop")) {
+            simulationManager.StopSimulation();
+        }
+        // End of Simulation
+
         ImGui::EndMainMenuBar();
     }
 }
