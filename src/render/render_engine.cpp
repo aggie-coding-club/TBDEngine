@@ -67,6 +67,7 @@ void RenderEngine::Display(unsigned int& framebuffer, int framebufferWidth, int 
 	// Bind the shader program
 	currShader.Bind();
 
+	currShader.SendUniformData(glm::vec2(framebufferWidth,framebufferHeight), "_ScreenParams");
 	// Update uniforms, if necessary (e.g., transformation matrices)
 	currShader.UpdateData();
 

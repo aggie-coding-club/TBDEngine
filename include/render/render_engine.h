@@ -19,7 +19,7 @@ class RenderEngine
 
 	std::string frags[2] = {
 	    "frag_gradient.glsl",
-	    "frag_gradient_box.glsl",
+	    "frag_gradient.glsl",
 	};
 
 	Basic_Shader currShader;

@@ -106,7 +106,7 @@ void GuiEngine::run(unsigned int& texture, unsigned int& rbo)
     ImGui::NewFrame();
 
     // Game Engine
-    menuBar.ShowMenuBar(showDetail, showView, showHierarchy, showCameraWindow);
+    menuBar.ShowMenuBar(showDetail, showView, showHierarchy);
     if(showHierarchy) {
 #ifndef _USE_SCENE_
         ShowFileHierarchy(gameEngine ,gameEngine->GetGameObjects());
@@ -120,9 +120,6 @@ void GuiEngine::run(unsigned int& texture, unsigned int& rbo)
     if(showDetail)
     {
         details.ShowDetails(gameEngine->GetCurrScene());
-    }
-    if(showCameraWindow){
-        cameraDebugWindow.ShowCameraDebugWindow(gameEngine->GetCurrScene()->GetCurrCamera());
     }
     if(showAddObject) {
         addObjectWindow.showAddObjectWindow(gameEngine, showAddObject);

@@ -2,7 +2,7 @@
 
 #include "gui/MenuBar.h"
 
-void MenuBar::ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy, bool &ShowCameraDebug){
+void MenuBar::ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy){
     if (ImGui::BeginMainMenuBar())
     {
         // File menu
@@ -53,8 +53,6 @@ void MenuBar::ShowMenuBar(bool &ShowDetail, bool &ShowView, bool &ShowHierarchy,
             ImGui::MenuItem("Show Details", nullptr, &ShowDetail);
 
             ImGui::MenuItem("Show File Hierarchy", nullptr, &ShowHierarchy);
-
-            ImGui::MenuItem("Show Camera Debug", nullptr, &ShowCameraDebug);
 
             ImGui::EndMenu();
         }

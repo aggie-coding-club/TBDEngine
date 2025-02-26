@@ -6,31 +6,21 @@
 void CameraDebugWindow::ShowCameraDebugWindow(std::shared_ptr<Camera> camera){
     ImGui::Begin("Camera Debug", nullptr);
 
-    glm::vec3 camEye = camera->GetEye();
+    glm::vec3 position = camera->GetPosition();
 
-    ImGui::Text("Camera Eye");
+    ImGui::Text("Position");
     ImGui::SameLine();
-    ImGui::DragFloat3("##CamEye", &camEye[0], 0.1f, -100.0f, 100.0f, "%.3f");
+    ImGui::DragFloat3("##Position", &position[0], 0.001f,0,0, "%.3f");
 
-    camera->SetEye(camEye);
+    camera->SetPosition(position);
 
-    glm::vec3 camCenter = camera->GetCenter();
+    glm::vec3 rotation = camera->GetRotation();
 
-    ImGui::Text("Camera Center");
+    ImGui::Text("Rotation");
     ImGui::SameLine();
-    ImGui::DragFloat3("##CamCenter", &camCenter[0], 0.1f, -100.0f, 100.0f, "%.3f");
+    ImGui::DragFloat3("##Rotation", &rotation[0], 0.001f, 0, 0, "%.3f");
 
-    camera->SetCenter(camCenter);
-
-    glm::vec3 camUp = camera->GetUpVec();
-
-    ImGui::Text("Camera Up Vector");
-    ImGui::SameLine();
-    ImGui::DragFloat3("##CamUpVect", &camUp[0], 0.001f, -100.0f, 100.0f, "%.3f");
-
-    camUp = glm::normalize(camUp);
-
-    camera->SetUpVec(camUp);
+    camera->SetRotation(rotation);
 
     ImGui::End();
 };

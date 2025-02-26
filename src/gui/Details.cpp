@@ -94,34 +94,29 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
     ImGui::Begin("Details",nullptr,window_flags);
     if (scene->selectedCamera) {
         std::shared_ptr<Camera> camera = scene->GetCurrCamera();
-        glm::vec3 camEye = camera->GetEye();
+        glm::vec3 position = camera->GetPosition();
 
-        ImGui::Text("Camera Eye");
+        ImGui::Text("Position");
         ImGui::SameLine();
-        ImGui::DragFloat3("##CamEye", &camEye[0], 0.1f, -100.0f, 100.0f, "%.3f");
+        ImGui::DragFloat3("##Position", &position[0], 0.001f,0,0, "%.3f");
 
-        camera->SetEye(camEye);
+        camera->SetPosition(position);
 
-        glm::vec3 camCenter = camera->GetCenter();
+        glm::vec3 rotation = camera->GetRotation();
 
-        ImGui::Text("Camera Center");
+        ImGui::Text("Rotation");
         ImGui::SameLine();
-        ImGui::DragFloat3("##CamCenter", &camCenter[0], 0.1f, -100.0f, 100.0f, "%.3f");
+        ImGui::DragFloat3("##Rotation", &rotation[0], 0.001f, 0, 0, "%.3f");
 
-        camera->SetCenter(camCenter);
+        camera->SetRotation(rotation);
 
-        glm::vec3 camUp = camera->GetUpVec();
+        float focusDist = camera->GetFocusDist();
 
-        ImGui::Text("Camera Up Vector");
+        ImGui::Text("Focus Distance");
         ImGui::SameLine();
-        ImGui::DragFloat3("##CamUpVect", &camUp[0], 0.001f, -100.0f, 100.0f, "%.3f");
+        ImGui::DragFloat("##FocusDst", &focusDist, 0.001f, 0, 0, "%.3f");
 
-        if(glm::length(camUp) != 0) {
-            camUp = glm::normalize(camUp);
-
-            camera->SetUpVec(camUp);
-        }
-        
+        camera->SetFocusDist(focusDist);
 
         if(ImGui::Button("Delete")) {
             DeleteObject(scene);

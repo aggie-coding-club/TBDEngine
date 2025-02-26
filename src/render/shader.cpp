@@ -150,7 +150,7 @@ std::string Shader::ReadShader(const std::string &name)
     return ss.str();
 }
 
-void Shader::SendAttributeData(std::vector<float>& buffer, const char* name)
+void Shader::SendBufferData(std::vector<float>& buffer, const char* name)
 {
     if (buffer.empty()) {
         std::cerr << "Empty buffer for attribute: " << name << std::endl;
@@ -188,6 +188,11 @@ void Shader::SendUniformData(int input, const char* name)
 void Shader::SendUniformData(float input, const char* name)
 {
     glUniform1f(glGetUniformLocation(shaderID, name), input);
+}
+
+void Shader::SendUniformData(glm::vec2 input, const char* name)
+{
+    glUniform2f(glGetUniformLocation(shaderID, name), input.x, input.y);
 }
 
 void Shader::SendUniformData(glm::vec3 input, const char* name)
