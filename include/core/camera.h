@@ -2,7 +2,10 @@
 #include <iostream>
 #include <ostream>
 #include <glm/glm.hpp>
+#include <glm/detail/type_quat.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+#include "fmt/format.h"
 
 class Camera
 {
@@ -11,7 +14,7 @@ private:
     float aspect;
     float focusDistance;
     glm::vec3 Position;
-    glm::vec4 Rotation;
+    glm::quat Rotation;
 
 public:
 
@@ -19,7 +22,7 @@ public:
         aspect(static_cast<float>(width)/ static_cast<float>(height)),
         focusDistance(1.0f),
         Position(glm::vec3(0.0f, 0.0f, 4.0f)),
-        Rotation(glm::vec4(0.0f)) {}
+        Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)) {}
 
     Camera(): Camera(1920, 1080){}
 
@@ -57,22 +60,27 @@ public:
     {
         glm::vec3 angles;
 
-        float sinr_cosp = 2 * (Rotation.w * Rotation.x + Rotation.y * Rotation.z);
-        float cosr_cosp = 1 - 2 * (Rotation.x * Rotation.x + Rotation.y * Rotation.y);
-        angles.x = std::atan2(sinr_cosp, cosr_cosp);
+        // Extract pitch (Y-axis rotation)
+        float sinp = 2 * (Rotation.w * Rotation.y - Rotation.z * Rotation.x);
+        if (std::abs(sinp) >= 1)
+            angles.y = std::copysign(glm::half_pi<float>(), sinp); // Prevents gimbal lock issue
+        else
+            angles.y = std::asin(sinp);
 
-        // pitch (y-axis rotation)
-        float sinp = std::sqrt(1 + 2 * (Rotation.w * Rotation.y - Rotation.x * Rotation.z));
-        float cosp = std::sqrt(1 - 2 * (Rotation.w * Rotation.y - Rotation.x * Rotation.z));
-        angles.y = 2 * std::atan2(sinp, cosp) - M_PI / 2;
-
-        // yaw (z-axis rotation)
+        // Extract yaw (Z-axis rotation)
         float siny_cosp = 2 * (Rotation.w * Rotation.z + Rotation.x * Rotation.y);
         float cosy_cosp = 1 - 2 * (Rotation.y * Rotation.y + Rotation.z * Rotation.z);
         angles.z = std::atan2(siny_cosp, cosy_cosp);
 
-        return angles;
+        // Extract roll (X-axis rotation)
+        float sinr_cosp = 2 * (Rotation.w * Rotation.x + Rotation.y * Rotation.z);
+        float cosr_cosp = 1 - 2 * (Rotation.x * Rotation.x + Rotation.y * Rotation.y);
+        angles.x = std::atan2(sinr_cosp, cosr_cosp);
+
+        return glm::degrees(angles); // Convert radians to degrees for UI
     }
+
+
 
     inline glm::vec3 GetCenter() const
     {
@@ -106,18 +114,15 @@ public:
         Position = _pos;
     }
 
-    inline void SetRotation(const glm::vec3 _rot)
+    inline void SetRotation(const glm::vec3& eulerAngles)
     {
-        double cr = cos(_rot.x * 0.5);
-        double sr = sin(_rot.x * 0.5);
-        double cp = cos(_rot.y * 0.5);
-        double sp = sin(_rot.y * 0.5);
-        double cy = cos(_rot.z * 0.5);
-        double sy = sin(_rot.z * 0.5);
+        glm::vec3 radianAngles = glm::radians(eulerAngles); // Convert degrees to radians
 
-        Rotation.w = cr * cp * cy + sr * sp * sy;
-        Rotation.x = sr * cp * cy - cr * sp * sy;
-        Rotation.y = cr * sp * cy + sr * cp * sy;
-        Rotation.z = cr * cp * sy - sr * sp * cy;
+        // Convert Euler angles to quaternion (YXZ Order)
+        Rotation = glm::quat(glm::vec3(radianAngles.x, radianAngles.y, radianAngles.z));
+
+        // Normalize to avoid floating point drift
+        Rotation = glm::normalize(Rotation);
     }
+
 };

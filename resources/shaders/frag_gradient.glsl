@@ -4,7 +4,6 @@ const float PI = 3.1415;
 
 uniform vec2 _ScreenParams;
 uniform vec3 _WorldSpaceCamPos;
-in vec2 pos;
 uniform vec3 viewParams;
 uniform mat4x4 camLocalToWorldMatrix;
 
@@ -208,10 +207,7 @@ void main()
 	Ray ray;
 	ray.dir = rayDir;
 	ray.origin = rayOrigin;
-
-	// Avoid division by zero by using a small epsilon value
-	const float epsilon = 1e-6;
-	ray.invDir = 1.0 / max(abs(rayDir), vec3(epsilon));
+	ray.invDir = 1.0 / ray.dir;
 
 	gl_FragColor = vec4(RaySphere(ray, vec3(0,0,0), 1).normal, 1);
 }

@@ -1,6 +1,8 @@
 // Code for Details window
 
 #include "gui/Details.h"
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 void ShowTransform(std::shared_ptr<Transform> &object_transform){
     if (ImGui::TreeNode("Transform")){
@@ -94,29 +96,31 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
     ImGui::Begin("Details",nullptr,window_flags);
     if (scene->selectedCamera) {
         std::shared_ptr<Camera> camera = scene->GetCurrCamera();
+
         glm::vec3 position = camera->GetPosition();
 
         ImGui::Text("Position");
         ImGui::SameLine();
-        ImGui::DragFloat3("##Position", &position[0], 0.001f,0,0, "%.3f");
-
-        camera->SetPosition(position);
+        if(ImGui::DragFloat3("##Position", &position[0], 0.001f,0,0, "%.3f")) {
+            camera->SetPosition(position);
+        }
 
         glm::vec3 rotation = camera->GetRotation();
 
         ImGui::Text("Rotation");
         ImGui::SameLine();
-        ImGui::DragFloat3("##Rotation", &rotation[0], 0.001f, 0, 0, "%.3f");
+        if(ImGui::DragFloat3("##Rotation", &rotation[0], 0.5f, -180, 180, "%.3f")) {
+            camera->SetRotation(rotation);
+        }
 
-        camera->SetRotation(rotation);
 
         float focusDist = camera->GetFocusDist();
 
         ImGui::Text("Focus Distance");
         ImGui::SameLine();
-        ImGui::DragFloat("##FocusDst", &focusDist, 0.001f, 0, 0, "%.3f");
-
-        camera->SetFocusDist(focusDist);
+        if(ImGui::DragFloat("##FocusDst", &focusDist, 0.001f, 0, 0, "%.3f")) {
+            camera->SetFocusDist(focusDist);
+        }
 
         if(ImGui::Button("Delete")) {
             DeleteObject(scene);
