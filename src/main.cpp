@@ -23,6 +23,7 @@
 #include <serial/lights.h>
 #include <serial/models.h>
 #include "core/scene.h"
+#include "scripting/scripting_engine.h"
 #include "serial/scenes.h"
 #include "serial/project.h"
 
@@ -36,6 +37,7 @@ GLFWwindow *window;
 
 std::unique_ptr<GuiEngine> guiEngine;
 std::unique_ptr<RenderEngine> renderEngine;
+std::unique_ptr<ScriptingEngine> scriptingEngine;
 
 GameEngine gameEngine;
 
@@ -75,9 +77,10 @@ int main(int argc, char *argv[])
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
-
 	guiEngine = std::make_unique<GuiEngine>();
 	renderEngine = std::make_unique<RenderEngine>(window, &gameEngine);
+	scriptingEngine = std::make_unique<ScriptingEngine>();
+	scriptingEngine->init();
 
 	guiEngine->init(window, &gameEngine);
 	while ( glfwWindowShouldClose(window) == 0 )
@@ -105,7 +108,7 @@ int main(int argc, char *argv[])
 	}
 	yamlFile << node;
 	yamlFile.close();
-
+	scriptingEngine->cleanUp();
 
 
 	return 0;
