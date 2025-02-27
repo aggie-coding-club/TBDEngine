@@ -17,6 +17,6 @@ class ScriptingEngine
 public:
     void init();
     void cleanUp();
-    void runScripts();
     void loadScripts();
+    void runScripts();
 };
