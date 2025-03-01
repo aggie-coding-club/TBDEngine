@@ -19,9 +19,9 @@ public:
     // flags
     bool autoCenterOfMass = true;
     bool detectCollisions = true;
-    bool useGravity = true;
+    bool useGravity = false;
     // If false, no force, gravity, or collision will affect the body
-    bool isKinematics;
+    bool isKinematics = true;
 
     /* Publics functions to be implemented later
      * AddForce()

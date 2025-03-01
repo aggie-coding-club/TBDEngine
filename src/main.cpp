@@ -23,8 +23,6 @@
 #include <yaml-cpp/yaml.h> // for tests, remove later
 #include <serial/lights.h>
 #include <serial/models.h>
-#include "core/scene.h"
-#include "serial/scenes.h"
 #include "serial/project.h"
 
 #define WINDOW_WIDTH 1920
@@ -41,7 +39,7 @@ std::unique_ptr<RenderEngine> renderEngine;
 GameEngine gameEngine;
 
 // Time delta calculations for physics
-std::chrono::duration<double> timeDelta = std::chrono::duration<double>::zero();
+std::chrono::duration<float> timeDelta = std::chrono::duration<float>::zero();
 auto start = std::chrono::steady_clock::now();
 auto end   = std::chrono::steady_clock::now();
 
