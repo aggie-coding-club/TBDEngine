@@ -7,7 +7,7 @@
 class RigidBody: public Component 
 {
     public:
-        Vec3 centerOfMass;
-        Vec3 angularVelocity;
+        glm::vec3 centerOfMass;
+        glm::vec3 angularVelocity;
         bool autoCenterOfMass;
-}
+};

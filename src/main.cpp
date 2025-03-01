@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <chrono>
 
 #include "gui/gui_engine.h"
 #define GL_SILENCE_DEPRECATION
@@ -38,6 +39,11 @@ std::unique_ptr<GuiEngine> guiEngine;
 std::unique_ptr<RenderEngine> renderEngine;
 
 GameEngine gameEngine;
+
+// Time delta calculations for physics
+std::chrono::duration<double> timeDelta = std::chrono::duration<double>::zero();
+auto start = std::chrono::steady_clock::now();
+auto end   = std::chrono::steady_clock::now();
 
 // Keyboard character callback function
 void CharacterCallback(GLFWwindow* lWindow, unsigned int key)
@@ -86,10 +92,13 @@ int main(int argc, char *argv[])
 		glfwGetWindowSize(window, &width, &height);
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        start = end;
 		guiEngine->run(width,height);
 		if(guiEngine->showView) {
 			renderEngine->Display();
 		}
+        end = std::chrono::steady_clock::now();
+        timeDelta = end - start;
 		glfwSwapBuffers(window);
 	}
 	guiEngine->cleanup();
