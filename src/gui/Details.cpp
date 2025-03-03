@@ -81,7 +81,7 @@ void DeleteObject(const std::shared_ptr<Scene>& scene) {
 void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
 {
     // Remove Decorations for the window
-    ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoResize;
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar;
 
     ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
 
