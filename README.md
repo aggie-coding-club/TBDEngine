@@ -77,7 +77,7 @@ command:
 - aryav123
 - dillil
 - naomismith3328
-- .funbreak
+- Orlando Haye
 - priyanka_27916
 - daddyvi
 
