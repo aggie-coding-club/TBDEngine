@@ -15,6 +15,7 @@ private:
     float focusDistance;
     glm::vec3 Position;
     glm::quat Rotation;
+    glm::vec3 EularRotation;
 
 public:
 
@@ -56,31 +57,14 @@ public:
         return Position;
     }
 
-    inline glm::vec3 GetRotation() const
+    inline glm::vec3 GetEularRotation() const
     {
-        glm::vec3 angles;
-
-        // Extract pitch (Y-axis rotation)
-        float sinp = 2 * (Rotation.w * Rotation.y - Rotation.z * Rotation.x);
-        if (std::abs(sinp) >= 1)
-            angles.y = std::copysign(glm::half_pi<float>(), sinp); // Prevents gimbal lock issue
-        else
-            angles.y = std::asin(sinp);
-
-        // Extract yaw (Z-axis rotation)
-        float siny_cosp = 2 * (Rotation.w * Rotation.z + Rotation.x * Rotation.y);
-        float cosy_cosp = 1 - 2 * (Rotation.y * Rotation.y + Rotation.z * Rotation.z);
-        angles.z = std::atan2(siny_cosp, cosy_cosp);
-
-        // Extract roll (X-axis rotation)
-        float sinr_cosp = 2 * (Rotation.w * Rotation.x + Rotation.y * Rotation.z);
-        float cosr_cosp = 1 - 2 * (Rotation.x * Rotation.x + Rotation.y * Rotation.y);
-        angles.x = std::atan2(sinr_cosp, cosr_cosp);
-
-        return glm::degrees(angles); // Convert radians to degrees for UI
+        return EularRotation;
     }
 
-
+    inline glm::quat GetRotation() const {
+        return Rotation;
+    }
 
     inline glm::vec3 GetCenter() const
     {
@@ -116,6 +100,7 @@ public:
 
     inline void SetRotation(const glm::vec3& eulerAngles)
     {
+        EularRotation = eulerAngles;
         glm::vec3 radianAngles = glm::radians(eulerAngles); // Convert degrees to radians
 
         // Convert Euler angles to quaternion (YXZ Order)

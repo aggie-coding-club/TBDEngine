@@ -105,11 +105,11 @@ void Details::ShowDetails(const std::shared_ptr<Scene>& scene)
             camera->SetPosition(position);
         }
 
-        glm::vec3 rotation = camera->GetRotation();
+        glm::vec3 rotation = camera->GetEularRotation();
 
         ImGui::Text("Rotation");
         ImGui::SameLine();
-        if(ImGui::DragFloat3("##Rotation", &rotation[0], 0.5f, -180, 180, "%.3f")) {
+        if(ImGui::DragFloat3("##Rotation", &rotation[0], 0.5f, 0, 0, "%.3f")) {
             camera->SetRotation(rotation);
         }
 
