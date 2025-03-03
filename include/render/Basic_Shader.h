@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../cmake-build-debug/_deps/glfw-src/deps/linmath.h"
 #include "render/tiny_obj_loader.h"
 
 #include "render/Shader.h"
@@ -11,9 +10,9 @@
 
 struct Triangle
 {
-    vec3 posA, posB, posC;
-    vec3 normalA, normalB, normalC;
-    vec2 uvA, uvB, uvC;
+    glm::vec3 posA, posB, posC;
+    glm::vec3 normalA, normalB, normalC;
+    glm::vec2 uvA, uvB, uvC;
 };
 
 class Basic_Shader : public Shader
