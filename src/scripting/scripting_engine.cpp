@@ -7,12 +7,28 @@
 
 #include "core/game_object.h"
 #include "core/components/transform.h"
+#include <iostream>
+#include <filesystem>
+
+// Function to collect all valid scripts into scriptPaths vector
+void ScriptingEngine::FindScripts(const std::string& folderPath) {
+    namespace fs = std::filesystem;
+    try {
+        for (const fs::directory_entry& entry : fs::recursive_directory_iterator(folderPath)) {
+            if (entry.path().extension() == ".as") { // Only add files with .as extension
+                scriptPaths.push_back(entry.path().string());
+            }
+        }
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "Filesystem error: " << e.what() << std::endl;
+    }
+}
 
 void ScriptingEngine::init() {
     engine = asCreateScriptEngine();
 
-    // Add a function to find all scripts
-    scriptPaths = std::vector<std::string>{"Assets/test.as"};
+    // Collect valid Scripts
+    FindScripts("../user/Assets");
 
     // Set the message callback to receive information on errors in human readable form.
     int r = engine->SetMessageCallback(asFUNCTION(message_callback), 0, asCALL_CDECL); assert( r >= 0 );

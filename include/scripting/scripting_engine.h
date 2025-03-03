@@ -15,6 +15,7 @@ class ScriptingEngine
     std::unordered_map<std::string, asIScriptObject*> scriptObjects;
 
 public:
+    void FindScripts(const std::string& folderPath);
     void init();
     void cleanUp();
     void loadScripts();
