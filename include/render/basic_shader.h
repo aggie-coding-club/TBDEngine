@@ -2,7 +2,7 @@
 
 #include "render/tiny_obj_loader.h"
 
-#include "render/Shader.h"
+#include "render/shader.h"
 
 #include "core/components/component.h"
 #include "core/components/light.h"

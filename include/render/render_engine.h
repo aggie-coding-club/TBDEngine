@@ -1,6 +1,6 @@
 #pragma once
 
-#include "render/Basic_Shader.h"
+#include "render/basic_shader.h"
 #include "core/game_engine.h"
 
 #include <GLFW/glfw3.h>
