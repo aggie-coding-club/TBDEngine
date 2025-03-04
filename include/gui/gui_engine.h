@@ -17,6 +17,7 @@
 #include "Viewport.h"
 #include "FileHierarchy.h"
 #include "MenuBar.h"
+#include "secondary_menu_bar.h"
 
 class GuiEngine
 {
@@ -26,6 +27,7 @@ private:
      GLFWwindow* window;
      GameEngine* gameEngine;
      ImFont* inter_24;
+     ImFont* icons;
      bool showDetail = true;
      bool showHierarchy = true;
      bool showCameraWindow = false;
@@ -40,6 +42,7 @@ private:
     Details details;
     MenuBar menuBar;
     AddObjectWindow addObjectWindow;
+    SecondMenuBar secondMenuBar;
 
 public:
      bool showView = true;
