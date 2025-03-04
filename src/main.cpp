@@ -18,13 +18,12 @@
 
 #include "core/game_engine.h"
 #include "render/render_engine.h"
+#include "physics/physics_engine.h"
 
 
 #include <yaml-cpp/yaml.h> // for tests, remove later
 #include <serial/lights.h>
 #include <serial/models.h>
-#include "core/scene.h"
-#include "serial/scenes.h"
 #include "serial/project.h"
 
 #define WINDOW_WIDTH 1920
@@ -37,11 +36,12 @@ GLFWwindow *window;
 
 std::unique_ptr<GuiEngine> guiEngine;
 std::unique_ptr<RenderEngine> renderEngine;
+std::unique_ptr<PhysicsEngine> physicsEngine;
 
 GameEngine gameEngine;
 
 // Time delta calculations for physics
-std::chrono::duration<double> timeDelta = std::chrono::duration<double>::zero();
+std::chrono::duration<float> timeDelta = std::chrono::duration<float>::zero();
 auto start = std::chrono::steady_clock::now();
 auto end   = std::chrono::steady_clock::now();
 
@@ -84,21 +84,26 @@ int main(int argc, char *argv[])
 
 	guiEngine = std::make_unique<GuiEngine>();
 	renderEngine = std::make_unique<RenderEngine>(window, &gameEngine);
+    physicsEngine = std::make_unique<PhysicsEngine>(&gameEngine, &timeDelta);
 
 	guiEngine->init(window, &gameEngine);
+    physicsEngine->Activate();
 	while ( glfwWindowShouldClose(window) == 0 )
 	{
-		int width,height;
+		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         start = end;
+        physicsEngine->Update();
+
 		guiEngine->run(width,height);
 		if(guiEngine->showView) {
 			renderEngine->Display();
 		}
         end = std::chrono::steady_clock::now();
         timeDelta = end - start;
+        std::cout << timeDelta.count() << std::endl;
 		glfwSwapBuffers(window);
 	}
 	guiEngine->cleanup();
