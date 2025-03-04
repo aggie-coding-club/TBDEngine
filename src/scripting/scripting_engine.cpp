@@ -28,7 +28,7 @@ void ScriptingEngine::init() {
     engine = asCreateScriptEngine();
 
     // Collect valid Scripts
-    FindScripts("../user/Assets");
+    FindScripts("Assets/");
 
     // Set the message callback to receive information on errors in human readable form.
     int r = engine->SetMessageCallback(asFUNCTION(message_callback), 0, asCALL_CDECL); assert( r >= 0 );
@@ -121,12 +121,12 @@ void ScriptingEngine::runScripts() {
 
 void ScriptingEngine::cleanUp()
 {
-    ctx->Release();
-    engine->ShutDownAndRelease();
-
     for (auto objectPair : scriptObjects) {
         objectPair.second->Release();
     }
+
+    ctx->Release();
+    engine->ShutDownAndRelease();
 }
 
 
