@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../cmake-build-debug/_deps/glfw-src/deps/linmath.h"
 #include "render/tiny_obj_loader.h"
 
 #include "render/Shader.h"
@@ -11,15 +10,16 @@
 
 struct Triangle
 {
-    vec3 posA, posB, posC;
-    vec3 normalA, normalB, normalC;
-    vec2 uvA, uvB, uvC;
+    glm::vec3 posA, posB, posC;
+    glm::vec3 normalA, normalB, normalC;
+    glm::vec2 uvA, uvB, uvC;
 };
 
 class Basic_Shader : public Shader
 {
 
     std::shared_ptr<Camera> camera;
+    std::vector<Triangle> triangles;
 
     // Function to generate a normal for a face (using the cross product of two edges)
     glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices)
@@ -72,6 +72,10 @@ class Basic_Shader : public Shader
                 size_t index_offset = 0;
                 for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++) {
                     size_t fv = shape.mesh.num_face_vertices[f];
+                    Triangle tri{};
+                    std::vector<glm::vec3> position;
+                    std::vector<glm::vec3> normal;
+                    std::vector<glm::vec2> uv;
                     // Loop over vertices in the face.
                     std::vector<glm::vec3> faceVertices;  // To store face vertices for normal calculation
                     for (size_t v = 0; v < fv; v++) {
@@ -80,9 +84,7 @@ class Basic_Shader : public Shader
                         float vx = attrib.vertices[3 * idx.vertex_index + 0];
                         float vy = attrib.vertices[3 * idx.vertex_index + 1];
                         float vz = attrib.vertices[3 * idx.vertex_index + 2];
-                        // posBuff.push_back(vx);
-                        // posBuff.push_back(vy);
-                        // posBuff.push_back(vz);
+                        position.push_back(glm::vec3(vx, vy, vz));
 
                         // Store the vertex for normal calculation (if normals are absent)
                         faceVertices.push_back(glm::vec3(vx, vy, vz));
@@ -92,28 +94,69 @@ class Basic_Shader : public Shader
                             // norBuff.push_back(attrib.normals[3 * idx.normal_index + 0]);
                             // norBuff.push_back(attrib.normals[3 * idx.normal_index + 1]);
                             // norBuff.push_back(attrib.normals[3 * idx.normal_index + 2]);
+                            glm::vec3 tempnormal(attrib.normals[3 * idx.normal_index + 0], attrib.normals[3 * idx.normal_index + 1], attrib.normals[3 * idx.normal_index + 2]);
+                            normal.push_back(tempnormal);
                         }
 
                         if (!attrib.texcoords.empty()) {
                             // texBuff.push_back(attrib.texcoords[2 * idx.texcoord_index + 0]);
                             // texBuff.push_back(attrib.texcoords[2 * idx.texcoord_index + 1]);
+                            uv.push_back(glm::vec2(attrib.texcoords[2 * idx.texcoord_index + 0], attrib.texcoords[2 * idx.texcoord_index + 1]));
                         }
                     }
                     index_offset += fv;
 
                     // Generate normals if not provided
                     if (attrib.normals.empty()) {
-                        glm::vec3 normal = GenerateNormal(faceVertices);
+                        glm::vec3 tempnormal = GenerateNormal(faceVertices);
                         for (size_t v = 0; v < fv; v++) {
                             // Duplicate normal for each vertex in the face (flat shading)
                             // norBuff.push_back(normal.x);
                             // norBuff.push_back(normal.y);
                             // norBuff.push_back(normal.z);
+                            normal.push_back(tempnormal);
                         }
                     }
+
+                    tri.posA = position[0];
+                    tri.posB = position[1];
+                    tri.posC = position[2];
+
+                    tri.normalA = normal[0];
+                    tri.normalB = normal[1];
+                    tri.normalC = normal[2];
+
+                    tri.uvA = uv[0];
+                    tri.uvB = uv[1];
+                    tri.uvC = uv[2];
+
+                    triangles.push_back(tri);
                 }
             }
         }
+    }
+
+    template <typename T>
+    void SendBufferData(std::vector<T>& buffer, const char* name, GLuint bindingIndex) {
+        if (buffer.empty()) {
+            std::cerr << "Empty buffer for attribute: " << name << std::endl;
+            return;
+        }
+
+        GLuint bufferID = 0;
+
+        // Check if the buffer exists for the given name
+        if (bufferMap.find(name) == bufferMap.end()) {
+            glGenBuffers(1, &bufferID);  // Generate a new buffer
+            bufferMap[name] = bufferID;  // Store the buffer ID in the map
+        } else {
+            bufferID = bufferMap[name];  // Reuse the existing buffer ID
+        }
+
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, bufferID);  // Bind SSBO
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(T) * buffer.size(), buffer.data(), GL_STATIC_DRAW);  // Upload data
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, bindingIndex, bufferID);  // Bind to specific binding point
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);  // Unbind
     }
 
 public:

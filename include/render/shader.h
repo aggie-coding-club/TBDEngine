@@ -5,6 +5,7 @@
 
 class Shader
 {
+protected:
 	GLint shaderID;
 	std::string vertexShaderFileName, fragmentShaderFileName;
 	std::unordered_map<std::string, GLuint> bufferMap;

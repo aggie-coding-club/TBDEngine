@@ -1,6 +1,8 @@
-#version 330
+#version 450 core
 
 const float PI = 3.1415;
+
+out vec4 gl_FragColor;
 
 uniform vec2 _ScreenParams;
 uniform vec3 _WorldSpaceCamPos;
@@ -20,6 +22,17 @@ struct HitInfo
 	float dst;
 	vec3 hitPoint;
 	vec3 normal;
+};
+
+// Hit Info Struct
+struct TriangleHitInfo
+{
+	bool didHit;                        // Did the ray hit?
+	float dst;                          // distance the ray had to travel
+	vec3 hitPoint;                    // The point that the ray hit the object
+	vec3 normal;                      // The normal of the object at that point
+	vec2 uv;                     // Location of hit on UV
+	int triIndex;
 };
 
 struct Triangle
@@ -80,7 +93,9 @@ struct Light
 };
 
 //buffer Model modelInfo;
-//buffer Triangle Triangles;
+layout(std430, binding = 1) buffer TriangleBuffer {
+	Triangle triangles[];
+};
 //buffer BVHNode Nodes;
 //buffer Light lights;
 
@@ -149,6 +164,35 @@ int lightCount;
 //	return hitInfo.normal;
 //}
 
+TriangleHitInfo RayTriangle(Ray ray, Triangle tri) {
+	vec3 edgeAB = tri.posB - tri.posA;
+	vec3 edgeAC = tri.posC - tri.posA;
+	vec3 normalVector = cross(edgeAB, edgeAC);
+	vec3 ao = ray.origin - tri.posA;
+	vec3 dao = cross(ao, ray.dir);
+
+	float determinant = -dot(ray.dir, normalVector);
+	float invDet = 1 / determinant;
+
+	// Calculate dst to Triangle and barycentric coordinates of intersection point
+	float dst = dot(ao, normalVector) * invDet;
+	float u = dot(edgeAC, dao) * invDet;
+	float v = -dot(edgeAB, dao) * invDet;
+	float w = 1 - u - v;
+
+	// Initialize hit info
+	TriangleHitInfo hitInfo;
+	hitInfo.didHit = determinant >= 1E-6 && dst >= -1E-6 && u >= -1E-6 && v >= -1E-6 && w >= -1E-6;
+	if (!hitInfo.didHit) return hitInfo;
+
+	hitInfo.hitPoint = ray.origin + ray.dir * dst;
+	hitInfo.dst = dst;
+
+	hitInfo.normal = normalize(tri.normalA * w + tri.normalB * u + tri.normalC * v);
+
+	return hitInfo;
+}
+
 HitInfo RaySphere(Ray ray, vec3 sphereCenter, float sphereRadius)
 {
 	HitInfo hitInfo = HitInfo(false, 0, vec3(0), vec3(0));
@@ -190,6 +234,7 @@ HitInfo RaySphere(Ray ray, vec3 sphereCenter, float sphereRadius)
 	return hitInfo;
 }
 
+
 void main()
 {
 	vec2 ndc = vec2(
@@ -209,6 +254,17 @@ void main()
 	ray.origin = rayOrigin;
 	ray.invDir = 1.0 / ray.dir;
 
-	gl_FragColor = vec4(RaySphere(ray, vec3(0,0,0), 1).normal, 1);
+	Triangle tri;
+	tri.posA = vec3(0,3,4);
+	tri.posB = vec3(4,0,3);
+	tri.posC = vec3(3,4,0);
+
+	float sq3 = 1/sqrt(3);
+	tri.normalA = vec3(sq3);
+	tri.normalB = vec3(sq3);
+	tri.normalC = vec3(sq3);
+
+
+	gl_FragColor = vec4(RayTriangle(ray, tri).normal, 1);
 }
 
