@@ -65,7 +65,7 @@ command:
 - Camryn Graham
 - Josh Eury
 - Raniv Gupta
-- sppoon_
+- Kate Serem
 - abhilaasya
 - ana_kaur
 - bangzhe
