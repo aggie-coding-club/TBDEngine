@@ -51,7 +51,7 @@ bool GuiEngine::init(GLFWwindow *_window, GameEngine *_game_engine)
 
     inter_24 = io->Fonts->AddFontFromFileTTF("../include/Fonts/Inter-VariableFont_opsz,wght.ttf", 24);
 
-    static constexpr ImWchar icon_ranges[]{ICON_MIN_FA, ICON_MAX_FA};
+    static constexpr ImWchar icon_ranges[]{ICON_MIN_FA, ICON_MAX_FA, 0};
 
     ImFontConfig icons_config;
     icons_config.MergeMode = true;
