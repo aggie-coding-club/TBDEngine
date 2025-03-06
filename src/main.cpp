@@ -13,6 +13,7 @@
 #include <GLES2/gl2.h>
 #endif
 #include <memory>
+#include <filesystem>
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 #include "core/game_engine.h"
@@ -77,6 +78,12 @@ int main(int argc, char *argv[])
 	glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glEnable(GL_DEPTH_TEST);
+
+	// Creates the assets folder if it doesn't already exist
+	if (!std::filesystem::exists(std::filesystem::current_path() / "Assets")) {
+		std::filesystem::create_directory(std::filesystem::current_path() / "Assets");
+	}
+
 	guiEngine = std::make_unique<GuiEngine>();
 	renderEngine = std::make_unique<RenderEngine>(window, &gameEngine);
 	scriptingEngine = std::make_unique<ScriptingEngine>();
