@@ -20,4 +20,5 @@ public:
     void cleanUp();
     void loadScripts();
     void runScripts();
+    void runScriptUpdate();
 };

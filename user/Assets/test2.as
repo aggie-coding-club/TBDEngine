@@ -4,4 +4,9 @@ class Object2 : Behavior
     {
         print("Test2 ");
     }
+
+    void update()
+    {
+        
+    }
 }

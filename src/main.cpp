@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
 			renderEngine->Display();
 		}
 		glfwSwapBuffers(window);
+		scriptingEngine->runScriptUpdate();
 	}
 	guiEngine->cleanup();
 

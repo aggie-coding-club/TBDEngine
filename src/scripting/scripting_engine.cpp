@@ -42,6 +42,7 @@ void ScriptingEngine::init() {
     // Register the script interface
     r = engine->RegisterInterface("Behavior"); assert( r >= 0 );
     r = engine->RegisterInterfaceMethod("Behavior", "void start()"); assert( r >= 0 );
+    r = engine->RegisterInterfaceMethod("Behavior", "void update()"); assert( r >= 0 );
 
     loadScripts();
     runScripts();
@@ -118,6 +119,39 @@ void ScriptingEngine::runScripts() {
         }
     }
 }
+
+void ScriptingEngine::runScriptUpdate() {
+    asIScriptModule *mod = engine->GetModule("ScriptModule"); assert(mod != nullptr);
+
+    for (auto objectPair : scriptObjects) {
+        asITypeInfo* type = mod->GetTypeInfoByName(objectPair.first.c_str()); assert(type != nullptr);
+        asIScriptObject* object = objectPair.second;
+
+        asIScriptFunction *func = type->GetMethodByDecl("void update()");
+        if( func == 0 )
+        {
+            // The function couldn't be found. Instruct the script writer
+            // to include the expected function in the script.
+            printf("The script must have the function 'void update()'. Please add it and try again.\n");
+            return;
+        }
+
+        // Create our context, prepare it, and then execute
+        ctx = engine->CreateContext();
+        ctx->Prepare(func);
+        ctx->SetObject(object);
+        int r = ctx->Execute();
+        if(r != asEXECUTION_FINISHED) {
+            // The execution didn't complete as expected. Determine what happened.
+            if( r == asEXECUTION_EXCEPTION )
+            {
+                // An exception occurred, let the script writer know what happened so it can be corrected.
+                printf("An exception '%s' occurred. Please correct the code and try again.\n", ctx->GetExceptionString());
+            }
+        }
+    }
+}
+
 
 void ScriptingEngine::cleanUp()
 {
