@@ -242,6 +242,6 @@ void main()
 	vec3 rayOrigin = _WorldSpaceCamPos;
 	vec3 rayDir = normalize(viewPoint - rayOrigin);
 
-	fragColor = vec4(Trace(rayOrigin, rayDir).material.color);
+	fragColor = vec4(models[0].material.specularProbability);
 }
 

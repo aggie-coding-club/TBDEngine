@@ -27,7 +27,7 @@ struct ModelInfo
     alignas(16) int triOffset;
     alignas(16) glm::mat4x4 worldToLocalMatrix;
     alignas(16) glm::mat4x4 localToWorldMatrix;
-    alignas(16) MaterialInfo material;
+    MaterialInfo material;
 };
 
 struct BVHNode

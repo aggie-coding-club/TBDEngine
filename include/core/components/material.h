@@ -37,7 +37,7 @@ class Material: public Component {
         MaterialInfo getMaterial()
         {
             MaterialInfo mat{-1,-1,diffuse, glm::vec4(0),
-        0, 0, shininess, 0,0,
+        0, 0.8, shininess, 0,0,
         specular};
 
             return mat;
