@@ -27,7 +27,7 @@ private:
         scene->GetCameras().emplace_back(camera);
         constexpr size_t n = 3;
         constexpr glm::vec3 pos[n] = {
-            {0.0f, -1.0f, 0.0f},
+            {0.0f, 0.0f, 0.0f},
             {-2.0f, -1.0f, -3.0f},
             {2.0f, -1.0f, -3.0f}
         };

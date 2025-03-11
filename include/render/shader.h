@@ -15,7 +15,8 @@ protected:
 public:
 	Shader();
 	~Shader();
-	void UpdateData();
+
+    virtual void UpdateData();
 	void SetShadersFileName(const std::string &vFileName, const std::string &sFileName);
 	void CheckShaderCompileStatus(GLuint shader);
 	void Init(std::shared_ptr<Scene> _Scene);

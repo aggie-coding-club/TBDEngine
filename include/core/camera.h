@@ -23,7 +23,9 @@ public:
         aspect(static_cast<float>(width)/ static_cast<float>(height)),
         focusDistance(1.0f),
         Position(glm::vec3(2.5f, 2.0f, 10.0f)),
-        Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)) {}
+        Rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
+        EularRotation(glm::vec3(0.f))
+        {}
 
     Camera(): Camera(1920, 1080){}
 

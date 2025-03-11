@@ -10,9 +10,32 @@
 
 struct Triangle
 {
-    glm::vec3 posA, posB, posC;
-    glm::vec3 normalA, normalB, normalC;
-    glm::vec2 uvA, uvB, uvC;
+    alignas(16) glm::vec3 posA;
+    alignas(16) glm::vec3 posB;
+    alignas(16) glm::vec3 posC;
+    alignas(16) glm::vec3 normalA;
+    alignas(16) glm::vec3 normalB;
+    alignas(16) glm::vec3 normalC;
+    alignas(8) glm::vec2 uvA;
+    alignas(8) glm::vec2 uvB;
+    alignas(8) glm::vec2 uvC;
+};
+
+struct ModelInfo
+{
+    alignas(16) int nodeOffset;
+    alignas(16) int triOffset;
+    alignas(16) glm::mat4x4 worldToLocalMatrix;
+    alignas(16) glm::mat4x4 localToWorldMatrix;
+    alignas(16) MaterialInfo material;
+};
+
+struct BVHNode
+{
+    alignas(16) glm::vec3 boundsMin;
+    alignas(16) glm::vec3 boundsMax;
+    alignas(4) int startIndex;
+    alignas(4) int triangleCount;
 };
 
 class Basic_Shader : public Shader
@@ -20,6 +43,9 @@ class Basic_Shader : public Shader
 
     std::shared_ptr<Camera> camera;
     std::vector<Triangle> triangles;
+    std::vector<ModelInfo> models;
+    std::unordered_map<std::string, int> loadedMeshOffset;
+    std::unordered_map<std::string, bool> modelsLoaded;
 
     // Function to generate a normal for a face (using the cross product of two edges)
     glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices)
@@ -47,7 +73,7 @@ class Basic_Shader : public Shader
     void LoadModel(const std::string &name)
     {
         // Taken from Shinjiro Sueda with slight modification
-        std::string meshName(name);
+        const std::string& meshName(name);
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
@@ -65,6 +91,7 @@ class Basic_Shader : public Shader
 
             // Temporary storage for normals if not present in the OBJ file
             std::vector<glm::vec3> generatedNormals;
+            loadedMeshOffset[meshName] = triangles.size();
 
             // Loop over shapes
             for (auto & shape : shapes) {
@@ -104,8 +131,8 @@ class Basic_Shader : public Shader
                             uv.push_back(glm::vec2(attrib.texcoords[2 * idx.texcoord_index + 0], attrib.texcoords[2 * idx.texcoord_index + 1]));
                         }
                     }
-                    index_offset += fv;
 
+                    index_offset += fv;
                     // Generate normals if not provided
                     if (attrib.normals.empty()) {
                         glm::vec3 tempnormal = GenerateNormal(faceVertices);
@@ -126,9 +153,18 @@ class Basic_Shader : public Shader
                     tri.normalB = normal[1];
                     tri.normalC = normal[2];
 
-                    tri.uvA = uv[0];
-                    tri.uvB = uv[1];
-                    tri.uvC = uv[2];
+                    if(!uv.empty())
+                    {
+                        tri.uvA = uv[0];
+                        tri.uvB = uv[1];
+                        tri.uvC = uv[2];
+                    }
+                    else
+                    {
+                        tri.uvA = glm::vec2(0);
+                        tri.uvB = tri.uvA;
+                        tri.uvC = tri.uvB;
+                    }
 
                     triangles.push_back(tri);
                 }
@@ -162,7 +198,7 @@ class Basic_Shader : public Shader
 public:
 
 
-    void UpdateData() {
+    void UpdateData() override {
         camera = scene->GetCurrCamera();
         if (!camera) // Check for a null camera
         {
@@ -189,57 +225,55 @@ public:
         // Send viewParams as (width, height, focus distance)
         SendUniformData(glm::vec3(planeWidth, planeHeight, focusDist), "viewParams");
 
+        for (const auto& model : scene->GetModels())
+        {
+            if(modelsLoaded.find(model->name) == modelsLoaded.end())
+            {
+                const auto& objTransform = std::dynamic_pointer_cast<Transform>( model->components[TRANSFORM]);
+                const auto& objMaterial = std::dynamic_pointer_cast<Material>( model->components[MATERIAL]);
+                const auto& objModel = std::dynamic_pointer_cast<Model>(model->components[MODEL]);
 
-        // for (const auto& model : scene->GetModels())
-        // {
-            // const auto& objTransform = std::dynamic_pointer_cast<Transform>( model->components[TRANSFORM]);
-            // const auto& objMaterial = std::dynamic_pointer_cast<Material>( model->components[MATERIAL]);
-            // const auto& objModel = std::dynamic_pointer_cast<Model>(model->components[MODEL]);
-            //
-            // std::string& modelPath = objModel->modelPath;
+                std::string& modelPath = objModel->modelPath;
 
-            // Check if the position buffer is already loaded
-            // if (posBuffMap.find(modelPath) == posBuffMap.end()) {
-            //     // Load model buffers if they are not already loaded
-            //     LoadModel(modelPath);
-            // }
+                // Check if the position buffer is already loaded
+                if (loadedMeshOffset.find(modelPath) == loadedMeshOffset.end()) {
+                    // Load model buffers if they are not already loaded
+                    LoadModel(modelPath);
+                }
 
-            // glm::mat4 modelMatrix(1.0f);
-            // modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position)
-            //     * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f))
-            //     * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f))
-            //     * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f))
-            //     * glm::scale(glm::mat4(1.0f), objTransform->scale);
+                glm::mat4 modelMatrix(1.0f);
+                modelMatrix = glm::translate(glm::mat4(1.0f), objTransform->position)
+                              * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f))
+                              * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f))
+                              * glm::rotate(glm::mat4(1.0f), glm::radians(objTransform->rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f))
+                              * glm::scale(glm::mat4(1.0f), objTransform->scale);
 
-            // glm::mat4 modelInverseTranspose = glm::transpose(glm::inverse(modelMatrix));
+                ModelInfo currentModel{};
+                currentModel.triOffset = loadedMeshOffset[modelPath];
+                currentModel.localToWorldMatrix = modelMatrix;
+                currentModel.worldToLocalMatrix = glm::inverse(modelMatrix);
+                currentModel.material = objMaterial->getMaterial();
 
-            // Use existing buffers stored in posBuffMap
-            // this->SendAttributeData(posBuffMap[modelPath], "vPositionModel");
-            // this->SendAttributeData(norBuffMap[modelPath], "vNormalModel");
-            // this->SendUniformData(modelMatrix, "model");
-            // this->SendUniformData(viewMatrix, "view");
-            // this->SendUniformData(projectionMatrix, "projection");
-            // this->SendUniformData(modelInverseTranspose, "modelInverseTranspose");
+                models.push_back(currentModel);
 
-            // Handle materials
-            // if (objMaterial) {
-            //     this->SendUniformData(objMaterial->ambient, "ka");
-            //     this->SendUniformData(objMaterial->diffuse, "kd");
-            //     this->SendUniformData(objMaterial->specular, "ks");
-            //     this->SendUniformData(objMaterial->shininess, "s");
-            // }
+                modelsLoaded[model->name] = true;
+            }
+// Handle lights
+//            const auto& lights = scene->GetLights();
+//            for (size_t i = 0; i < lights.size(); i++) {
+//                const auto& light = lights[i];
+//                const auto lightTransform = std::dynamic_pointer_cast<Transform>(light->components[TRANSFORM]);
+//                const auto lightComponent = std::dynamic_pointer_cast<Light>(light->components[LIGHT]);
+//
+//                std::string name = fmt::format("lights[{}]", i);
+//                this->SendUniformData(lightTransform->position, (name + ".position").c_str());
+//                this->SendUniformData(lightComponent->color, (name+".color").c_str());
+//            }
+        }
 
-            // Handle lights
-            // const auto& lights = scene->GetLights();
-            // for (size_t i = 0; i < lights.size(); i++) {
-            //     const auto& light = lights[i];
-            //     const auto lightTransform = std::dynamic_pointer_cast<Transform>(light->components[TRANSFORM]);
-            //     const auto lightComponent = std::dynamic_pointer_cast<Light>(light->components[LIGHT]);
-            //
-            //     std::string name = fmt::format("lights[{}]", i);
-            //     this->SendUniformData(lightTransform->position, (name + ".position").c_str());
-            //     this->SendUniformData(lightComponent->color, (name+".color").c_str());
-            // }
-        // }
+        SendUniformData((int)models.size(), "modelCount");
+        SendBufferData(models, "models", 0);
+        SendUniformData((int)triangles.size(), "triangleCount");
+        SendBufferData(triangles, "triangles", 1);
     };
 };
