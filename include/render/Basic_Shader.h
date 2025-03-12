@@ -37,7 +37,7 @@ struct BoundingBox
     glm::vec3 Max;
     glm::vec3 Center = (Min + Max) * 0.5f;
     glm::vec3 Size = Max - Min;
-    bool hasPoint;
+    bool hasPoint = false;
 
     void GrowToInclude(glm::vec3 min, glm::vec3 max)
     {
@@ -81,7 +81,7 @@ class Basic_Shader : public Shader
     std::vector<Triangle> triangles;
     std::vector<unsigned int> triIndexs;
     std::vector<ModelInfo> models;
-    std::unordered_map<std::string, int> loadedMeshOffset;
+    std::unordered_map<std::string, std::pair<unsigned int, unsigned int>> loadedMeshOffset;
     std::unordered_map<std::string, bool> modelsLoaded;
     std::vector<BVHNode> bvhNodes;
 
@@ -300,7 +300,7 @@ class Basic_Shader : public Shader
 
             // Temporary storage for normals if not present in the OBJ file
             std::vector<glm::vec3> generatedNormals;
-            loadedMeshOffset[meshName] = triangles.size();
+            loadedMeshOffset[meshName].first = triangles.size();
 
             // Loop over shapes
             for (auto & shape : shapes) {
@@ -432,8 +432,17 @@ public:
         float planeHeight = focusDist * tan(glm::radians(fovy * 0.5f)) * 2.0f;
         float planeWidth = planeHeight * aspect;
 
+        int useSun = 1;
+        float sunFocus = 0.8;
+        float sunIntensity = 10;
+        glm::vec3 sunColor = glm::vec3(1,1,1);
+
         // Send viewParams as (width, height, focus distance)
         SendUniformData(glm::vec3(planeWidth, planeHeight, focusDist), "viewParams");
+        SendUniformData(useSun, "useSky");
+        SendUniformData(sunFocus, "sunFocus");
+        SendUniformData(sunIntensity, "sunIntensity");
+        SendUniformData(sunColor, "sunColor");
 
         for (const auto& model : scene->GetModels())
         {
@@ -449,7 +458,8 @@ public:
                 if (loadedMeshOffset.find(modelPath) == loadedMeshOffset.end()) {
                     // Load model buffers if they are not already loaded
                     LoadModel(modelPath);
-                    int offset = loadedMeshOffset[modelPath];
+                    int offset = loadedMeshOffset[modelPath].first;
+                    loadedMeshOffset[modelPath].second = bvhNodes.size();
                     BuildBVH(offset, triangles.size() - offset);
                 }
 
@@ -461,7 +471,7 @@ public:
                               * glm::scale(glm::mat4(1.0f), objTransform->scale);
 
                 ModelInfo currentModel{};
-                currentModel.triOffset = loadedMeshOffset[modelPath];
+                currentModel.triOffset = loadedMeshOffset[modelPath].first;
                 currentModel.localToWorldMatrix = modelMatrix;
                 currentModel.worldToLocalMatrix = glm::inverse(modelMatrix);
                 currentModel.material = objMaterial->getMaterial();
@@ -488,6 +498,7 @@ public:
         SendUniformData((int)triangles.size(), "triangleCount");
         SendBufferData(triangles, "triangles", 1);
         SendBufferData(triIndexs, "triIndex", 1);
+        SendBufferData(bvhNodes, "nodes", 2);
 
 //        std::cout << models[0].material.specularColor[0] << " " << models[0].material.specularColor[1] << " " << models[0].material.specularColor[2] << " " << models[0].material.specularColor[3] << std::endl;
     };

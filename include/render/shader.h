@@ -25,6 +25,7 @@ public:
 
 	void SendUniformData(glm::vec2 input, const char* name);
 	void SendBufferData(std::vector<float>& buffer, const char* name);
+    void SendUniformData(bool a, const char* name);
 	void SendUniformData(int a, const char* name);
 	void SendUniformData(float a, const char* name);
 	void SendUniformData(glm::vec3 input, const char* name);

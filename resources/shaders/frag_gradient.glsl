@@ -9,6 +9,10 @@ uniform vec2 _ScreenParams;
 uniform vec3 _WorldSpaceCamPos;
 uniform vec3 viewParams;
 uniform mat4x4 camLocalToWorldMatrix;
+uniform int useSky;
+uniform float sunFocus;
+uniform float sunIntensity;
+uniform vec3 sunColor;
 
 struct Ray
 {
@@ -102,7 +106,7 @@ layout(std430, binding = 1) buffer TriangleBuffer {
 };
 
 layout(std430, binding = 2) buffer NodeBuffer {
-	BVHNode Nodes[];
+	BVHNode nodes[];
 };
 
 layout(std430, binding = 3) buffer LightBuffer {
@@ -112,6 +116,16 @@ layout(std430, binding = 3) buffer LightBuffer {
 int triangleCount;
 int modelCount;
 int lightCount;
+
+float lerp(float start, float end, float time)
+{
+	return start + (end - start) * time;
+}
+
+vec3 lerp(vec3 start, vec3 end, float time)
+{
+	return vec3(lerp(start.x, end.x, time), lerp(start.y, end.y, time), lerp(start.z, end.z, time));
+}
 
 float RandomValue(inout uint state)
 {
@@ -147,6 +161,23 @@ vec3 RandomHemiDir(vec3 normal, inout uint rngState)
 {
 	vec3 dir = RandomDirection(rngState);
 	return dir * sign(dot(normal, dir));
+}
+
+// Get Light From Enviornment
+vec3 GetEnvironmentLight(vec3 dir)
+{
+	if (useSky == 0) return 0;
+	const vec3 GroundColor = vec3(0.35, 0.3, 0.35);
+	const vec3 SkyColorHorizon = vec3(1, 1, 1);
+	const vec3 SkyColorZenith = vec3(0.08, 0.37, 0.73);
+
+	float skyGradientT = pow(smoothstep(0, 0.4, dir.y), 0.35);
+	float groundToSkyT = smoothstep(-0.01, 0, dir.y);
+	vec3 skyGradient = lerp(SkyColorHorizon, SkyColorZenith, skyGradientT);
+	float sun = pow(max(0, dot(dir, vec3(1,1,1))), sunFocus) * sunIntensity;
+	// Combine ground, sky, and sun
+	vec3 composite = lerp(GroundColor, skyGradient, groundToSkyT) + sunColor * sun * (groundToSkyT >= 1 ? 1 : 0);
+	return composite;
 }
 
 TriangleHitInfo RayTriangle(Ray ray, Triangle tri) {
@@ -189,7 +220,61 @@ float RayBoundingBoxDst(Ray ray, vec3 boxMin, vec3 boxMax)
 
 	bool hit = bool(tFar >= tNear) && bool(tFar > 0);
 	float dst = hit ? (tNear > 0 ? tNear : 0) : float(uintBitsToFloat(0x7F800000));
-return dst;
+	return dst;
+}
+
+TriangleHitInfo RayTriangleBVH(inout Ray ray, float rayLength, int nodeOffset, int triOffset)
+{
+	TriangleHitInfo result;
+	result.dst = rayLength;
+	result.triIndex = -1;
+
+	int stack[64];
+	int stackIndex = 0;
+	stack[stackIndex++] = nodeOffset + 0;
+
+	while (stackIndex > 0)
+	{
+		BVHNode node = nodes[stack[--stackIndex]];
+		bool isLeaf = bool(node.triangleCount > 0);
+
+		if(isLeaf)
+		{
+			for(int i = 0; i < node.triangleCount; i++)
+			{
+				Triangle tri = triangles[triIndex[triOffset + node.startIndex + i]];
+				TriangleHitInfo triHitInfo = RayTriangle(ray, tri);
+
+				if (triHitInfo.didHit && triHitInfo.dst < result.dst)
+				{
+					result = triHitInfo;
+					result.triIndex = node.startIndex + i;
+				}
+			}
+		}
+		else
+		{
+			int childIndexA = nodeOffset + node.startIndex + 0;
+			int childIndexB = nodeOffset + node.startIndex + 1;
+			BVHNode childA = nodes[childIndexA];
+			BVHNode childB = nodes[childIndexB];
+
+			float dstA = RayBoundingBoxDst(ray, childA.boundsMin, childA.boundsMax);
+			float dstB = RayBoundingBoxDst(ray, childB.boundsMin, childB.boundsMax);
+
+			// Look at closeset child node first
+			bool isNearestA = bool(dstA <= dstB);
+			float dstNear = isNearestA ? dstA : dstB;
+			float dstFar = isNearestA ? dstB : dstA;
+			int childIndexNear = isNearestA ? childIndexA : childIndexB;
+			int childIndexFar = isNearestA ? childIndexB : childIndexA;
+
+			if(dstFar < result.dst) stack[stackIndex++] = childIndexFar;
+			if(dstNear < result.dst) stack[stackIndex++] = childIndexNear;
+		}
+	}
+
+	return result;
 }
 
 ModelHitInfo CalculateRayCollision(Ray worldRay)
@@ -202,16 +287,16 @@ ModelHitInfo CalculateRayCollision(Ray worldRay)
 	{
 		Model model = models[i];
 		localRay.origin = (model.worldToLocalMatrix * vec4(worldRay.origin, 1)).xyz;
-		localRay.dir = (model.worldToLocalMatrix * vec4(worldRay.dir, 1)).xyz;
+		localRay.dir = (model.worldToLocalMatrix * vec4(worldRay.dir, 0)).xyz;
 		localRay.invDir = 1 / localRay.dir;
 
-		TriangleHitInfo hit = RayTriangle(localRay, triangles[triIndex[model.triOffset]]);
+		TriangleHitInfo hit = RayTriangleBVH(localRay, result.dst, model.nodeOffset, model.triOffset);
 
 		if(hit.dst < result.dst)
 		{
 			result.didHit = true;
 			result.dst = hit.dst;
-			result.normal = normalize((model.localToWorldMatrix * vec4(hit.normal, 0)).xyz);
+			result.normal = normalize(transpose(inverse(mat3(model.localToWorldMatrix))) * hit.normal);
 			result.uv = hit.uv;
 			result.hitPoint = worldRay.origin + worldRay.dir * hit.dst;
 			result.material = model.material;
@@ -221,13 +306,20 @@ ModelHitInfo CalculateRayCollision(Ray worldRay)
 	return result;
 }
 
-ModelHitInfo Trace(vec3 rayOrgin, vec3 rayDir)
+vec3 Trace(vec3 rayOrigin, vec3 rayDir)
 {
 	Ray ray;
-	ray.origin = rayOrgin;
+	ray.origin = rayOrigin;
 	ray.dir = rayDir;
 
-	return CalculateRayCollision(ray);
+	uint rngState = 0;
+	ModelHitInfo hitInfo = CalculateRayCollision(ray);
+	if (!hitInfo.didHit)
+	{
+		return 0;
+	}
+
+	return hitInfo.normal * 0.5f + 0.5f;
 }
 
 void main()
@@ -243,5 +335,6 @@ void main()
 	vec3 rayOrigin = _WorldSpaceCamPos;
 	vec3 rayDir = normalize(viewPoint - rayOrigin);
 
-	fragColor = vec4(triangles[0].normalC, 1);
+	fragColor = vec4(Trace(rayOrigin, rayDir), 1);
+	fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / 2.2));
 }

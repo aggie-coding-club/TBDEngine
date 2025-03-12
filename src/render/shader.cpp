@@ -180,6 +180,11 @@ void Shader::SendBufferData(std::vector<float>& buffer, const char* name)
     glVertexAttribPointer(aLoc, 3, GL_FLOAT, GL_FALSE, 0, nullptr);  // Set the pointer for vertex attributes
 }
 
+void Shader::SendUniformData(bool input, const char* name)
+{
+    glUniform1i(glGetUniformLocation(shaderID, name), static_cast<GLint>(input));
+}
+
 void Shader::SendUniformData(int input, const char* name)
 {
     glUniform1i(glGetUniformLocation(shaderID, name), input);
