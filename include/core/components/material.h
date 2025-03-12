@@ -7,13 +7,13 @@ struct MaterialInfo
 {
     alignas(4) int textureIndex = -1;
     alignas(4) int normalIndex = -1;
-    alignas(16) glm::vec4 color;
-    alignas(16) glm::vec4 emissionColor;
     alignas(4) float emissionStrength;
     alignas(4) float specularProbability;
     alignas(4) float smoothness;
     alignas(4) float refractIndx;
     alignas(4) float transparency;
+    alignas(16) glm::vec4 color;
+    alignas(16) glm::vec4 emissionColor;
     alignas(16) glm::vec4 specularColor;
 };
 
@@ -36,9 +36,9 @@ class Material: public Component {
 
         MaterialInfo getMaterial()
         {
-            MaterialInfo mat{-1,-1,diffuse, glm::vec4(0),
+            MaterialInfo mat{-1,-1,
         0, 0.8, shininess, 0,0,
-        specular};
+        diffuse, glm::vec4(0),specular};
 
             return mat;
         }

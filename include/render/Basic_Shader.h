@@ -23,11 +23,12 @@ struct Triangle
 
 struct ModelInfo
 {
-    alignas(16) int nodeOffset;
-    alignas(16) int triOffset;
+    alignas(4) int nodeOffset;
+    alignas(4) int triOffset;
+    alignas(4) float pad1, pad2;
     alignas(16) glm::mat4x4 worldToLocalMatrix;
     alignas(16) glm::mat4x4 localToWorldMatrix;
-    MaterialInfo material;
+    alignas(16) MaterialInfo material;
 };
 
 struct BVHNode
@@ -275,5 +276,6 @@ public:
         SendBufferData(models, "models", 0);
         SendUniformData((int)triangles.size(), "triangleCount");
         SendBufferData(triangles, "triangles", 1);
+//        std::cout << models[0].material.specularColor[0] << " " << models[0].material.specularColor[1] << " " << models[0].material.specularColor[2] << " " << models[0].material.specularColor[3] << std::endl;
     };
 };

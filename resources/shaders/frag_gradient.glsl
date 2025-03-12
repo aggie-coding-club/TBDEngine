@@ -47,13 +47,13 @@ struct Material
 {
 	int textureIndex;
 	int normalIndex;
-	vec4 color;
-	vec4 emissionColor;
 	float emissionStrength;
 	float specularProbability;
 	float smoothness;
 	float refractIndx;
 	float transparency;
+	vec4 color;
+	vec4 emissionColor;
 	vec4 specularColor;
 };
 
@@ -187,14 +187,14 @@ float RayBoundingBoxDst(Ray ray, vec3 boxMin, vec3 boxMax)
 	float tFar = min(min(t2.x, t2.y), t2.z);
 
 	bool hit = bool(tFar >= tNear) && bool(tFar > 0);
-	float dst = hit ? (tNear > 0 ? tNear : 0) : float(1.0/0.0);
+	float dst = hit ? (tNear > 0 ? tNear : 0) : float(uintBitsToFloat(0x7F800000));
 return dst;
 }
 
 ModelHitInfo CalculateRayCollision(Ray worldRay)
 {
 	ModelHitInfo result;
-	result.dst = 1.0/0.0;
+	result.dst = uintBitsToFloat(0x7F800000);
 	Ray localRay;
 
 	for(int i = 0; i < modelCount; i++)
@@ -242,6 +242,5 @@ void main()
 	vec3 rayOrigin = _WorldSpaceCamPos;
 	vec3 rayDir = normalize(viewPoint - rayOrigin);
 
-	fragColor = vec4(models[0].material.specularProbability);
+	fragColor = vec4(triangles[0].normalC, 1);
 }
-
