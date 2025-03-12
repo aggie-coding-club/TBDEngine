@@ -98,6 +98,7 @@ layout(std430, binding = 0) buffer ModelBuffer {
 
 layout(std430, binding = 1) buffer TriangleBuffer {
 	Triangle triangles[];
+	uint triIndex[];
 };
 
 layout(std430, binding = 2) buffer NodeBuffer {
@@ -204,7 +205,7 @@ ModelHitInfo CalculateRayCollision(Ray worldRay)
 		localRay.dir = (model.worldToLocalMatrix * vec4(worldRay.dir, 1)).xyz;
 		localRay.invDir = 1 / localRay.dir;
 
-		TriangleHitInfo hit = RayTriangle(localRay, triangles[model.triOffset]);
+		TriangleHitInfo hit = RayTriangle(localRay, triangles[triIndex[model.triOffset]]);
 
 		if(hit.dst < result.dst)
 		{

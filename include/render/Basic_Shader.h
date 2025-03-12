@@ -31,6 +31,30 @@ struct ModelInfo
     alignas(16) MaterialInfo material;
 };
 
+struct BoundingBox
+{
+    glm::vec3 Min;
+    glm::vec3 Max;
+    glm::vec3 Center = (Min + Max) * 0.5f;
+    glm::vec3 Size = Max - Min;
+    bool hasPoint;
+
+    void GrowToInclude(glm::vec3 min, glm::vec3 max)
+    {
+        if(hasPoint)
+        {
+            Min = glm::min(Min, min);
+            Max = glm::max(Max, max);
+        }
+        else
+        {
+            hasPoint = true;
+            Min = min;
+            Max = max;
+        }
+    }
+};
+
 struct BVHNode
 {
     alignas(16) glm::vec3 boundsMin;
@@ -39,17 +63,201 @@ struct BVHNode
     alignas(4) int triangleCount;
 };
 
+struct aabb
+{
+    glm::vec3 bmin = glm::vec3(1e30f), bmax = glm::vec3(-1e30f);
+    void grow( glm::vec3 p ) { bmin = min( bmin, p ), bmax = max( bmax, p ); }
+    float area()
+    {
+        glm::vec3 e = bmax - bmin; // box extent
+        return e.x * e.y + e.y * e.z + e.z * e.x;
+    }
+};
+
 class Basic_Shader : public Shader
 {
 
     std::shared_ptr<Camera> camera;
     std::vector<Triangle> triangles;
+    std::vector<unsigned int> triIndexs;
     std::vector<ModelInfo> models;
     std::unordered_map<std::string, int> loadedMeshOffset;
     std::unordered_map<std::string, bool> modelsLoaded;
+    std::vector<BVHNode> bvhNodes;
+
+    void BuildBVH(unsigned int triStartIndex, unsigned int triCount)
+    {
+        BVHNode root{glm::vec3(glm::uintBitsToFloat(0x7F800000)), glm::vec3(glm::uintBitsToFloat(0xFF800000)),-1,-1};
+        for(size_t i = 0; i < triCount; i++)
+        {
+            root.boundsMin = glm::min(root.boundsMin, (triangles)[triStartIndex + i].posA);
+            root.boundsMin = glm::min(root.boundsMin, triangles[triStartIndex + i].posB);
+            root.boundsMin = glm::min(root.boundsMin, triangles[triStartIndex + i].posC);
+            root.boundsMax = glm::max(root.boundsMax, triangles[triStartIndex + i].posA);
+            root.boundsMax = glm::max(root.boundsMax, triangles[triStartIndex + i].posB);
+            root.boundsMax = glm::max(root.boundsMax, triangles[triStartIndex + i].posC);
+        }
+        bvhNodes.push_back(root);
+    }
+
+    float NodeCost(glm::vec3 size, unsigned int triNum)
+    {
+        float halfArea = size.x * size.y + size.x * size.z + size.y * size.z;
+        return halfArea * triNum;
+    }
+
+    struct BoundingBox
+    {
+        glm::vec3 Min;
+        glm::vec3 Max;
+        glm::vec3 Center = (Min + Max) * 0.5f;
+        glm::vec3 Size = Max - Min;
+        bool hasPoint;
+
+    void GrowToInclude(Triangle tri)
+        {
+            if (hasPoint)
+            {
+                Min = min(Min, tri.posA);
+                Min = min(Min, tri.posB);
+                Min = min(Min, tri.posC);
+                Max = max(Max, tri.posA);
+                Max = max(Max, tri.posB);
+                Max = max(Max, tri.posC);
+            }
+            else
+            {
+                hasPoint = true;
+                Min = min(tri.posA,min(tri.posB, tri.posC));
+                Max = max(tri.posA,max(tri.posB, tri.posC));
+            }
+        }
+    };
+
+    glm::vec3 GetTriCenter(Triangle tri)
+    {
+        glm::vec3 center = tri.posA + tri.posB + tri.posC;
+        return center / 3.f;
+    }
+
+    float EvaluateSplit(int splitAxis, float splitPos, int start, int count)
+    {
+        int numOnLeft = 0, numOnRight = 0;
+        BoundingBox boundsLeft, boundsRight;
+
+        for(int i = start; i < start + count; ++i)
+        {
+            Triangle tri = triangles[i];
+            if (GetTriCenter(tri)[splitAxis] < splitPos)
+            {
+                boundsLeft.GrowToInclude(tri);
+                ++numOnLeft;
+            }
+            else
+            {
+                boundsRight.GrowToInclude(tri);
+                ++numOnRight;
+            }
+        }
+
+        float costA = NodeCost(boundsLeft.Size, numOnLeft);
+        float costB = NodeCost(boundsRight.Size, numOnLeft);
+        return costA + costB;
+    }
+
+    struct SplitCalc
+    {
+        int axis;
+        float pos;
+        float cost;
+    };
+
+    SplitCalc ChooseSplit(BVHNode node, int start, int count)
+    {
+        if (count <= 1)
+        {
+            return SplitCalc{0,0, glm::uintBitsToFloat(0x7F800000)};
+        }
+
+        float bestSplitPos = 0;
+        int bestSplitAxis = 0;
+        const int numSplitTests = 5;
+
+        float bestCost = glm::uintBitsToFloat(0X7F800000);
+
+        for(int axis = 0; axis < 3; ++axis)
+        {
+            for(int i = 0; i < numSplitTests; ++i)
+            {
+                float splitT = (i + 1.f)/(numSplitTests + 1.f);
+                float splitPos = node.boundsMin[axis] + ((node.boundsMax[axis] - node.boundsMin[axis]) * splitT);
+                float cost = EvaluateSplit(axis, splitPos, start, count);
+                if (cost < bestCost)
+                {
+                    bestCost = cost;
+                    bestSplitAxis = axis;
+                    bestSplitPos = splitPos;
+                }
+            }
+        }
+        return SplitCalc{bestSplitAxis, bestSplitPos, bestCost};
+    }
+
+    void Split(int parentIndex, int triStartIndex, int triCount, int depth = 0)
+    {
+        const int MaxDepth = 64;
+        BVHNode parent = bvhNodes[parentIndex];
+        glm::vec3 size = parent.boundsMax - parent.boundsMin;
+        float parentCost = NodeCost(size, triCount);
+
+        SplitCalc result = ChooseSplit(parent, triStartIndex, triCount);
+
+        if (depth < MaxDepth && result.cost < parentCost)
+        {
+            BoundingBox boundsLeft, boundsRight;
+            int numOnLeft;
+
+            for (int i = triStartIndex; i < triStartIndex + triCount; ++i)
+            {
+                Triangle tri = triangles[triIndexs[i]];
+                if(GetTriCenter(tri)[result.axis] < result.pos)
+                {
+                    boundsLeft.GrowToInclude(tri);
+                    int swap = triIndexs[triStartIndex + numOnLeft];
+                    triIndexs[triStartIndex + numOnLeft++] = triIndexs[i];
+                    triIndexs[i] = swap;
+                }
+                else
+                {
+                    boundsRight.GrowToInclude(tri);
+                }
+            }
+
+            int numOnRight = triCount - numOnLeft;
+            int triStartLeft = triStartIndex;
+            int triStartRight = triStartIndex + numOnLeft;
+
+            int childIndexLeft = bvhNodes.size();
+            bvhNodes.push_back(BVHNode{boundsLeft.Min, boundsLeft.Max, triStartLeft, 0});
+            int childIndexRight = bvhNodes.size();
+            bvhNodes.push_back(BVHNode{boundsRight.Min, boundsRight.Max, triStartLeft, 0});
+
+            parent.startIndex = childIndexLeft;
+            bvhNodes[parentIndex] = parent;
+
+            Split(childIndexLeft, triStartIndex, numOnLeft, depth + 1);
+            Split(childIndexRight, triStartIndex + numOnLeft, numOnRight, depth + 1);
+        }
+        else
+        {
+            parent.startIndex = triStartIndex;
+            parent.triangleCount = triCount;
+            bvhNodes[parentIndex] = parent;
+        }
+    }
 
     // Function to generate a normal for a face (using the cross product of two edges)
-    glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices)
+    static glm::vec3 GenerateNormal(const std::vector<glm::vec3>& faceVertices)
     {
         // Ensure there are exactly three vertices
         if (faceVertices.size() != 3) {
@@ -168,6 +376,7 @@ class Basic_Shader : public Shader
                     }
 
                     triangles.push_back(tri);
+                    triIndexs.push_back(triIndexs.size());
                 }
             }
         }
@@ -240,6 +449,8 @@ public:
                 if (loadedMeshOffset.find(modelPath) == loadedMeshOffset.end()) {
                     // Load model buffers if they are not already loaded
                     LoadModel(modelPath);
+                    int offset = loadedMeshOffset[modelPath];
+                    BuildBVH(offset, triangles.size() - offset);
                 }
 
                 glm::mat4 modelMatrix(1.0f);
@@ -276,6 +487,8 @@ public:
         SendBufferData(models, "models", 0);
         SendUniformData((int)triangles.size(), "triangleCount");
         SendBufferData(triangles, "triangles", 1);
+        SendBufferData(triIndexs, "triIndex", 1);
+
 //        std::cout << models[0].material.specularColor[0] << " " << models[0].material.specularColor[1] << " " << models[0].material.specularColor[2] << " " << models[0].material.specularColor[3] << std::endl;
     };
 };
