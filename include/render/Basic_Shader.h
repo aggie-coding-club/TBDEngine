@@ -31,47 +31,12 @@ struct ModelInfo
     alignas(16) MaterialInfo material;
 };
 
-struct BoundingBox
-{
-    glm::vec3 Min;
-    glm::vec3 Max;
-    glm::vec3 Center = (Min + Max) * 0.5f;
-    glm::vec3 Size = Max - Min;
-    bool hasPoint = false;
-
-    void GrowToInclude(glm::vec3 min, glm::vec3 max)
-    {
-        if(hasPoint)
-        {
-            Min = glm::min(Min, min);
-            Max = glm::max(Max, max);
-        }
-        else
-        {
-            hasPoint = true;
-            Min = min;
-            Max = max;
-        }
-    }
-};
-
 struct BVHNode
 {
     alignas(16) glm::vec3 boundsMin;
     alignas(16) glm::vec3 boundsMax;
     alignas(4) int startIndex;
     alignas(4) int triangleCount;
-};
-
-struct aabb
-{
-    glm::vec3 bmin = glm::vec3(1e30f), bmax = glm::vec3(-1e30f);
-    void grow( glm::vec3 p ) { bmin = min( bmin, p ), bmax = max( bmax, p ); }
-    float area()
-    {
-        glm::vec3 e = bmax - bmin; // box extent
-        return e.x * e.y + e.y * e.z + e.z * e.x;
-    }
 };
 
 class Basic_Shader : public Shader
@@ -87,7 +52,10 @@ class Basic_Shader : public Shader
 
     void BuildBVH(unsigned int triStartIndex, unsigned int triCount)
     {
-        BVHNode root{glm::vec3(glm::uintBitsToFloat(0x7F800000)), glm::vec3(glm::uintBitsToFloat(0xFF800000)),-1,-1};
+        BVHNode root{glm::vec3(std::numeric_limits<float>::infinity()),
+                     glm::vec3(-std::numeric_limits<float>::infinity()),
+                     -1, -1};
+
         for(size_t i = 0; i < triCount; i++)
         {
             root.boundsMin = glm::min(root.boundsMin, (triangles)[triStartIndex + i].posA);
@@ -98,38 +66,35 @@ class Basic_Shader : public Shader
             root.boundsMax = glm::max(root.boundsMax, triangles[triStartIndex + i].posC);
         }
         bvhNodes.push_back(root);
+        Split(bvhNodes.size() - 1, triStartIndex, triCount);
     }
 
     float NodeCost(glm::vec3 size, unsigned int triNum)
     {
-        float halfArea = size.x * size.y + size.x * size.z + size.y * size.z;
-        return halfArea * triNum;
+        float surfaceArea = 2.0f * (size.x * size.y + size.x * size.z + size.y * size.z);
+        return surfaceArea * triNum;
     }
 
     struct BoundingBox
     {
         glm::vec3 Min;
         glm::vec3 Max;
-        glm::vec3 Center = (Min + Max) * 0.5f;
-        glm::vec3 Size = Max - Min;
-        bool hasPoint;
+        [[nodiscard]] glm::vec3 Center() const { return (Min + Max) * 0.5f; }
+        [[nodiscard]] glm::vec3 Size() const { return Max - Min; }
+        bool hasPoint = false;
 
-    void GrowToInclude(Triangle tri)
+        void GrowToInclude(Triangle tri)
         {
             if (hasPoint)
             {
-                Min = min(Min, tri.posA);
-                Min = min(Min, tri.posB);
-                Min = min(Min, tri.posC);
-                Max = max(Max, tri.posA);
-                Max = max(Max, tri.posB);
-                Max = max(Max, tri.posC);
+                Min = glm::min(Min, glm::min(tri.posA, glm::min(tri.posB, tri.posC)));
+                Max = glm::max(Max, glm::max(tri.posA, glm::max(tri.posB, tri.posC)));
             }
             else
             {
                 hasPoint = true;
-                Min = min(tri.posA,min(tri.posB, tri.posC));
-                Max = max(tri.posA,max(tri.posB, tri.posC));
+                Min = glm::min(tri.posA,min(tri.posB, tri.posC));
+                Max = glm::max(tri.posA,max(tri.posB, tri.posC));
             }
         }
     };
@@ -160,8 +125,8 @@ class Basic_Shader : public Shader
             }
         }
 
-        float costA = NodeCost(boundsLeft.Size, numOnLeft);
-        float costB = NodeCost(boundsRight.Size, numOnLeft);
+        float costA = NodeCost(boundsLeft.Size(), numOnLeft);
+        float costB = NodeCost(boundsRight.Size(), numOnRight);
         return costA + costB;
     }
 
@@ -172,7 +137,7 @@ class Basic_Shader : public Shader
         float cost;
     };
 
-    SplitCalc ChooseSplit(BVHNode node, int start, int count)
+    SplitCalc ChooseSplit(const BVHNode &node, int start, int count)
     {
         if (count <= 1)
         {
@@ -212,20 +177,26 @@ class Basic_Shader : public Shader
 
         SplitCalc result = ChooseSplit(parent, triStartIndex, triCount);
 
+        if (std::isnan(result.pos) || std::isinf(result.pos)) {
+            parent.startIndex = triStartIndex;
+            parent.triangleCount = triCount;
+            bvhNodes[parentIndex] = parent;
+            return;
+        }
+
         if (depth < MaxDepth && result.cost < parentCost)
         {
             BoundingBox boundsLeft, boundsRight;
-            int numOnLeft;
+            int numOnLeft = 0;
 
             for (int i = triStartIndex; i < triStartIndex + triCount; ++i)
             {
                 Triangle tri = triangles[triIndexs[i]];
                 if(GetTriCenter(tri)[result.axis] < result.pos)
                 {
+                    std::swap(triIndexs[i], triIndexs[triStartIndex + numOnLeft]);
                     boundsLeft.GrowToInclude(tri);
-                    int swap = triIndexs[triStartIndex + numOnLeft];
-                    triIndexs[triStartIndex + numOnLeft++] = triIndexs[i];
-                    triIndexs[i] = swap;
+                    ++numOnLeft;
                 }
                 else
                 {
@@ -234,15 +205,25 @@ class Basic_Shader : public Shader
             }
 
             int numOnRight = triCount - numOnLeft;
+
+            if (numOnLeft == 0 || numOnRight == 0)
+            {
+                parent.startIndex = triStartIndex;
+                parent.triangleCount = triCount;
+                bvhNodes[parentIndex] = parent;
+                return;  // Stop splitting if all triangles end up on one side
+            }
+
             int triStartLeft = triStartIndex;
             int triStartRight = triStartIndex + numOnLeft;
 
             int childIndexLeft = bvhNodes.size();
             bvhNodes.push_back(BVHNode{boundsLeft.Min, boundsLeft.Max, triStartLeft, 0});
             int childIndexRight = bvhNodes.size();
-            bvhNodes.push_back(BVHNode{boundsRight.Min, boundsRight.Max, triStartLeft, 0});
+            bvhNodes.push_back(BVHNode{boundsRight.Min, boundsRight.Max, triStartRight, 0});
 
             parent.startIndex = childIndexLeft;
+            parent.triangleCount = -1;
             bvhNodes[parentIndex] = parent;
 
             Split(childIndexLeft, triStartIndex, numOnLeft, depth + 1);
@@ -407,8 +388,7 @@ class Basic_Shader : public Shader
 
 public:
 
-
-    void UpdateData() override {
+    void UpdateData() {
         camera = scene->GetCurrCamera();
         if (!camera) // Check for a null camera
         {
@@ -436,13 +416,6 @@ public:
         float sunFocus = 0.8;
         float sunIntensity = 10;
         glm::vec3 sunColor = glm::vec3(1,1,1);
-
-        // Send viewParams as (width, height, focus distance)
-        SendUniformData(glm::vec3(planeWidth, planeHeight, focusDist), "viewParams");
-        SendUniformData(useSun, "useSky");
-        SendUniformData(sunFocus, "sunFocus");
-        SendUniformData(sunIntensity, "sunIntensity");
-        SendUniformData(sunColor, "sunColor");
 
         for (const auto& model : scene->GetModels())
         {
@@ -492,13 +465,26 @@ public:
 //                this->SendUniformData(lightComponent->color, (name+".color").c_str());
 //            }
         }
+        // Send viewParams as (width, height, focus distance)
+        SendUniformData(glm::vec3(planeWidth, planeHeight, focusDist), "viewParams");
 
+        // Send enviornment params
+        SendUniformData(useSun, "useSky");
+        SendUniformData(sunFocus, "sunFocus");
+        SendUniformData(sunIntensity, "sunIntensity");
+        SendUniformData(sunColor, "sunColor");
+
+        // Send Model and BVH info
         SendUniformData((int)models.size(), "modelCount");
         SendBufferData(models, "models", 0);
         SendUniformData((int)triangles.size(), "triangleCount");
         SendBufferData(triangles, "triangles", 1);
         SendBufferData(triIndexs, "triIndex", 1);
         SendBufferData(bvhNodes, "nodes", 2);
+
+        std::cout << bvhNodes.size() << std::endl;
+
+//        std::cout << bvhNodes[1].triangleCount << " " << bvhNodes.size() << std::endl;
 
 //        std::cout << models[0].material.specularColor[0] << " " << models[0].material.specularColor[1] << " " << models[0].material.specularColor[2] << " " << models[0].material.specularColor[3] << std::endl;
     };

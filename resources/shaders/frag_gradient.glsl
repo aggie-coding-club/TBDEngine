@@ -235,7 +235,15 @@ TriangleHitInfo RayTriangleBVH(inout Ray ray, float rayLength, int nodeOffset, i
 
 	while (stackIndex > 0)
 	{
-		BVHNode node = nodes[stack[--stackIndex]];
+		if (stackIndex <= 0) {
+			break; // Prevents underflow
+		}
+
+		int nodeIndex = stack[--stackIndex];
+		if (nodeIndex < 0 || nodeIndex >= nodes.length()) {
+			continue; // Skip invalid nodes
+		}
+		BVHNode node = nodes[nodeIndex];
 		bool isLeaf = bool(node.triangleCount > 0);
 
 		if(isLeaf)
@@ -335,6 +343,6 @@ void main()
 	vec3 rayOrigin = _WorldSpaceCamPos;
 	vec3 rayDir = normalize(viewPoint - rayOrigin);
 
-	fragColor = vec4(Trace(rayOrigin, rayDir), 1);
-	fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / 2.2));
+//	fragColor = vec4(Trace(rayOrigin, rayDir), 1);
+	fragColor = models[0].material.specularColor;
 }

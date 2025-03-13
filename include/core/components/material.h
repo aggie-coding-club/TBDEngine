@@ -27,7 +27,7 @@ class Material: public Component {
 
         Material(const glm::vec4 ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1),
                  const glm::vec4 diffuse = glm::vec4(0.8f, 0.8f, 0.8f, 1),
-                 const glm::vec4 specular = glm::vec4(0.5f, 0.5f, 0.5f, 1),
+                 const glm::vec4 specular = glm::vec4(1.f, 0.f, 0.f, 1),
                  const float shininess = 32.0f)
             : ambient(ambient), diffuse(diffuse), specular(specular), shininess(shininess)
         {
