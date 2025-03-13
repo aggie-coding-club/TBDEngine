@@ -69,17 +69,17 @@ class Basic_Shader : public Shader
         Split(bvhNodes.size() - 1, triStartIndex, triCount);
     }
 
-    float NodeCost(glm::vec3 size, unsigned int triNum)
+    float NodeCost(glm::vec3 size, int triNum)
     {
-        float surfaceArea = 2.0f * (size.x * size.y + size.x * size.z + size.y * size.z);
-        return surfaceArea * triNum;
+        float halfArea = size.x * size.y + size.x * size.z + size.y * size.z;
+        return halfArea * triNum;
     }
 
     struct BoundingBox
     {
         glm::vec3 Min;
         glm::vec3 Max;
-        [[nodiscard]] glm::vec3 Center() const { return (Min + Max) * 0.5f; }
+        [[nodiscard]] glm::vec3 Center() const { return (Min + Max) / 2.f; }
         [[nodiscard]] glm::vec3 Size() const { return Max - Min; }
         bool hasPoint = false;
 
@@ -105,22 +105,23 @@ class Basic_Shader : public Shader
         return center / 3.f;
     }
 
-    float EvaluateSplit(int splitAxis, float splitPos, int start, int count)
+    float EvaluateSplit(int splitAxis, float splitPos, int triStartIndex, int triCount)
     {
-        int numOnLeft = 0, numOnRight = 0;
         BoundingBox boundsLeft, boundsRight;
+        int numOnLeft = 0;
+        int numOnRight = 0;
 
-        for(int i = start; i < start + count; ++i)
+        for(int i = triStartIndex; i < triStartIndex + triCount; ++i)
         {
-            Triangle tri = triangles[i];
-            if (GetTriCenter(tri)[splitAxis] < splitPos)
+            const Triangle *tri = &triangles[triIndexs[i]];
+            if (GetTriCenter(*tri)[splitAxis] < splitPos)
             {
-                boundsLeft.GrowToInclude(tri);
+                boundsLeft.GrowToInclude(*tri);
                 ++numOnLeft;
             }
             else
             {
-                boundsRight.GrowToInclude(tri);
+                boundsRight.GrowToInclude(*tri);
                 ++numOnRight;
             }
         }
@@ -137,31 +138,31 @@ class Basic_Shader : public Shader
         float cost;
     };
 
-    SplitCalc ChooseSplit(const BVHNode &node, int start, int count)
+    SplitCalc ChooseSplit(const BVHNode &node, int triStartPos, int triCount)
     {
-        if (count <= 1)
+        if (triCount <= 1)
         {
-            return SplitCalc{0,0, glm::uintBitsToFloat(0x7F800000)};
+            return SplitCalc{0,0, std::numeric_limits<float>::infinity()};
         }
 
         float bestSplitPos = 0;
         int bestSplitAxis = 0;
         const int numSplitTests = 5;
 
-        float bestCost = glm::uintBitsToFloat(0X7F800000);
+        float bestCost = std::numeric_limits<float>::infinity();
 
         for(int axis = 0; axis < 3; ++axis)
         {
             for(int i = 0; i < numSplitTests; ++i)
             {
-                float splitT = (i + 1.f)/(numSplitTests + 1.f);
+                float splitT = ((float)i + 1.f)/(numSplitTests + 1.f);
                 float splitPos = node.boundsMin[axis] + ((node.boundsMax[axis] - node.boundsMin[axis]) * splitT);
-                float cost = EvaluateSplit(axis, splitPos, start, count);
+                float cost = EvaluateSplit(axis, splitPos, triStartPos, triCount);
                 if (cost < bestCost)
                 {
                     bestCost = cost;
-                    bestSplitAxis = axis;
                     bestSplitPos = splitPos;
+                    bestSplitAxis = axis;
                 }
             }
         }
@@ -191,16 +192,19 @@ class Basic_Shader : public Shader
 
             for (int i = triStartIndex; i < triStartIndex + triCount; ++i)
             {
-                Triangle tri = triangles[triIndexs[i]];
-                if(GetTriCenter(tri)[result.axis] < result.pos)
+                Triangle* tri = &triangles[triIndexs[i]];
+                if(GetTriCenter(*tri)[result.axis] < result.pos)
                 {
-                    std::swap(triIndexs[i], triIndexs[triStartIndex + numOnLeft]);
-                    boundsLeft.GrowToInclude(tri);
+                    int temp = triIndexs[i];
+                    triIndexs[i] = triIndexs[triStartIndex + numOnLeft];
+                    triIndexs[triStartIndex + numOnLeft] = temp;
+
+                    boundsLeft.GrowToInclude(*tri);
                     ++numOnLeft;
                 }
                 else
                 {
-                    boundsRight.GrowToInclude(tri);
+                    boundsRight.GrowToInclude(*tri);
                 }
             }
 
@@ -214,16 +218,15 @@ class Basic_Shader : public Shader
                 return;  // Stop splitting if all triangles end up on one side
             }
 
-            int triStartLeft = triStartIndex;
+            int triStartLeft = triStartIndex + 0;
             int triStartRight = triStartIndex + numOnLeft;
 
-            int childIndexLeft = bvhNodes.size();
+            int childIndexLeft = (int)bvhNodes.size();
             bvhNodes.push_back(BVHNode{boundsLeft.Min, boundsLeft.Max, triStartLeft, 0});
-            int childIndexRight = bvhNodes.size();
+            int childIndexRight = (int)bvhNodes.size();
             bvhNodes.push_back(BVHNode{boundsRight.Min, boundsRight.Max, triStartRight, 0});
 
             parent.startIndex = childIndexLeft;
-            parent.triangleCount = -1;
             bvhNodes[parentIndex] = parent;
 
             Split(childIndexLeft, triStartIndex, numOnLeft, depth + 1);
@@ -413,8 +416,8 @@ public:
         float planeWidth = planeHeight * aspect;
 
         int useSun = 1;
-        float sunFocus = 0.8;
-        float sunIntensity = 10;
+        float sunFocus = 1;
+        float sunIntensity = 0.4;
         glm::vec3 sunColor = glm::vec3(1,1,1);
 
         for (const auto& model : scene->GetModels())
@@ -482,7 +485,7 @@ public:
         SendBufferData(triIndexs, "triIndex", 1);
         SendBufferData(bvhNodes, "nodes", 2);
 
-        std::cout << bvhNodes.size() << std::endl;
+//        std::cout << bvhNodes.size() << std::endl;
 
 //        std::cout << bvhNodes[1].triangleCount << " " << bvhNodes.size() << std::endl;
 

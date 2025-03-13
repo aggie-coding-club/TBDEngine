@@ -166,7 +166,7 @@ vec3 RandomHemiDir(vec3 normal, inout uint rngState)
 // Get Light From Enviornment
 vec3 GetEnvironmentLight(vec3 dir)
 {
-	if (useSky == 0) return 0;
+	if (useSky == 0) return vec3(0);
 	const vec3 GroundColor = vec3(0.35, 0.3, 0.35);
 	const vec3 SkyColorHorizon = vec3(1, 1, 1);
 	const vec3 SkyColorZenith = vec3(0.08, 0.37, 0.73);
@@ -324,7 +324,7 @@ vec3 Trace(vec3 rayOrigin, vec3 rayDir)
 	ModelHitInfo hitInfo = CalculateRayCollision(ray);
 	if (!hitInfo.didHit)
 	{
-		return 0;
+		return GetEnvironmentLight(rayDir);
 	}
 
 	return hitInfo.normal * 0.5f + 0.5f;
@@ -343,6 +343,11 @@ void main()
 	vec3 rayOrigin = _WorldSpaceCamPos;
 	vec3 rayDir = normalize(viewPoint - rayOrigin);
 
-//	fragColor = vec4(Trace(rayOrigin, rayDir), 1);
-	fragColor = models[0].material.specularColor;
+	Ray ray;
+	ray.dir = rayDir;
+	ray.origin = rayOrigin;
+	ray.invDir = 1.f / rayDir;
+
+	fragColor = vec4(Trace(rayOrigin, rayDir), 1);
+//	fragColor = vec4(RayTriangle(ray, triangles[0]).normal, 1);
 }
