@@ -102,7 +102,10 @@ layout(std430, binding = 0) buffer ModelBuffer {
 
 layout(std430, binding = 1) buffer TriangleBuffer {
 	Triangle triangles[];
-	uint triIndex[];
+};
+
+layout(std430, binding = 4) buffer TriangleIndexesBuffer {
+	int triIndex[];
 };
 
 layout(std430, binding = 2) buffer NodeBuffer {
@@ -113,9 +116,9 @@ layout(std430, binding = 3) buffer LightBuffer {
 	Light lights[];
 };
 
-int triangleCount;
-int modelCount;
-int lightCount;
+uniform int triangleCount;
+uniform int modelCount;
+uniform int lightCount;
 
 float lerp(float start, float end, float time)
 {
@@ -209,8 +212,7 @@ TriangleHitInfo RayTriangle(Ray ray, Triangle tri) {
 	return hitInfo;
 }
 
-float RayBoundingBoxDst(Ray ray, vec3 boxMin, vec3 boxMax)
-{
+float RayBoundingBoxDst(Ray ray, vec3 boxMin, vec3 boxMax) {
 	vec3 tMin = (boxMin - ray.origin) * ray.invDir;
 	vec3 tMax = (boxMax - ray.origin) * ray.invDir;
 	vec3 t1 = min(tMin, tMax);
@@ -218,8 +220,8 @@ float RayBoundingBoxDst(Ray ray, vec3 boxMin, vec3 boxMax)
 	float tNear = max(max(t1.x, t1.y), t1.z);
 	float tFar = min(min(t2.x, t2.y), t2.z);
 
-	bool hit = bool(tFar >= tNear) && bool(tFar > 0);
-	float dst = hit ? (tNear > 0 ? tNear : 0) : float(uintBitsToFloat(0x7F800000));
+	float hit = step(0.0, tFar - tNear) * step(0.0, tFar);
+	float dst = mix(float(uintBitsToFloat(0x7F800000)), max(0.0, tNear), hit);
 	return dst;
 }
 
@@ -231,18 +233,14 @@ TriangleHitInfo RayTriangleBVH(inout Ray ray, float rayLength, int nodeOffset, i
 
 	int stack[64];
 	int stackIndex = 0;
-	stack[stackIndex++] = nodeOffset + 0;
+	stack[stackIndex] = nodeOffset;
+	++stackIndex;
 
 	while (stackIndex > 0)
 	{
-		if (stackIndex <= 0) {
-			break; // Prevents underflow
-		}
+		--stackIndex;
+		int nodeIndex = stack[stackIndex];
 
-		int nodeIndex = stack[--stackIndex];
-		if (nodeIndex < 0 || nodeIndex >= nodes.length()) {
-			continue; // Skip invalid nodes
-		}
 		BVHNode node = nodes[nodeIndex];
 		bool isLeaf = bool(node.triangleCount > 0);
 
@@ -250,8 +248,7 @@ TriangleHitInfo RayTriangleBVH(inout Ray ray, float rayLength, int nodeOffset, i
 		{
 			for(int i = 0; i < node.triangleCount; i++)
 			{
-				Triangle tri = triangles[triIndex[triOffset + node.startIndex + i]];
-				TriangleHitInfo triHitInfo = RayTriangle(ray, tri);
+				TriangleHitInfo triHitInfo = RayTriangle(ray, triangles[triIndex[triOffset + node.startIndex + i]]);
 
 				if (triHitInfo.didHit && triHitInfo.dst < result.dst)
 				{
@@ -277,8 +274,16 @@ TriangleHitInfo RayTriangleBVH(inout Ray ray, float rayLength, int nodeOffset, i
 			int childIndexNear = isNearestA ? childIndexA : childIndexB;
 			int childIndexFar = isNearestA ? childIndexB : childIndexA;
 
-			if(dstFar < result.dst) stack[stackIndex++] = childIndexFar;
-			if(dstNear < result.dst) stack[stackIndex++] = childIndexNear;
+			if(dstFar < result.dst)
+			{
+				stack[stackIndex] = childIndexFar;
+				stackIndex++;
+			}
+			if(dstNear < result.dst)
+			{
+				stack[stackIndex] = childIndexNear;
+				stackIndex++;
+			}
 		}
 	}
 
@@ -304,7 +309,8 @@ ModelHitInfo CalculateRayCollision(Ray worldRay)
 		{
 			result.didHit = true;
 			result.dst = hit.dst;
-			result.normal = normalize(transpose(inverse(mat3(model.localToWorldMatrix))) * hit.normal);
+//			result.normal = normalize(transpose(inverse(mat3(model.localToWorldMatrix))) * hit.normal);
+			result.normal = hit.normal;
 			result.uv = hit.uv;
 			result.hitPoint = worldRay.origin + worldRay.dir * hit.dst;
 			result.material = model.material;
@@ -327,27 +333,42 @@ vec3 Trace(vec3 rayOrigin, vec3 rayDir)
 		return GetEnvironmentLight(rayDir);
 	}
 
-	return hitInfo.normal * 0.5f + 0.5f;
+	return hitInfo.normal;
 }
 
 void main()
 {
 	vec2 ndc = vec2(
 	(gl_FragCoord.x / _ScreenParams.x) * 2.0 - 1.0,
-	-(gl_FragCoord.y / _ScreenParams.y) * 2.0 + 1.0 // Flip Y
+	(gl_FragCoord.y / _ScreenParams.y) * 2.0 - 1.0
 	);
 
-	vec3 viewPointLocal = vec3(ndc * viewParams.xy, 1.0);
-	vec3 viewPoint = (camLocalToWorldMatrix * vec4(viewPointLocal, 1.0)).xyz;
+	vec3 viewPointLocal = vec3(ndc, 1.0) * viewParams;
+	vec3 focusPoint = (camLocalToWorldMatrix * vec4(viewPointLocal, 1.0)).xyz;
 
 	vec3 rayOrigin = _WorldSpaceCamPos;
-	vec3 rayDir = normalize(viewPoint - rayOrigin);
+	vec3 rayDir = normalize(focusPoint - rayOrigin);
 
 	Ray ray;
 	ray.dir = rayDir;
 	ray.origin = rayOrigin;
 	ray.invDir = 1.f / rayDir;
 
+	Triangle tri;
+	tri.posA = vec3(0.5, -0.5, 0);
+	tri.posB = vec3(0.5, 0.5, 0);
+	tri.posC = vec3(-0.5, 0.5, 0);
+	tri.normalA = vec3(0, 0, 1);
+	tri.normalB = vec3(0, 0, 1);
+	tri.normalC = vec3(0, 0, 1);
+
 	fragColor = vec4(Trace(rayOrigin, rayDir), 1);
-//	fragColor = vec4(RayTriangle(ray, triangles[0]).normal, 1);
+
+//	fragColor = vec4(RayTriangle(ray, triangles[0]).dst);
+
+//	fragColor = vec4(RayBoundingBoxDst(ray, nodes[0].boundsMin, nodes[0].boundsMax));
+
+//	fragColor = vec4(RayTriangleBVH(ray, uintBitsToFloat(0x7F800000), 0, 0).normal, 1);
+
+//	fragColor = vec4(CalculateRayCollision(ray).normal, 1);
 }

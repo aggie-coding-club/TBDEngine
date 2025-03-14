@@ -44,7 +44,7 @@ class Basic_Shader : public Shader
 
     std::shared_ptr<Camera> camera;
     std::vector<Triangle> triangles;
-    std::vector<unsigned int> triIndexs;
+    std::vector<int> triIndexs;
     std::vector<ModelInfo> models;
     std::unordered_map<std::string, std::pair<unsigned int, unsigned int>> loadedMeshOffset;
     std::unordered_map<std::string, bool> modelsLoaded;
@@ -71,8 +71,8 @@ class Basic_Shader : public Shader
 
     float NodeCost(glm::vec3 size, int triNum)
     {
-        float halfArea = size.x * size.y + size.x * size.z + size.y * size.z;
-        return halfArea * triNum;
+        float area = size.x * size.y + size.x * size.z + size.y * size.z;
+        return area * triNum;
     }
 
     struct BoundingBox
@@ -99,6 +99,13 @@ class Basic_Shader : public Shader
         }
     };
 
+    float SurfaceArea(const BoundingBox& box)
+    {
+        glm::vec3 size = box.Size();
+        return 2.0f * (size.x * size.y + size.x * size.z + size.y * size.z);
+    }
+
+
     glm::vec3 GetTriCenter(Triangle tri)
     {
         glm::vec3 center = tri.posA + tri.posB + tri.posC;
@@ -111,9 +118,9 @@ class Basic_Shader : public Shader
         int numOnLeft = 0;
         int numOnRight = 0;
 
-        for(int i = triStartIndex; i < triStartIndex + triCount; ++i)
+        for (int i = triStartIndex; i < triStartIndex + triCount; ++i)
         {
-            const Triangle *tri = &triangles[triIndexs[i]];
+            const Triangle* tri = &triangles[triIndexs[i]];
             if (GetTriCenter(*tri)[splitAxis] < splitPos)
             {
                 boundsLeft.GrowToInclude(*tri);
@@ -126,10 +133,22 @@ class Basic_Shader : public Shader
             }
         }
 
-        float costA = NodeCost(boundsLeft.Size(), numOnLeft);
-        float costB = NodeCost(boundsRight.Size(), numOnRight);
-        return costA + costB;
+        if (numOnLeft == 0 || numOnRight == 0)
+        {
+            return std::numeric_limits<float>::infinity(); // Avoid empty splits
+        }
+
+        float SA_P = SurfaceArea(BoundingBox{boundsLeft.Min, boundsRight.Max}); // Parent surface area
+        float SA_L = SurfaceArea(boundsLeft);
+        float SA_R = SurfaceArea(boundsRight);
+
+        const float C_T = 1.0f; // Traversal cost
+        const float C_I = 1.0f; // Intersection cost
+
+        float cost = C_T + ((SA_L / SA_P) * numOnLeft * C_I) + ((SA_R / SA_P) * numOnRight * C_I);
+        return cost;
     }
+
 
     struct SplitCalc
     {
@@ -142,7 +161,7 @@ class Basic_Shader : public Shader
     {
         if (triCount <= 1)
         {
-            return SplitCalc{0,0, std::numeric_limits<float>::infinity()};
+            return SplitCalc{0, 0, std::numeric_limits<float>::infinity()};
         }
 
         float bestSplitPos = 0;
@@ -151,13 +170,14 @@ class Basic_Shader : public Shader
 
         float bestCost = std::numeric_limits<float>::infinity();
 
-        for(int axis = 0; axis < 3; ++axis)
+        for (int axis = 0; axis < 3; ++axis)
         {
-            for(int i = 0; i < numSplitTests; ++i)
+            for (int i = 0; i < numSplitTests; ++i)
             {
-                float splitT = ((float)i + 1.f)/(numSplitTests + 1.f);
+                float splitT = ((float)i + 1.f) / (numSplitTests + 1.f);
                 float splitPos = node.boundsMin[axis] + ((node.boundsMax[axis] - node.boundsMin[axis]) * splitT);
                 float cost = EvaluateSplit(axis, splitPos, triStartPos, triCount);
+
                 if (cost < bestCost)
                 {
                     bestCost = cost;
@@ -166,6 +186,7 @@ class Basic_Shader : public Shader
                 }
             }
         }
+
         return SplitCalc{bestSplitAxis, bestSplitPos, bestCost};
     }
 
@@ -177,13 +198,6 @@ class Basic_Shader : public Shader
         float parentCost = NodeCost(size, triCount);
 
         SplitCalc result = ChooseSplit(parent, triStartIndex, triCount);
-
-        if (std::isnan(result.pos) || std::isinf(result.pos)) {
-            parent.startIndex = triStartIndex;
-            parent.triangleCount = triCount;
-            bvhNodes[parentIndex] = parent;
-            return;
-        }
 
         if (depth < MaxDepth && result.cost < parentCost)
         {
@@ -209,14 +223,6 @@ class Basic_Shader : public Shader
             }
 
             int numOnRight = triCount - numOnLeft;
-
-            if (numOnLeft == 0 || numOnRight == 0)
-            {
-                parent.startIndex = triStartIndex;
-                parent.triangleCount = triCount;
-                bvhNodes[parentIndex] = parent;
-                return;  // Stop splitting if all triangles end up on one side
-            }
 
             int triStartLeft = triStartIndex + 0;
             int triStartRight = triStartIndex + numOnLeft;
@@ -391,6 +397,11 @@ class Basic_Shader : public Shader
 
 public:
 
+    void PrintVec3(glm::vec3 print)
+    {
+        std::cout << "(" << print[0] << ", " << print[1] << ", " << print[2] << ")" << std::endl;
+    }
+
     void UpdateData() {
         camera = scene->GetCurrCamera();
         if (!camera) // Check for a null camera
@@ -412,12 +423,12 @@ public:
         float focusDist = camera->GetFocusDist();
         float aspect = camera->GetAspect();
 
-        float planeHeight = focusDist * tan(glm::radians(fovy * 0.5f)) * 2.0f;
+        float planeHeight = focusDist * tan(glm::radians(fovy) * 0.5f) * 2.0f;
         float planeWidth = planeHeight * aspect;
 
         int useSun = 1;
-        float sunFocus = 1;
-        float sunIntensity = 0.4;
+        float sunFocus = 0.1;
+        float sunIntensity = 0.5;
         glm::vec3 sunColor = glm::vec3(1,1,1);
 
         for (const auto& model : scene->GetModels())
@@ -482,13 +493,7 @@ public:
         SendBufferData(models, "models", 0);
         SendUniformData((int)triangles.size(), "triangleCount");
         SendBufferData(triangles, "triangles", 1);
-        SendBufferData(triIndexs, "triIndex", 1);
+        SendBufferData(triIndexs, "triIndex", 4);
         SendBufferData(bvhNodes, "nodes", 2);
-
-//        std::cout << bvhNodes.size() << std::endl;
-
-//        std::cout << bvhNodes[1].triangleCount << " " << bvhNodes.size() << std::endl;
-
-//        std::cout << models[0].material.specularColor[0] << " " << models[0].material.specularColor[1] << " " << models[0].material.specularColor[2] << " " << models[0].material.specularColor[3] << std::endl;
     };
 };
